@@ -1,9 +1,13 @@
 #pragma once
 
+#define Vec4 glm::vec4
 #define Vec3 glm::vec3
+#define Vec2 glm::vec2
+#define Mat4x4 glm::mat4x4
+#define Mat3x3 glm::mat3x3
+#define Mat4x3 glm::mat4x3
 #define EPSILON 0.00001f
 #define PI 3.1415926f
-#define Vec2 glm::vec2
 
 //Note on coordinates:
 
