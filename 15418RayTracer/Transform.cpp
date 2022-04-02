@@ -3,6 +3,8 @@
 #include "glm/glm.hpp"
 //Noting the issues with euler angle rotations (gimble lock) I will
 //Be using them over quaternions because quaternions are black magic
+
+//Create transformation matrix from Transform
 Mat4x3 Transform::makeTransform() {
 	//Create rotation matrices
 	//Will do out just to make CUDA translation possible
@@ -23,4 +25,34 @@ Mat4x3 Transform::makeTransform() {
 	//Scale and rotate before position, scaling and rotation can be swapped 
 	Mat3x3 RS = matMult(R, S);
 	return matMult(P, RS);
+}
+
+
+
+
+//Parent space transformations
+//Transformation defines transform from parent to local space
+Mat4x3 Transform::localToParent() {
+	if (!tempMatrixFilled) makeAndSaveTransform();
+	return tempMatrix; //So, take the local space, and apply the parent to local transform to get the parent space equivalent
+}
+Mat4x3 Transform::parentToLocal() {
+	if (!tempMatrixFilled) makeAndSaveTransform();
+	return matInverse(tempMatrix);
+}
+
+//World space transformations
+Mat4x3 Transform::localToWorld() {
+	if (!tempMatrixFilled) makeAndSaveTransform();
+	Mat4x3 res = tempMatrix; //So, take the local spa
+	if (parent != nullptr) res = (parent->localToWorld()) * (Mat4x4)res;
+	return res;
+}
+
+Mat4x3 Transform::worldToLocal() {
+	if (!tempMatrixFilled) makeAndSaveTransform();
+	Mat4x3 res = tempMatrix; //So, take the local spa
+	if (parent != nullptr) res = (parent->localToWorld()) * (Mat4x4)res;
+	return matInverse(res);
+
 }

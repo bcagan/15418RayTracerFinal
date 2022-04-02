@@ -13,6 +13,15 @@ public:
 	Mat4x3 matMult(Mat4x3 A, Mat3x3 B) {
 		return B*A;
 	}
+	Mat4x4 matInverse(Mat4x4 M) {
+		return glm::inverse(M);
+	}
+	Mat4x3 matInverse(Mat4x3 M) {
+		return glm::inverse(M);
+	}
+	Mat3x3 matInverse(Mat3x3 M) {
+		return glm::inverse(M);
+	}
 	Vec4 matVecMult(Mat4x4 M, Vec4 v) {
 		return M * v;
 	}
@@ -40,17 +49,28 @@ public:
 		tempMatrix = makeTransform();
 	}//Above but saves to temp matrix for performance reasons
 	Mat4x3 tempMatrix; //^^^^
+	bool tempMatrixFilled = false;
 
 	//Parent space transformations
-	Mat4x3 localToParent() const;
-	Mat4x3 parentToLocal() const;
+	Mat4x3 localToParent();
+	Mat4x3 parentToLocal();
 
 	//World space transformations
-	Mat4x3 localToWorld() const;
-	Mat4x3 worldToLocal() const;
+	Mat4x3 localToWorld();
+	Mat4x3 worldToLocal();
 
 	Transform* parent = nullptr;
 
-	Transform();
+	Transform(Vec3 p, Vec3 r, Vec3 s) {
+		pos = p;
+		rot = r;
+		scale = s;
+	}
+
+	Transform(float x, float y, float z, float thx, float thy, float thz, float sx, float sy, float sz) {
+		pos = Vec3(x,y,z);
+		rot = Vec3(thx,thy,thz);
+		scale = Vec3(sx,sy,sz);
+	}
 };
 
