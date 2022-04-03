@@ -13,12 +13,25 @@ public:
 	//Example: mint may have a use I dont remember but we might not use it however when navigating the bvh tree, if we know we intersect at t = 10,
 	//then any other intersection at t >= 10 can be ruled out
 
+	Ray transformRay(Transform transform);
+
 	Ray(Vec3 origin, Vec3 dir) {
 		mint = EPSILON;
 		maxt = INFINITY;
 		o = origin;
 		d = dir;
 	};
+
+	Ray() {
+		Vec3 origin(0.f);
+		Vec3 dir(1.f);
+		mint = EPSILON;
+		maxt = INFINITY;
+		o = origin;
+		d = dir;
+	};
+private:
+	float numBounces = 15; //Default 15 recursive bounces max
 };
 
 //Glm has most of the structures we need to do sequential matrix and vecter operations, I defined a lot of useful thing in defined.h

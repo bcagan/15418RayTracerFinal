@@ -67,6 +67,12 @@ public:
 		scale = s;
 	}
 
+	Transform() {
+		pos = Vec3(0.f);
+		rot = Vec3(0.f);
+		scale = Vec3(1.f);
+	}
+
 	Transform(float x, float y, float z, float thx, float thy, float thz, float sx, float sy, float sz) {
 		pos = Vec3(x,y,z);
 		rot = Vec3(thx,thy,thz);
