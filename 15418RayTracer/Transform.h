@@ -1,5 +1,8 @@
 #pragma once
+#ifndef TRANSFORM_H
+#define TRANSFORM_H
 #include "Defined.h"
+#include "glm/glm.hpp"
 class Transform
 {
 public:
@@ -14,13 +17,16 @@ public:
 		return B*A;
 	}
 	Mat4x4 matInverse(Mat4x4 M) {
-		return glm::inverse(M);
+		//return glm::inverse(M);
+		return M;
 	}
 	Mat4x3 matInverse(Mat4x3 M) {
-		return glm::inverse(M);
+		//return glm::inverse(M);
+		return M;
 	}
 	Mat3x3 matInverse(Mat3x3 M) {
-		return glm::inverse(M);
+		//return glm::inverse(M);
+		return M;
 	}
 	Vec4 matVecMult(Mat4x4 M, Vec4 v) {
 		return M * v;
@@ -47,6 +53,7 @@ public:
 	Mat4x3 makeTransform();//Of note, 4 columns, 3 rows, homogenous coordinate row not accounted for. GLM has a weird naming format
 	Mat4x3 makeAndSaveTransform(){
 		tempMatrix = makeTransform();
+		return tempMatrix;
 	}//Above but saves to temp matrix for performance reasons
 	Mat4x3 tempMatrix; //^^^^
 	bool tempMatrixFilled = false;
@@ -80,3 +87,4 @@ public:
 	}
 };
 
+#endif

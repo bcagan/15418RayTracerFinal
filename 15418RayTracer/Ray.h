@@ -1,8 +1,11 @@
 #pragma once
+#ifndef RAY_H
+#define RAY_H
 #include "glm/glm.hpp" 
 #include "Defined.h"
 #include "Material.h"
-
+#include "GLFW/glfw3.h"
+#include "Transform.h"
 
 class Ray
 {
@@ -54,3 +57,4 @@ public:
 	};
 	Vec3 bounce(Ray out); //Return ray bouncing (in opposite direction) into material that will result in out
 };
+#endif

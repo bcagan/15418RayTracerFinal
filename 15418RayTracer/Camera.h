@@ -1,4 +1,7 @@
 #pragma once
+#ifndef CAMERA_H
+#define CAMERA_H
+
 #include "Defined.h"
 #include<vector>
 #include"Ray.h"
@@ -33,3 +36,4 @@ public:
 	std::vector<std::vector<Color3f>> image;
 };
 
+#endif

@@ -1,4 +1,7 @@
 #pragma once
+
+#ifndef DEFINED_H
+#define EDFINED_H
 #include "glm/glm.hpp"
 
 #define Vec4 glm::vec4
@@ -13,6 +16,19 @@
 #define randf()  static_cast <float> (rand()) / static_cast <float> (RAND_MAX)
 struct Color3f
 {
+	Color3f(float c) {
+		r = c;
+		g = c;
+		b = c;
+	};
+	Color3f(float a,float d,float c) {
+		r = a;
+		g = d;
+		b = c;
+	};
+	Color3f() {
+		r = 1.f; g = 1.f; b = 1.f;
+	}
 	float r;
 	float g;
 	float b;
@@ -23,12 +39,6 @@ struct Color3f
 //Camera normally points along -z in camera space. For convinience then, world space will use right hand rule if need be, and have y be up
 //Spherical coordinates: Vertical: phi [0,pi], theta [0,2pi]
 
-Vec2 vecNormalize(Vec2 v) {
-	return glm::normalize(v);
-}
-Vec3 vecNormalize(Vec3 v) {
-	return glm::normalize(v);
-}
-Vec4 vecNormalize(Vec4 v) {
-	return glm::normalize(v);
-}
+#define vecNormalize glm::normalize
+
+#endif
