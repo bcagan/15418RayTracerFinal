@@ -1,12 +1,11 @@
 #pragma once
-#ifndef SCENE_H
-#define  SCENE_H
 
 #include <vector>
 #include "Defined.h"
 #include "Ray.h"
 #include "Object.h"
 #include "Camera.h"
+
 class Scene
 {
 public:
@@ -20,5 +19,5 @@ private:
 	//To make the code easier, I'm going to assume that the objects are always in world space, and that the rays will be transformed from camera to world space.
 	std::vector<Object> sceneObjs;
 };
-#endif
+
 

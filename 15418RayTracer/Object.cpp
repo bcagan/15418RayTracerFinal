@@ -1,9 +1,11 @@
 #include "Object.h"
+#include "Defined.h"
+#include "Ray.h"
 
 bool BBox::hit(const Ray &r) {
-    double tmin = -INFINITY, tmax = INFINITY;
+    /*double tmin = -INFINITY, tmax = INFINITY;
 
-    Vec3f invdir = 1 / r.d; 
+    Vec3f invdir = 1.f / r.d; 
 
     // value of t in the parametric ray equation where ray intersects min coordinate with dimension i
     double t1 = (min.x - r.o.x) * invdir.x;
@@ -25,10 +27,12 @@ bool BBox::hit(const Ray &r) {
     tmin = max(tmin, min(t1, t2));
     tmax = min(tmax, max(t1, t2));
 
-    return tmax >= max(tmin, 0.0);
+    return tmax >= max(tmin, 0.0);*/
+    return true;
 }
 
 bool Sphere::hit(const Ray &r) {
+    /*
     float t0, t1;
 
     Vec3 L = center - r.o;
@@ -40,7 +44,7 @@ bool Sphere::hit(const Ray &r) {
     if (d2 > radius2) return false;
     float thc = sqrt(radius2 - d2);
     //t0 = tca - thc;
-    //t1 = tca + thc;
+    //t1 = tca + thc;*/
 
     return true;
 }

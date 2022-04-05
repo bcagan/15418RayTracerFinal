@@ -1,13 +1,11 @@
 #pragma once
-#ifndef CAMERA_H
-#define CAMERA_H
 
 #include "Defined.h"
-#include<vector>
-#include"Ray.h"
 #include "Transform.h"
-class Camera
-{
+#include "Ray.h"
+#include <vector>
+
+class Camera{
 public:
 	Camera() {
 		image = std::vector<std::vector<Color3f>>(resY);
@@ -36,4 +34,3 @@ public:
 	std::vector<std::vector<Color3f>> image;
 };
 
-#endif

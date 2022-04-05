@@ -1,6 +1,4 @@
 #pragma once
-#ifndef OBJECT_H
-#define OBJECT_H
 #include "Defined.h"
 #include "Material.h"
 #include "Ray.h"
@@ -9,12 +7,13 @@
 class Object
 {
 public:
-	virtual bool hit(Ray ray);//I assumne info of the material will be populated in scene intersection func
+	virtual bool hit(const Ray& ray);//I assumne info of the material will be populated in scene intersection func
 };
 
 class BBox{
 public:
 	BBox(Vec3 minn, Vec3 maxx) : min(minn), max(maxx) {}
+	BBox() : min(Vec3(0.f)), max(Vec3(1.f)) {}
 	Vec3 min;
 	Vec3 max;
 	bool hit(const Ray &ray);
@@ -45,12 +44,15 @@ public:
 
 class Sphere : public Object {
 public:
-	Sphere(Vec3 c, float r) : radius(r), center(c) {}
+	Sphere(Vec3 c, float r) : radius(r) {
+		t.pos = c; 
+	}
 
 	BBox bbox;
 	Material Mat;
 	float size;
 	Transform t;
+	float radius;
 
-	bool hit(const Ray &ray);
-}
+	bool hit(const Ray& ray);
+};

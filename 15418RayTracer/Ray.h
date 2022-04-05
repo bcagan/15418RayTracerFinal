@@ -1,6 +1,4 @@
 #pragma once
-#ifndef RAY_H
-#define RAY_H
 #include "glm/glm.hpp" 
 #include "Defined.h"
 #include "Material.h"
@@ -57,4 +55,3 @@ public:
 	};
 	Vec3 bounce(Ray out); //Return ray bouncing (in opposite direction) into material that will result in out
 };
-#endif

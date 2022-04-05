@@ -1,6 +1,4 @@
 #pragma once
-#ifndef MATERIAL_H
-#define MATERIAL_H
 #include "Defined.h"
 #include <stdlib.h>
 
@@ -19,5 +17,3 @@ public:
 
 
 };
-
-#endif

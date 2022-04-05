@@ -1,8 +1,7 @@
 #pragma once
 
-#ifndef DEFINED_H
-#define EDFINED_H
 #include "glm/glm.hpp"
+#define vecNormalize glm::normalize
 
 #define Vec4 glm::vec4
 #define Vec3 glm::vec3
@@ -39,6 +38,3 @@ struct Color3f
 //Camera normally points along -z in camera space. For convinience then, world space will use right hand rule if need be, and have y be up
 //Spherical coordinates: Vertical: phi [0,pi], theta [0,2pi]
 
-#define vecNormalize glm::normalize
-
-#endif

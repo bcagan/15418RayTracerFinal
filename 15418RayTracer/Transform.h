@@ -1,6 +1,4 @@
 #pragma once
-#ifndef TRANSFORM_H
-#define TRANSFORM_H
 #include "Defined.h"
 #include "glm/glm.hpp"
 class Transform
@@ -86,5 +84,3 @@ public:
 		scale = Vec3(sx,sy,sz);
 	}
 };
-
-#endif
