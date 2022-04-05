@@ -1,6 +1,6 @@
 #include "Object.h"
 
-bool BBox::intersect(const Ray &r) {
+bool BBox::hit(const Ray &r) {
     double tmin = -INFINITY, tmax = INFINITY;
 
     Vec3f invdir = 1 / r.d; 
