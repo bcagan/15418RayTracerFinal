@@ -1,4 +1,6 @@
 #pragma once
+#ifndef OBJECT_H
+#define OBJECT_H
 #include "Defined.h"
 #include "Material.h"
 #include "Ray.h"
@@ -28,7 +30,6 @@ public:
 	Cube(Vec3 p, float s, Transform t =Transform()) {
 		pos = p;
 		size = s;
-		Mat =  defaultMaterial;
 	}
 	Vec3 pos;
 	BBox bbox;
@@ -40,3 +41,4 @@ public:
 		return bbox.hit(ray);
 	};
 };
+#endif
