@@ -14,8 +14,9 @@ public:
 
 class BBox{
 public:
-	Vec3 pos;
-	Vec3 size;
+	BBox(Vec3 minn, Vec3 maxx) : min(minn), max(maxx) {}
+	Vec3 min;
+	Vec3 max;
 	bool hit(const Ray &ray);
 };
 
@@ -45,6 +46,11 @@ public:
 class Sphere : public Object {
 public:
 	Sphere(Vec3 c, float r) : radius(r), center(c) {}
+
+	BBox bbox;
+	Material Mat;
+	float size;
+	Transform t;
 
 	bool hit(const Ray &ray);
 }
