@@ -14,7 +14,7 @@ class BBox{
 public:
 	Vec3 pos;
 	Vec3 size;
-	bool hit(Ray ray);
+	bool hit(const Ray &ray);
 };
 
 
@@ -36,7 +36,14 @@ public:
 	float size;
 	Transform t;
 
-	bool hit(Ray ray) override {
+	bool hit(const Ray &ray) override {
 		return bbox.hit(ray);
 	};
 };
+
+class Sphere : public Object {
+public:
+	Sphere(Vec3 c, float r) : radius(r), center(c) {}
+
+	bool hit(const Ray &ray);
+}

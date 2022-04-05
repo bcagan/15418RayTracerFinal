@@ -1,6 +1,6 @@
 #include "Object.h"
 
-bool BBox::intersect(const Ray &r) {
+bool BBox::hit(const Ray &r) {
     double tmin = -INFINITY, tmax = INFINITY;
 
     Vec3f invdir = 1 / r.d; 
@@ -26,4 +26,21 @@ bool BBox::intersect(const Ray &r) {
     tmax = min(tmax, max(t1, t2));
 
     return tmax >= max(tmin, 0.0);
+}
+
+bool Sphere::hit(const Ray &r) {
+    float t0, t1;
+
+    Vec3 L = center - r.o;
+    float tca = dot(L, dir);
+    // ignore if vector is facing the opposite way in any direction
+    if (tca < 0) return false;
+    float d2 = dot(L, L) - tca * tca;
+    float radius2 = radius * radius;
+    if (d2 > radius2) return false;
+    float thc = sqrt(radius2 - d2);
+    //t0 = tca - thc;
+    //t1 = tca + thc;
+
+    return true;
 }
