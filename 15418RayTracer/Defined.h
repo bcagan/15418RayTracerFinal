@@ -13,24 +13,24 @@
 #define PI 3.1415926f
 //https://stackoverflow.com/questions/686353/random-float-number-generation
 #define randf()  static_cast <float> (rand()) / static_cast <float> (RAND_MAX)
-struct Color3f
+struct Color3
 {
-	Color3f(float c) {
+	Color3(unsigned char c) {
 		r = c;
 		g = c;
 		b = c;
 	};
-	Color3f(float a,float d,float c) {
+	Color3(unsigned char a, unsigned char d, unsigned char c) {
 		r = a;
 		g = d;
 		b = c;
 	};
-	Color3f() {
-		r = 1.f; g = 1.f; b = 1.f;
+	Color3() {
+		r = 255; g = 255; b = 255;
 	}
-	float r;
-	float g;
-	float b;
+	unsigned char r;
+	unsigned char g;
+	unsigned char b;
 };
 
 //Note on coordinates:

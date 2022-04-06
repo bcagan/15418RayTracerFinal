@@ -7,4 +7,6 @@ C:\GL\glad\glad.h(494,1): warning C4005: 'GL_TEXTURE_COMPONENTS': macro redefini
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\GL\gl.h(1153): message : see previous definition of 'GL_TEXTURE_COMPONENTS'
 C:\GL\glad\glad.h(588,1): warning C4005: 'GL_CLIENT_ALL_ATTRIB_BITS': macro redefinition
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\GL\gl.h(973): message : see previous definition of 'GL_CLIENT_ALL_ATTRIB_BITS'
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Camera.h(17,10): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Camera.h(18,10): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
   15418RayTracer.vcxproj -> C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\x64\Debug\15418RayTracer.exe

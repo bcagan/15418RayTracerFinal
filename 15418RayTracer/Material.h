@@ -6,14 +6,14 @@
 class Material
 {
 public:
-	Material(Color3f a, Color3f e) {
+	Material(Color3 a, Color3 e) {
 		albedo = a;
 		emitted = e;
 	}
 	Material() {
 	}
-	Color3f albedo;
-	Color3f emitted;
+	Color3 albedo;
+	Color3 emitted;
 
 
 };

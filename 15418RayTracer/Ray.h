@@ -47,10 +47,10 @@ public:
 	Vec3 normG; //Geometric normal
 	Vec2 uv; //uv for texture if we decide to go that route, I dont think we will
 
-	Color3f emitted() {
+	Color3 emitted() {
 		return Mat.emitted;
 	};
-	Color3f albedo() {
+	Color3 albedo() {
 		return Mat.albedo;
 	};
 	Vec3 bounce(Ray out); //Return ray bouncing (in opposite direction) into material that will result in out

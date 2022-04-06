@@ -8,17 +8,17 @@
 class Camera{
 public:
 	Camera() {
-		image = std::vector<std::vector<Color3f>>(resY);
-		for (int xi = 0; xi < resX; xi++) {
-			image[xi] = std::vector<Color3f>(resX);
+		image = std::vector<std::vector<Color3>>(resY);
+		for (int yi = 0; yi < resY; yi++) {
+			image[yi] = std::vector<Color3>(resX);
 		}
 	};
 	Camera(float x, float y) {
 		resX = x;
 		resY = y;
-		image = std::vector<std::vector<Color3f>>(resY);
-		for (int xi = 0; xi < resX; xi++) {
-			image[xi] = std::vector<Color3f>(resX);
+		image = std::vector<std::vector<Color3>>(resY);
+		for (int yi = 0; yi < resY; yi++) {
+			image[yi] = std::vector<Color3>(resX);
 		}
 
 	};
@@ -31,6 +31,6 @@ public:
 	//To be used possibly for orbital camera controls
 	Ray castRay(int pixX, int pixY);
 
-	std::vector<std::vector<Color3f>> image;
+	std::vector<std::vector<Color3>> image;
 };
 

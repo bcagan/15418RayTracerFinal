@@ -6,6 +6,9 @@
 #include <gl/GL.h>
 #include <io.h>
 #include <glad/glad.h>
+#include "Camera.h"
+#include "Defined.h"
+#include <malloc.h>
 
 void processInput(GLFWwindow* window) { //Function for all input code
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) { //If escape is pressed
@@ -82,9 +85,11 @@ int main() {
                     "out vec4 FragColor;\n"
                     "in vec3 ourColor;\n"
                     "in vec2 ourUV;\n"
+                    "uniform sampler2D inTex;\n"
                     "void main()\n"
                     "{\n"
-                    "FragColor = vec4(ourColor,1.0f);\n"
+                    //"FragColor = vec4(ourColor,1.0f);\n"
+                    "FragColor = texture(inTex,ourUV);\n"
                     "}\n\0";
 
     unsigned int fragmentShader;
@@ -140,6 +145,46 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    //Creating tex
+
+    unsigned int tex;
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    // Wrapping
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    //Filtering
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    int w = 1280; int h = 720;
+    Camera cam;
+    for (int i = 0; i < w; i++) {
+        unsigned char r = (int)((float)i / 1280.f * 255.f);
+        for (int j = 0; j < h; j++) {
+            unsigned char b = (int)((float)j / 720.f * 255.f);
+            Color3 col(r, 0, b);
+            cam.image[j][i] = col;
+        }
+    }
+
+    Color3* saveImage = (Color3*)malloc(sizeof(Color3)*1280*720);
+    for (int j = 0; j < h; j++) {
+        for (int i = 0; i < w; i++) {
+            saveImage[j * 1280 + i] = cam.image[j][i];
+        }
+    }
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, (void*) saveImage);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glUseProgram(shaderProgram);   
+    glUniform1i(glGetUniformLocation(shaderProgram, "inTex"), 0);
+    
+
     int val = 255;
 
 
@@ -156,12 +201,12 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);//Tells opengl to clear the color buffer only, not the depth or stencil buffer
         float vertices[] = {
             //positions        //colors        //UV
-             1.f,-1.f, 0.0f, colVal,0.0f,0.0f, 1.f,0.f, //bottom right
-            -1.f,-1.f, 0.0f, 0.0f,colVal,0.0f, 0.f,0.f, //bottom left
-             1.f,1.f, 0.0f, colVal,colVal,0.0f, 1.f,1.f, //top right
-            -1.f,-1.f, 0.0f, 0.0f,colVal,0.0f, 0.f,0.f, //bottom left
-             1.f,1.f, 0.0f, colVal,colVal,0.0f, 1.f,1.f, //top right
-            -1.f,1.f, 0.0f, 0.0f,0.0f,colVal, 0.f,1.f //top left
+             1.f,-1.f, 0.0f, colVal,0.0f,0.0f, 1.f,1.f, //bottom right
+            -1.f,-1.f, 0.0f, 0.0f,colVal,0.0f, 0.f,1.f, //bottom left
+            -1.f,1.f, 0.0f, 0.0f,0.0f,colVal, 0.f,0.f, //top left
+             1.f,-1.f, 0.0f, colVal,0.0f,0.0f, 1.f,1.f, //bottom right
+             1.f,1.f, 0.0f, colVal,colVal,0.0f, 1.f,0.f, //top right
+            -1.f,1.f, 0.0f, 0.0f,0.0f,colVal, 0.f,0.f //top left
         };
 
 
