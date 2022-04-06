@@ -5,6 +5,7 @@
 #include "GLFW/glfw3.h"
 #include <gl/GL.h>
 #include <io.h>
+#include <glad/glad.h>
 
 void processInput(GLFWwindow* window) { //Function for all input code
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) { //If escape is pressed
@@ -25,7 +26,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     //Create window object
-    GLFWwindow* window = glfwCreateWindow(2480, 1440, "Window Test", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "Window Test", NULL, NULL);
     //(creates window of size 1440p titled Window Test
     if (window == NULL) { //Null error handling
         std::cout << "Error when creating window\n";
@@ -56,6 +57,7 @@ int main() {
             "layout (location = 1) in vec3 aColor;\n"
             "layout (location = 2) in vec2 aTex;\n"
             "out vec3 ourColor;\n"
+            "out vec2 ourUV;\n"
             "void main()\n"
             "{\n"
             "gl_Position = vec4(aPos,1.0);\n"
@@ -114,13 +116,6 @@ int main() {
     
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
-    float vertices[] = {
-        //positions        //colors        //UV
-         0.5f,-0.5f, 0.0f, 1.0f,0.0f,0.0f, 1.f,0.f, //bottom right
-        -0.5f,-0.5f, 0.0f, 0.0f,1.0f,0.0f, 0.f,0.f, //bottom left
-         0.5f,-0.5f, 0.0f, 1.0f,0.0f,0.0f, 1.f,1.f, //bottom right
-        -0.5f,-0.5f, 0.0f, 0.0f,1.0f,0.0f, 0.f,1.f //bottom left
-    };
     
     unsigned int indices[] = {//starts from 0
         0,1,3, //tri1
@@ -130,16 +125,6 @@ int main() {
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
-    
-    unsigned int VBO; //The vertex buffer. Has a unique id
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO); 
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); 
-
-    unsigned int EBO; //Element Buffer Object
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 
     //pos atribute
@@ -155,34 +140,54 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    int val = 255;
+
 
     while (!glfwWindowShouldClose(window)) {//Loop unless user closes
         //input
+        val--;
+        if (val <= -255) val = 255;
+        int tempVal = val;
+        if (tempVal < 0) tempVal = -tempVal;
+        float colVal = (float)tempVal / 255.f;
         processInput(window);//Run all input checking code
 
-        glClearColor(1.0f, 0.98f, 0.3f, 1.0f); //Sets the color values to clear with
+        glClearColor(1.0f, 1.f, 1.f, 1.0f); //Sets the color values to clear with
         glClear(GL_COLOR_BUFFER_BIT);//Tells opengl to clear the color buffer only, not the depth or stencil buffer
-
-        float newVertices[] = {
+        float vertices[] = {
             //positions        //colors        //UV
-            0.5f,-0.5f, 0.0f, 1.0f,0.0f,0.0f, 1.f,0.f, //bottom right
-            -0.5f,-0.5f, 0.0f, 0.0f,1.0f,0.0f, 0.f,0.f, //bottom left
-            0.5f,-0.5f, 0.0f, 1.0f,0.0f,0.0f, 1.f,1.f, //bottom right
-            -0.5f,-0.5f, 0.0f, 0.0f,1.0f,0.0f, 0.f,1.f //bottom left
+             1.f,-1.f, 0.0f, colVal,0.0f,0.0f, 1.f,0.f, //bottom right
+            -1.f,-1.f, 0.0f, 0.0f,colVal,0.0f, 0.f,0.f, //bottom left
+             1.f,1.f, 0.0f, colVal,colVal,0.0f, 1.f,1.f, //top right
+            -1.f,-1.f, 0.0f, 0.0f,colVal,0.0f, 0.f,0.f, //bottom left
+             1.f,1.f, 0.0f, colVal,colVal,0.0f, 1.f,1.f, //top right
+            -1.f,1.f, 0.0f, 0.0f,0.0f,colVal, 0.f,1.f //top left
         };
 
+
+        glUseProgram(shaderProgram);//(Already set but doing anyways) set shaderprogram       
         glBindVertexArray(VAO);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO); 
-        glBufferData(GL_ARRAY_BUFFER, sizeof(newVertices), newVertices, GL_STATIC_DRAW); 
+        unsigned int VBO; //The vertex buffer. Has a unique id
+        glGenBuffers(1, &VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+
+        //pos atribute
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        //color atribute
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * (sizeof(float)), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+        //uv atribute
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * (sizeof(float)), (void*)(6 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+        
+       // glBindBuffer(GL_ARRAY_BUFFER, VBO); 
+        //glBufferData(GL_ARRAY_BUFFER, sizeof(newVertices), newVertices, GL_STATIC_DRAW); 
 
         //Drawing a triangle
-        glUseProgram(shaderProgram);//(Already set but doing anyways) set shaderprogram
-
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); //Drawing the rectange from 2 triangles via EBO. Unused currently
-
-
-        glBindVertexArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
         //Buffer swapping
 
@@ -190,11 +195,10 @@ int main() {
         //them to display on screen
         glfwPollEvents(); //Checks user input, updates windows state, and calls need funcs
         //That is watches for events
+        glDeleteBuffers(1, &VBO);
     } 
     
     glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
     glDeleteProgram(shaderProgram);
 
     
