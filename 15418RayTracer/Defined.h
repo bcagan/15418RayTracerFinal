@@ -25,9 +25,17 @@ struct Color3
 		g = d;
 		b = c;
 	};
+	Color3(Vec3 v) {
+		r = v.x;
+		g = v.y;
+		b = v.z;
+	};
 	Color3() {
 		r = 255; g = 255; b = 255;
-	}
+	};
+	Vec3 toVec3() {
+		return Vec3(r,g,b);
+	};
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;

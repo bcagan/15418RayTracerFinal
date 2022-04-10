@@ -31,11 +31,12 @@ public:
 		o = origin;
 		d = dir;
 	};
-private:
+// private: 
+// need this to be public for renderC recursion depth 
 	float numBounces = 15; //Default 15 recursive bounces max
 };
 
-//Glm has most of the structures we need to do sequential matrix and vecter operations, I defined a lot of useful thing in defined.h
+//Glm has most of the structures we need to do sequential matrix and vector operations, I defined a lot of useful thing in defined.h
 
 class Hit
 {
@@ -47,11 +48,16 @@ public:
 	Vec3 normG; //Geometric normal
 	Vec2 uv; //uv for texture if we decide to go that route, I dont think we will
 
+	// not sure how to initialize
+	Hit() {
+
+	};
+
 	Color3 emitted() {
 		return Mat.emitted;
 	};
 	Color3 albedo() {
 		return Mat.albedo;
 	};
-	Vec3 bounce(Ray out); //Return ray bouncing (in opposite direction) into material that will result in out
+	Ray bounce(Ray out); //Return ray bouncing (in opposite direction) into material that will result in out
 };
