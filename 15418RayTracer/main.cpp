@@ -29,7 +29,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     //Create window object
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "Window Test", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "CUDA Path Tracer", NULL, NULL);
     //(creates window of size 1440p titled Window Test
     if (window == NULL) { //Null error handling
         std::cout << "Error when creating window\n";
@@ -207,7 +207,7 @@ int main() {
              1.f,-1.f, 0.0f, colVal,0.0f,0.0f, 1.f,1.f, //bottom right
              1.f,1.f, 0.0f, colVal,colVal,0.0f, 1.f,0.f, //top right
             -1.f,1.f, 0.0f, 0.0f,0.0f,colVal, 0.f,0.f //top left
-        };
+        }; //UV is x,y, [0,1] = [left, right], [0,1] = [top,bottom]
 
 
         glUseProgram(shaderProgram);//(Already set but doing anyways) set shaderprogram       

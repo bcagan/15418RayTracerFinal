@@ -11,7 +11,7 @@ class Scene
 public:
 	Object addObj(Object o);
 	void render(); //Image stored in camera
-	bool intersect(Ray ray, Hit hit);
+	bool intersect(Ray ray, Hit& hit);
 
 	Camera cam;
 private:
