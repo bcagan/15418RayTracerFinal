@@ -2,7 +2,7 @@
 #include "Defined.h"
 #include "Ray.h"
 
-bool BBox::hit(const Ray &r) {
+bool BBox::hit(const Ray &r, Hit& hit) {
     /*double tmin = -INFINITY, tmax = INFINITY;
 
     Vec3f invdir = 1.f / r.d; 
@@ -27,11 +27,14 @@ bool BBox::hit(const Ray &r) {
     tmin = max(tmin, min(t1, t2));
     tmax = min(tmax, max(t1, t2));
 
-    return tmax >= max(tmin, 0.0);*/
-    return true;
+    if(tmax >= max(tmin, 0.0f)){
+        hit.t = max(tmin, 0.0f);
+        return true;
+    }*/
+    return false;
 }
 
-bool Sphere::hit(const Ray &r) {
+bool Sphere::hit(const Ray &r, Hit& hit) {
     /*
     float t0, t1;
 
@@ -44,7 +47,8 @@ bool Sphere::hit(const Ray &r) {
     if (d2 > radius2) return false;
     float thc = sqrt(radius2 - d2);
     //t0 = tca - thc;
-    //t1 = tca + thc;*/
+    //t1 = tca + thc;
+    */
 
     return true;
 }

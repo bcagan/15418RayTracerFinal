@@ -7,8 +7,18 @@
 #include <memory>
 
 bool Scene::intersect(Ray ray, Hit& hit) {
-    // use BVH tree / seq. BBox calculation
-    return true;
+    //Presume transform is just position, not rotation or scaling, so transform defines objects world space pos
+    bool hitBool = false;
+    for (auto obj : sceneObjs) {
+        Hit temp;
+        if (obj.bbox.hit(ray,temp)) {
+            if (obj.hit(ray, hit)) {
+                if(hit.t < ray.maxt) ray.maxt = hit.t;
+                hitBool = true; //hit itself must be updated here
+            }
+        }
+    }
+    return hitBool;
 }
 
 // helper function for render (recursion as deep as the original ray's bounce count)
