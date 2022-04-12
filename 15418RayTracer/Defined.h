@@ -25,10 +25,13 @@ struct Color3
 		g = d;
 		b = c;
 	};
-	Color3(Vec3 v) {
-		r = v.x;
-		g = v.y;
-		b = v.z;
+	Color3(Vec3 v) { //Assume float in [0.f,1.f]
+		auto round = [](float f) {
+			return floor(f + 0.5f);
+		};
+		r = round(v.x*255.f);
+		g = round(v.y*255.f);
+		b = round(v.z*255.f);
 	};
 	Color3() {
 		r = 255; g = 255; b = 255;

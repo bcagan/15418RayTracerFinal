@@ -4,6 +4,7 @@
 #include "Ray.h"
 #include "Camera.h"
 #include "glm/glm.hpp" 
+#include <memory>
 
 bool Scene::intersect(Ray ray, Hit& hit) {
     // use BVH tree / seq. BBox calculation
@@ -21,8 +22,7 @@ Color3 Scene::renderC(Ray r, int numBounces) {
         }
     }
 
-    //assume background is black for now
-    return Color3(0, 0, 0);
+    return background;
 
 }
 void Scene::render() {
@@ -30,8 +30,8 @@ void Scene::render() {
     // resolution
     int height = cam.resY;
     int width = cam.resX;
-    std::unique_ptr<Vec3[]> frame(new Vec3[width * height]);
-    Vec3* pix = frame.get();
+    //std::unique_ptr<Vec3[width * height]> frame(new Vec3[width * height]);
+    //Vec3* pix = frame.get();
     float lensDistance = cam.lensDistance;
     float vFov = cam.vFov;
     // float scale = tan(deg2rad(options.fov * 0.5));
@@ -41,29 +41,35 @@ void Scene::render() {
         for (int i = 0; i < width; ++i) {
             Color3 rgb;
             int sampleCount = 0;
-            std::unique_ptr<Vec3[]> samples(new Vec3[this->numSamples]);
-            Vec3* s = samples.get();
+            std::unique_ptr<Color3[]> samples(new Color3[numSamples]);
+            Color3* s = samples.get(); 
 
-            while (sampleCount < this->numSamples) {
-                // from scratchapixel, not sure if this is correct, currently just emits rays from the pixel location
-                // 
-                // int x = (2 * (i + 0.5) / (float)width - 1) * imageAspectRatio * scale;
-                // int y = (1 - 2 * (j + 0.5) / (float)height) * scale;
+            while (sampleCount < numSamples) {
                 Ray r = cam.castRay(i, j);
                 rgb = renderC(r, r.numBounces);
-                *(s++) = rgb.toVec3();
+                *(s++) = rgb;
                
                 sampleCount++;
             }
 
-            // should combine the samples here (currently just uses the last sample)
-            *(pix++) = rgb.toVec3();
+            sampleCount = 1;
+            s = samples.get();
+            rgb = *s;
+            s++;
+            while(sampleCount < numSamples) {
+                rgb.r += s->r;
+                rgb.g += s->g;
+                rgb.b += s->b;
+                s++;
+                sampleCount++;
+            }
+            rgb.r /= (float)sampleCount;
+            rgb.g /= (float)sampleCount;
+            rgb.b /= (float)sampleCount;
             
+            //*(pix++) = rgb.toVec3();
+            cam.image[j][i] = rgb;
         }
     }
-
-    // all rgb values are stored in frame
-    // should be used here to actually create the image
-	
 }
 
