@@ -66,6 +66,11 @@ public:
 
 	Transform* parent = nullptr;
 
+	//Need to implement in a way thatll work on cuda
+	Vec3 normTransform(Vec3 v) {
+		return glm::normalize(glm::transpose(glm::inverse(localToWorld())) * Vec4(v, 0.f));
+	}
+
 	Transform(Vec3 p, Vec3 r, Vec3 s) {
 		pos = p;
 		rot = r;

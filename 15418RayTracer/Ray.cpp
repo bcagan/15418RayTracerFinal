@@ -13,7 +13,7 @@ Ray Ray::transformRay(Transform transform) {
 
 
 //Derived for 15-468's DIRT path tracer base code
-inline Vec3 randomOnUnitHemisphere(float cosphi, float theta){
+inline Vec3 randomOnUnitSphere(float cosphi, float theta){
 
 	float sinphi = sqrt(1.f - cosphi * cosphi);
 	float x = cos(theta) * sinphi;
@@ -22,8 +22,10 @@ inline Vec3 randomOnUnitHemisphere(float cosphi, float theta){
 	return Vec3(x, y, z);
 }
 
+
+
 Vec3 Hit::bounce(Ray out) {
 	float theta = 2.f* randf()*PI;
-	float cosphi = randf();
-	return randomOnUnitHemisphere(cosphi, theta); //This is in hit-space, need to transform to world space still
+	float cosphi = 2.f * randf() - 1.f;
+	return glm::normalize(normS +  randomOnUnitSphere(cosphi, theta));
 }
