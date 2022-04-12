@@ -81,3 +81,19 @@ Week 6 (4/24- 4/30): Debugging and optimizing, add material (reflection and refr
 Two basic materials, refraction for transparency (dielectric material), and a reflection (perfect reflected bounce light around normal) which has a particular albedo (reflectivity) which scales how different wavelengths (R,G,B) reflect.
 
 Week 7 (5/1-5/5): Debugging and optimization, create example scenes
+
+**Milestone Report** 
+
+Milestone Report:
+
+	So far, we have created the definitions and almost complete sequential implementations for our Camera, Scene, Rays, Objects and their Materials, and Bounding Box Implementation. This includes basic OpenGL rendering, casting rays from the camera, and ray-object intersection tests.
+	We still haven’t gotten to our CUDA implementation  for the camera to emit rays and BVH tree creation, simply due to the fact that our sequential implementations took longer than expected, but we do have some cushion towards the end to make up for falling behind.  
+	We plan to show both demos of our actual render output as well as graphs of perceived speedup under different CUDA parameters. The rest of the work is pretty clear, it’s just a matter of coding and doing the work.
+
+Week 4 (4/10-4/16): Make Ray Shooting Parallel, Build Scene-Ray-Light intersection routines
+	Check all meshes in scene/objects
+Week 5 (4/17- 4/23): Finish basic rendering integration, Begin building BVH support
+	Navigate BVH tree, searching in parallel if possible, in order to get first hit faster add file reading for scenes
+Week 6 (4/24- 4/30): Debugging and optimizing, add material (reflection and refraction support)
+	Two basic materials, refraction for transparency (dielectric material), and a reflection (perfect reflected bounce light around normal) which has a particular albedo (reflectivity) which scales how different wavelengths (R,G,B) reflect.
+Week 7 (5/1-5/5): Debugging and optimization, create example scenes
