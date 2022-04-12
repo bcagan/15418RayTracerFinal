@@ -12,4 +12,18 @@ Ray Ray::transformRay(Transform transform) {
 }
 
 
-//Ray hit::bounce(Ray out); //Return ray bouncing (in opposite direction) into material that will result in out
+//Derived for 15-468's DIRT path tracer base code
+inline Vec3 randomOnUnitHemisphere(float cosphi, float theta){
+
+	float sinphi = sqrt(1.f - cosphi * cosphi);
+	float x = cos(theta) * sinphi;
+	float z = sin(theta) * sinphi;
+	float y = cosphi;
+	return Vec3(x, y, z);
+}
+
+Vec3 Hit::bounce(Ray out) {
+	float theta = 2.f* randf()*PI;
+	float cosphi = randf();
+	return randomOnUnitHemisphere(cosphi, theta); //This is in hit-space, need to transform to world space still
+}

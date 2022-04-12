@@ -59,5 +59,5 @@ public:
 	Color3 albedo() {
 		return Mat.albedo;
 	};
-	Ray bounce(Ray out); //Return ray bouncing (in opposite direction) into material that will result in out
+	Vec3 bounce(Ray out); //Return ray bouncing (in opposite direction) into material that will result in out
 };

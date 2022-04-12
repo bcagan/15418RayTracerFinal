@@ -30,7 +30,9 @@ Color3 Scene::renderC(Ray r, int numBounces) {
     if (numBounces > 0) {
         Hit hit = Hit(); //initialize hit here
         if (Scene::intersect(r, hit)) {
-            Ray newR = hit.bounce(r);
+            Vec3 bouncedHit = hit.bounce(r);
+            Vec3 bouncedWorld;
+            Ray newR = Ray(hit.t * r.d + r.o, bouncedWorld);
             Vec3 colorVec = hit.emitted().toVec3() + hit.albedo().toVec3() * renderC(newR, numBounces - 1).toVec3();
             return Color3(colorVec);
         }
