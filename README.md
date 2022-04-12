@@ -84,11 +84,11 @@ Week 7 (5/1-5/5): Debugging and optimization, create example scenes
 
 **Milestone Report** 
 
-Milestone Report:
-
 So far, we have created the definitions and almost complete sequential implementations for our Camera, Scene, Rays, Objects and their Materials, and Bounding Box Implementation. This includes basic OpenGL rendering, casting rays from the camera, and ray-object intersection tests.
 We still haven’t gotten to our CUDA implementation  for the camera to emit rays and BVH tree creation, simply due to the fact that our sequential implementations took longer than expected, but we do have some cushion towards the end to make up for falling behind.  
 We plan to show both demos of our actual render output as well as graphs of perceived speedup under different CUDA parameters. The rest of the work is pretty clear, it’s just a matter of coding and doing the work.
+
+**Updated Schedule**
 
 Week 4 (4/10-4/16): Make Ray Shooting Parallel, Build Scene-Ray-Light intersection routines
 	Check all meshes in scene/objects
