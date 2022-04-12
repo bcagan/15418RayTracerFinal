@@ -6,6 +6,10 @@
 #include "glm/glm.hpp" 
 #include <memory>
 
+void Scene::addObj(Object o) {
+    sceneObjs.push_back(o);
+}
+
 bool Scene::intersect(Ray ray, Hit& hit) {
     //Presume transform is just position, not rotation or scaling, so transform defines objects world space pos
     bool hitBool = false;

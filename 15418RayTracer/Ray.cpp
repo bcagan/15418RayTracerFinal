@@ -10,3 +10,6 @@ Ray Ray::transformRay(Transform transform) {
 	retRay.o = transform.matVecMult(transform.localToWorld(), o);
 	return retRay;
 }
+
+
+//Ray hit::bounce(Ray out); //Return ray bouncing (in opposite direction) into material that will result in out

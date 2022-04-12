@@ -8,7 +8,9 @@ class Object
 {
 public:
 	BBox bbox;
-	virtual bool hit(const Ray& ray, Hit& hit);//I assumne info of the material will be populated in scene intersection func
+	virtual bool hit(const Ray& ray, Hit& hit) {
+		return false;
+	}//I assumne info of the material will be populated in scene intersection func
 };
 
 class BBox{
