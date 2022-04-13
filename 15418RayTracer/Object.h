@@ -59,12 +59,16 @@ class Sphere : public Object {
 public:
 	Sphere(Vec3 c, float r) : radius(r) {
 		t.pos = c; 
+		//Set bbox
+	}
+
+	Sphere(){
+		//set bbox
 	}
 
 	Material Mat;
-	float size;
 	Transform t;
-	float radius;
+	float radius = 1.f;
 
 	bool hit(const Ray& ray, Hit& hit);
 };

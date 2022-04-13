@@ -9,6 +9,8 @@
 #include "Camera.h"
 #include "Defined.h"
 #include <malloc.h>
+#include "Scene.h"
+#include "Object.h"
 
 void processInput(GLFWwindow* window) { //Function for all input code
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) { //If escape is pressed
@@ -183,23 +185,43 @@ int main() {
     glBindTexture(GL_TEXTURE_2D, tex);
     glUseProgram(shaderProgram);   
     glUniform1i(glGetUniformLocation(shaderProgram, "inTex"), 0);
-    
+
+    //Create scene and camera
+    Scene sc;
+    sc.background = Color3(0.f);
+    //Assume camera is facing -z with up as +y as default
+    Sphere sph = Sphere(Vec3(0.f,2.f,-10.f),2.f);
+    sph.Mat.albedo = Color3(255, 255, 0);
+    sph.Mat.emitted = Color3(0,0,0);
+    sc.addObj(sph);
 
     int val = 255;
-
+    float vertices[] = {
+        //positions        //colors        //UV
+         1.f,-1.f, 0.0f, 1.f,0.0f,0.0f, 1.f,1.f, //bottom right
+        -1.f,-1.f, 0.0f, 0.0f,1.f,0.0f, 0.f,1.f, //bottom left
+        -1.f,1.f, 0.0f, 0.0f,0.0f,1.f, 0.f,0.f, //top left
+         1.f,-1.f, 0.0f, 1.f,0.0f,0.0f, 1.f,1.f, //bottom right
+         1.f,1.f, 0.0f, 1.f,1.f,0.0f, 1.f,0.f, //top right
+        -1.f,1.f, 0.0f, 0.0f,0.0f,1.f, 0.f,0.f //top left
+    }; //UV is x,y, [0,1] = [left, right], [0,1] = [top,bottom]
 
     while (!glfwWindowShouldClose(window)) {//Loop unless user closes
         //input
         val--;
-        if (val <= -255) val = 255;
+        /*if (val <= -255) val = 255;
         int tempVal = val;
         if (tempVal < 0) tempVal = -tempVal;
         float colVal = (float)tempVal / 255.f;
-        processInput(window);//Run all input checking code
+
+        //Ray trace image
+        //Store image in saveImage
+
+        */processInput(window);//Run all input checking code
 
         glClearColor(1.0f, 1.f, 1.f, 1.0f); //Sets the color values to clear with
         glClear(GL_COLOR_BUFFER_BIT);//Tells opengl to clear the color buffer only, not the depth or stencil buffer
-        float vertices[] = {
+        /*float vertices[] = {
             //positions        //colors        //UV
              1.f,-1.f, 0.0f, colVal,0.0f,0.0f, 1.f,1.f, //bottom right
             -1.f,-1.f, 0.0f, 0.0f,colVal,0.0f, 0.f,1.f, //bottom left
@@ -207,7 +229,7 @@ int main() {
              1.f,-1.f, 0.0f, colVal,0.0f,0.0f, 1.f,1.f, //bottom right
              1.f,1.f, 0.0f, colVal,colVal,0.0f, 1.f,0.f, //top right
             -1.f,1.f, 0.0f, 0.0f,0.0f,colVal, 0.f,0.f //top left
-        }; //UV is x,y, [0,1] = [left, right], [0,1] = [top,bottom]
+        }; //UV is x,y, [0,1] = [left, right], [0,1] = [top,bottom]*/
 
 
         glUseProgram(shaderProgram);//(Already set but doing anyways) set shaderprogram       

@@ -65,6 +65,7 @@ bool Sphere::hit(const Ray &r, Hit& h) {
     h.t = std::max(t0, 0.0);
     h.normG = glm::normalize((r.o + h.t * r.d) - t.pos);
     h.normS = h.normG;
+    h.uv = Vec2(0.f);
 
     return true;
 }
