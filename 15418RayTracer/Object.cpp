@@ -31,26 +31,40 @@ bool BBox::hit(const Ray &r, Hit& hit) {
 
     if(tmax >= std::max(tmin, 0.0)){
         hit.t = std::max(tmin, 0.0);
+        Vec3 pos = ((max + min) / 2.0f);
+        hit.normG = glm::normalize((r.o + hit.t * r.d) - pos);
+        hit.normS = hit.normG;
+        hit.uv = Vec2(0.f);
         return true;
     }
     return false;
 }
 
-bool Sphere::hit(const Ray &r, Hit& hit) {
+bool Sphere::hit(const Ray &r, Hit& h) {
     
-    float t0, t1;
+    double t0, t1;
 
     Vec3 L = t.pos - r.o;
-    float tca = dot(L, r.d);
+    double tca = dot(L, r.d);
     // ignore if vector is facing the opposite way in any direction
     if (tca < 0) return false;
-    float d2 = dot(L, L) - tca * tca;
-    float radius2 = radius * radius;
+    double d2 = dot(L, L) - tca * tca;
+    double radius2 = radius * radius;
     if (d2 > radius2) return false;
-    float thc = sqrt(radius2 - d2);
-    //t0 = tca - thc;
-    //t1 = tca + thc;
-    
+    double thc = sqrt(radius2 - d2);
+    t0 = tca - thc;
+    t1 = tca + thc;
+
+    if (t0 > t1) std::swap(t0, t1);
+
+    if (t0 < 0) {
+        t0 = t1; // if t0 is negative, let's use t1 instead 
+        if (t0 < 0) return false; // both t0 and t1 are negative 
+    }
+
+    h.t = std::max(t0, 0.0);
+    h.normG = glm::normalize((r.o + h.t * r.d) - t.pos);
+    h.normS = h.normG;
 
     return true;
 }
