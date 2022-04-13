@@ -53,7 +53,7 @@ public:
 		tempMatrix = makeTransform();
 		return tempMatrix;
 	}//Above but saves to temp matrix for performance reasons
-	Mat4x3 tempMatrix; //^^^^
+	Mat4x3 tempMatrix = Mat4x3(0.f); //^^^^
 	bool tempMatrixFilled = false;
 
 	//Parent space transformations

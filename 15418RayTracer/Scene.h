@@ -9,7 +9,7 @@
 class Scene
 {
 public:
-	Object addObj(Object o);
+	void addObj(Object o);
 	void render(); //Image stored in camera
 	Color3 renderC(Ray r, int numBounces);
 	bool intersect(Ray ray, Hit& hit);
