@@ -48,7 +48,6 @@ public:
 	Vec3 normG; //Geometric normal
 	Vec2 uv; //uv for texture if we decide to go that route, I dont think we will
 
-	// not sure how to initialize
 	Hit() {
 
 	};
