@@ -33,6 +33,12 @@ public:
 	Cube(Vec3 p, float s, Transform t =Transform()) {
 		pos = p;
 		size = s;
+		//Set bbox
+	}
+	Cube() {
+		pos = Vec3(0.f);
+		size = 1.f;
+		//set bbox
 	}
 	Vec3 pos;
 	Material Mat;
