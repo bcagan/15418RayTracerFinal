@@ -17,14 +17,14 @@ bool BBox::hit(const Ray &r, Hit& hit) {
     tmin = std::max(tmin, std::min(t1, t2));
     tmax = std::min(tmax, std::max(t1, t2));
 
-    double t1 = (min.y - r.o.y) * invdir.y;
-    double t2 = (max.y - r.o.y) * invdir.y;
+    t1 = (min.y - r.o.y) * invdir.y;
+    t2 = (max.y - r.o.y) * invdir.y;
 
     tmin = std::max(tmin, std::min(t1, t2));
     tmax = std::min(tmax, std::max(t1, t2));
 
-    double t1 = (min.z - r.o.z) * invdir.z;
-    double t2 = (max.z - r.o.z) * invdir.z;
+    t1 = (min.z - r.o.z) * invdir.z;
+    t2 = (max.z - r.o.z) * invdir.z;
 
     tmin = std::max(tmin, std::min(t1, t2));
     tmax = std::min(tmax, std::max(t1, t2));

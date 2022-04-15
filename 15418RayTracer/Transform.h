@@ -15,16 +15,14 @@ public:
 		return B*A;
 	}
 	Mat4x4 matInverse(Mat4x4 M) {
-		//return glm::inverse(M);
-		return M;
+		return glm::inverse(M);
 	}
 	Mat4x3 matInverse(Mat4x3 M) {
-		//return glm::inverse(M);
+		//return Mat4x3( glm::inverse(Mat4x4(M)));
 		return M;
 	}
 	Mat3x3 matInverse(Mat3x3 M) {
-		//return glm::inverse(M);
-		return M;
+		return glm::inverse(M);
 	}
 	Vec4 matVecMult(Mat4x4 M, Vec4 v) {
 		return M * v;

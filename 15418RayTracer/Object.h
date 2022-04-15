@@ -4,6 +4,15 @@
 #include "Ray.h"
 #include "Transform.h"
 
+class BBox {
+public:
+	BBox(Vec3 minn, Vec3 maxx) : min(minn), max(maxx) {}
+	BBox() : min(Vec3(0.f)), max(Vec3(1.f)) {}
+	Vec3 min;
+	Vec3 max;
+	bool hit(const Ray& ray, Hit& hit);
+};
+
 class Object
 {
 public:
@@ -13,14 +22,6 @@ public:
 	}//I assumne info of the material will be populated in scene intersection func
 };
 
-class BBox{
-public:
-	BBox(Vec3 minn, Vec3 maxx) : min(minn), max(maxx) {}
-	BBox() : min(Vec3(0.f)), max(Vec3(1.f)) {}
-	Vec3 min;
-	Vec3 max;
-	bool hit(const Ray &ray, Hit& hit);
-};
 
 
 //Proposed default object types:
