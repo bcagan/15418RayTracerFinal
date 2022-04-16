@@ -27,6 +27,9 @@ public:
 	Vec4 matVecMult(Mat4x4 M, Vec4 v) {
 		return M * v;
 	}
+	Vec3 matVecMult(Mat4x4 M, Vec3 v) {
+		return Vec3(M * Vec4(v,1.f));
+	}
 	Vec3 matVecMult(Mat3x3 M, Vec3 v) {
 		return M * v;
 	}
@@ -46,21 +49,21 @@ public:
 	Vec3 scale = Vec3(1.0f, 1.0f, 1.0f);
 
 	//Take above structures and create transformation matrix
-	Mat4x3 makeTransform();//Of note, 4 columns, 3 rows, homogenous coordinate row not accounted for. GLM has a weird naming format
-	Mat4x3 makeAndSaveTransform(){
+	Mat4x4 makeTransform();//Of note, 4 columns, 3 rows, homogenous coordinate row not accounted for. GLM has a weird naming format
+	Mat4x4 makeAndSaveTransform(){
 		tempMatrix = makeTransform();
 		return tempMatrix;
 	}//Above but saves to temp matrix for performance reasons
-	Mat4x3 tempMatrix = Mat4x3(0.f); //^^^^
+	Mat4x4 tempMatrix = Mat4x3(0.f); //^^^^
 	bool tempMatrixFilled = false;
 
 	//Parent space transformations
-	Mat4x3 localToParent();
-	Mat4x3 parentToLocal();
+	Mat4x4 localToParent();
+	Mat4x4 parentToLocal();
 
 	//World space transformations
-	Mat4x3 localToWorld();
-	Mat4x3 worldToLocal();
+	Mat4x4 localToWorld();
+	Mat4x4 worldToLocal();
 
 	Transform* parent = nullptr;
 
