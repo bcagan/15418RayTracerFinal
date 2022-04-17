@@ -11,6 +11,7 @@
 #include <malloc.h>
 #include "Scene.h"
 #include "Object.h"
+#include <chrono>
 
 void processInput(GLFWwindow* window) { //Function for all input code
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) { //If escape is pressed
@@ -160,34 +161,33 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
     int w = 1280; int h = 720;
-    /*Camera cam;
+    Scene sc;
     for (int i = 0; i < w; i++) {
         unsigned char r = (int)((float)i / 1280.f * 255.f);
         for (int j = 0; j < h; j++) {
             unsigned char b = (int)((float)j / 720.f * 255.f);
             Color3 col(r, 0, b);
-            cam.image[j][i] = col;
+            sc.cam.image[j][i] = col;
         }
-    }*/
+    }
 
     Color3* saveImage = (Color3*)malloc(sizeof(Color3)*1280*720);
-    /*for (int j = 0; j < h; j++) {
+    for (int j = 0; j < h; j++) {
         for (int i = 0; i < w; i++) {
-            saveImage[j * 1280 + i] = cam.image[j][i];
+            saveImage[j * 1280 + i] = sc.cam.image[j][i];
         }
-    }*/
+    }
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, (void*) saveImage);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, (void*)saveImage);
     glGenerateMipmap(GL_TEXTURE_2D);
 
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex);
-    glUseProgram(shaderProgram);   
+    glUseProgram(shaderProgram);
     glUniform1i(glGetUniformLocation(shaderProgram, "inTex"), 0);
 
     //Create scene and camera
-    Scene sc;
     sc.background = Color3(0.f);
     //Assume camera is facing -z with up as +y as default
     Sphere sph = Sphere(Vec3(0.f,2.f,-10.f),2.f);
@@ -206,13 +206,25 @@ int main() {
         -1.f,1.f, 0.0f, 0.0f,0.0f,1.f, 0.f,0.f //top left
     }; //UV is x,y, [0,1] = [left, right], [0,1] = [top,bottom]
 
+
+
+
+    /*auto current_time = std::chrono::high_resolution_clock::now();
+			static auto previous_time = current_time;
+			float elapsed = std::chrono::duration< float >(current_time - previous_time).count();
+			previous_time = current_time;*/
+
+    auto currentTime = std::chrono::high_resolution_clock::now();
+
     while (!glfwWindowShouldClose(window)) {//Loop unless user closes
-        //input
-        /*val--;
-        if (val <= -255) val = 255;
-        int tempVal = val;
-        if (tempVal < 0) tempVal = -tempVal;
-        float colVal = (float)tempVal / 255.f;*/
+
+        auto previousTime = currentTime;
+        currentTime = std::chrono::high_resolution_clock::now();
+        float delta = std::chrono::duration< float >(currentTime - previousTime).count();
+
+        processInput(window);//Run all input checking code
+
+        std::cout << delta << " is the delta\n";
 
         //Ray trace image
         sc.render();
@@ -223,20 +235,17 @@ int main() {
             }
         }
 
-        processInput(window);//Run all input checking code
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, (void*)saveImage);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, tex);
+        glUseProgram(shaderProgram);
+        glUniform1i(glGetUniformLocation(shaderProgram, "inTex"), 0);
 
         glClearColor(1.0f, 1.f, 1.f, 1.0f); //Sets the color values to clear with
         glClear(GL_COLOR_BUFFER_BIT);//Tells opengl to clear the color buffer only, not the depth or stencil buffer
-        /*float vertices[] = {
-            //positions        //colors        //UV
-             1.f,-1.f, 0.0f, colVal,0.0f,0.0f, 1.f,1.f, //bottom right
-            -1.f,-1.f, 0.0f, 0.0f,colVal,0.0f, 0.f,1.f, //bottom left
-            -1.f,1.f, 0.0f, 0.0f,0.0f,colVal, 0.f,0.f, //top left
-             1.f,-1.f, 0.0f, colVal,0.0f,0.0f, 1.f,1.f, //bottom right
-             1.f,1.f, 0.0f, colVal,colVal,0.0f, 1.f,0.f, //top right
-            -1.f,1.f, 0.0f, 0.0f,0.0f,colVal, 0.f,0.f //top left
-        }; //UV is x,y, [0,1] = [left, right], [0,1] = [top,bottom]*/
-
 
         glUseProgram(shaderProgram);//(Already set but doing anyways) set shaderprogram       
         glBindVertexArray(VAO);
@@ -256,8 +265,8 @@ int main() {
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * (sizeof(float)), (void*)(6 * sizeof(float)));
         glEnableVertexAttribArray(2);
         
-       // glBindBuffer(GL_ARRAY_BUFFER, VBO); 
-        //glBufferData(GL_ARRAY_BUFFER, sizeof(newVertices), newVertices, GL_STATIC_DRAW); 
+        glBindBuffer(GL_ARRAY_BUFFER, VBO); 
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); 
 
         //Drawing a triangle
         glDrawArrays(GL_TRIANGLES, 0, 6);

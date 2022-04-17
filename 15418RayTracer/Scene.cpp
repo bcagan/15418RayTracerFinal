@@ -69,19 +69,18 @@ void Scene::render() {
 
             sampleCount = 1;
             s = samples.get();
-            rgb = *s;
-            s++;
+            std::vector <int> col(3);
             while(sampleCount < numSamples) {
-                rgb.r += s->r;
-                rgb.g += s->g;
-                rgb.b += s->b;
+                col[0] += s->r;
+                col[1] += s->g;
+                col[2] += s->b;
                 s++;
                 sampleCount++;
             }
-            rgb.r /= (float)sampleCount;
-            rgb.g /= (float)sampleCount;
-            rgb.b /= (float)sampleCount;
-            
+            rgb.r = (unsigned char)(col[0] /= sampleCount);
+            rgb.g = (unsigned char)(col[1] /= sampleCount);
+            rgb.b = (unsigned char)(col[2] /= sampleCount);
+
             //*(pix++) = rgb.toVec3();
             cam.image[j][i] = rgb;
         }
