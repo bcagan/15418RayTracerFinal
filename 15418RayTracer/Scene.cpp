@@ -40,10 +40,6 @@ Color3 Scene::renderC(Ray r, int numBounces) {
             Ray newR = Ray(hit.t * r.d + r.o, bouncedHit);
             Vec3 renderCRes = renderC(newR, numBounces - 1).toVec3();
             Vec3 colorVec = hit.emitted().toVec3() + hit.albedo().toVec3() * renderCRes;
-            //std::cout << "emitted is " << hit.emitted().toVec3().x << " " << hit.emitted().toVec3().y << " " << hit.emitted().toVec3().z << std::endl;
-            //std::cout << "renderc is " << renderCRes.x << " " << renderCRes.y << " " << renderCRes.z << std::endl;
-            //std::cout << "albedo is " << hit.albedo().toVec3().x << " " << hit.albedo().toVec3().y << " " << hit.albedo().toVec3().z << std::endl;
-            //std::cout << "The color is " << colorVec.x << " " << colorVec.y << " " << colorVec.z << std::endl;
             return Color3(colorVec);
         }
     }

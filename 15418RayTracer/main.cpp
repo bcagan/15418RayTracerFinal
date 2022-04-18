@@ -190,7 +190,7 @@ int main() {
     //Create scene and camera
     sc.background = Color3(0.f);
     //Assume camera is facing -z with up as +y as default
-    Sphere sph = Sphere(Vec3(0.f,2.f,-10.f),2.f);
+    Sphere sph = Sphere(Vec3(0.f,0.f,-10.f),1.f);
     sph.Mat.albedo = Color3(255, 255, 0);
     sph.Mat.emitted = Color3(255,255,0);
     sc.addObj(&sph);
