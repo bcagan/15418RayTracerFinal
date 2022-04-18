@@ -16,6 +16,7 @@ public:
 class Object
 {
 public:
+	Material Mat;
 	BBox bbox;
 	virtual bool hit(const Ray& ray, Hit& hit) {
 		printf("generic\n");
@@ -43,7 +44,6 @@ public:
 		//set bbox
 	}
 	Vec3 pos;
-	Material Mat;
 	float size;
 	Transform t;
 
@@ -74,7 +74,6 @@ public:
 		//set bbox
 	}
 
-	Material Mat;
 	Transform t;
 	float radius = 1.f;
 

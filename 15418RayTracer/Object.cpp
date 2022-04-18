@@ -43,7 +43,6 @@ bool BBox::hit(const Ray &r, Hit& hit) {
 bool Sphere::hit(const Ray& r, Hit& h) {
     
     double t0, t1;
-    printf("sphere\n");
     Vec3 L = t.pos - r.o;
     double tca = dot(L, r.d);
     // ignore if vector is facing the opposite way in any direction
@@ -66,6 +65,5 @@ bool Sphere::hit(const Ray& r, Hit& h) {
     h.normG = glm::normalize((r.o + h.t * r.d) - t.pos);
     h.normS = h.normG;
     h.uv = Vec2(0.f);
-    //printf("Gets here\n");
     return true;
 }

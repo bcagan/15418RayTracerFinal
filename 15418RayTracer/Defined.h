@@ -1,6 +1,8 @@
 #pragma once
 
 #include "glm/glm.hpp"
+#include <iostream>
+#include <io.h>
 #define vecNormalize glm::normalize
 
 #define Vec4 glm::vec4
@@ -29,9 +31,9 @@ struct Color3
 		auto round = [](float f) {
 			return floor(f + 0.5f);
 		};
-		r = round(v.x*255.f);
-		g = round(v.y*255.f);
-		b = round(v.z*255.f);
+		r = round(v.x);
+		g = round(v.y);
+		b = round(v.z);
 	};
 	Color3() {
 		r = 255; g = 255; b = 255;

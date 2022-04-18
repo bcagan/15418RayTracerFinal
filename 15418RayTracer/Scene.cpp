@@ -20,7 +20,10 @@ bool Scene::intersect(Ray ray, Hit& hit) {
         Hit temp;
         if (obj->bbox.hit(ray,temp)) {
             if (obj->hit(ray, hit)) {
-                if(hit.t < ray.maxt) ray.maxt = hit.t;
+                if (hit.t < ray.maxt) {
+                    ray.maxt = hit.t;
+                    hit.Mat = obj->Mat;
+                }
                 hitBool = true; //hit itself must be updated here
             }
         }
@@ -32,10 +35,15 @@ bool Scene::intersect(Ray ray, Hit& hit) {
 Color3 Scene::renderC(Ray r, int numBounces) {
     if (numBounces > 0) {
         Hit hit = Hit(); //initialize hit here
-        if (Scene::intersect(r, hit)) { //Hiit is not working!!!!!
+        if (Scene::intersect(r, hit)) { 
             Vec3 bouncedHit = hit.bounce(r);
             Ray newR = Ray(hit.t * r.d + r.o, bouncedHit);
-            Vec3 colorVec = hit.emitted().toVec3() + hit.albedo().toVec3() * renderC(newR, numBounces - 1).toVec3();
+            Vec3 renderCRes = renderC(newR, numBounces - 1).toVec3();
+            Vec3 colorVec = hit.emitted().toVec3() + hit.albedo().toVec3() * renderCRes;
+            //std::cout << "emitted is " << hit.emitted().toVec3().x << " " << hit.emitted().toVec3().y << " " << hit.emitted().toVec3().z << std::endl;
+            //std::cout << "renderc is " << renderCRes.x << " " << renderCRes.y << " " << renderCRes.z << std::endl;
+            //std::cout << "albedo is " << hit.albedo().toVec3().x << " " << hit.albedo().toVec3().y << " " << hit.albedo().toVec3().z << std::endl;
+            //std::cout << "The color is " << colorVec.x << " " << colorVec.y << " " << colorVec.z << std::endl;
             return Color3(colorVec);
         }
     }
@@ -68,7 +76,7 @@ void Scene::render() {
                 rgb = renderC(r, r.numBounces);
                 *(s++) = rgb;
                 //All are black here
-                //std::cout << sampleCount << " sample " << j << "row " << i << "col " << (int)rgb.r << " r " << (int)rgb.g << " g " << (int)rgb.b << "b\n";
+                //if(rgb.r != 0)std::cout << sampleCount << " sample " << j << "row " << i << "col " << (int)rgb.r << " r " << (int)rgb.g << " g " << (int)rgb.b << "b\n";
                
                 sampleCount++;
             }
