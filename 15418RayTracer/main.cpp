@@ -193,7 +193,7 @@ int main() {
     Sphere sph = Sphere(Vec3(0.f,2.f,-10.f),2.f);
     sph.Mat.albedo = Color3(255, 255, 0);
     sph.Mat.emitted = Color3(255,255,0);
-    sc.addObj(sph);
+    sc.addObj(&sph);
 
     int val = 255;
     float vertices[] = {

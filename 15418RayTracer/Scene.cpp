@@ -5,18 +5,21 @@
 #include "Camera.h"
 #include "glm/glm.hpp" 
 #include <memory>
+#include <io.h>
+#include <iostream>
 
-void Scene::addObj(Object o) {
+void Scene::addObj(Object* o) {
     sceneObjs.push_back(o);
 }
 
 bool Scene::intersect(Ray ray, Hit& hit) {
     //Presume transform is just position, not rotation or scaling, so transform defines objects world space pos
     bool hitBool = false;
-    for (auto obj : sceneObjs) {
+    for (int o = 0; o < sceneObjs.size(); o++) {
+        auto obj = sceneObjs[o];
         Hit temp;
-        if (obj.bbox.hit(ray,temp)) {
-            if (obj.hit(ray, hit)) {
+        if (obj->bbox.hit(ray,temp)) {
+            if (obj->hit(ray, hit)) {
                 if(hit.t < ray.maxt) ray.maxt = hit.t;
                 hitBool = true; //hit itself must be updated here
             }
@@ -29,7 +32,7 @@ bool Scene::intersect(Ray ray, Hit& hit) {
 Color3 Scene::renderC(Ray r, int numBounces) {
     if (numBounces > 0) {
         Hit hit = Hit(); //initialize hit here
-        if (Scene::intersect(r, hit)) {
+        if (Scene::intersect(r, hit)) { //Hiit is not working!!!!!
             Vec3 bouncedHit = hit.bounce(r);
             Ray newR = Ray(hit.t * r.d + r.o, bouncedHit);
             Vec3 colorVec = hit.emitted().toVec3() + hit.albedo().toVec3() * renderC(newR, numBounces - 1).toVec3();
@@ -37,6 +40,7 @@ Color3 Scene::renderC(Ray r, int numBounces) {
         }
     }
 
+    
     return background;
 
 }
@@ -63,11 +67,13 @@ void Scene::render() {
                 Ray r = cam.castRay(i, j);
                 rgb = renderC(r, r.numBounces);
                 *(s++) = rgb;
+                //All are black here
+                //std::cout << sampleCount << " sample " << j << "row " << i << "col " << (int)rgb.r << " r " << (int)rgb.g << " g " << (int)rgb.b << "b\n";
                
                 sampleCount++;
             }
 
-            sampleCount = 1;
+            sampleCount = 0;
             s = samples.get();
             std::vector <int> col(3);
             while(sampleCount < numSamples) {
@@ -77,6 +83,7 @@ void Scene::render() {
                 s++;
                 sampleCount++;
             }
+
             rgb.r = (unsigned char)(col[0] /= sampleCount);
             rgb.g = (unsigned char)(col[1] /= sampleCount);
             rgb.b = (unsigned char)(col[2] /= sampleCount);

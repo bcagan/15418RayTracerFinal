@@ -1,11 +1,26 @@
-﻿  Scene.cpp
+﻿  Camera.cpp
 C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(32,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
 C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(33,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
 C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(34,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
 C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Camera.h(17,10): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
 C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Camera.h(18,10): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Scene.cpp(59,58): warning C4244: 'initializing': conversion from 'float' to 'size_t', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Scene.cpp(64,35): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+  Object.cpp
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(32,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(33,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(34,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Object.cpp(33,25): warning C4244: '=': conversion from 'const _Ty' to 'float', possible loss of data
+          with
+          [
+              _Ty=double
+          ]
+  Scene.cpp
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(32,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(33,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(34,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Camera.h(17,10): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Camera.h(18,10): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Scene.cpp(64,58): warning C4244: 'initializing': conversion from 'float' to 'size_t', possible loss of data
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Scene.cpp(69,35): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
   main.cpp
 C:\GL\glad\glad.h(322,1): warning C4005: 'GL_ALL_ATTRIB_BITS': macro redefinition
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\GL\gl.h(107): message : see previous definition of 'GL_ALL_ATTRIB_BITS'
