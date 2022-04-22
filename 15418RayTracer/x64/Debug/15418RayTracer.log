@@ -1,7 +1,16 @@
-﻿  Camera.cpp
+﻿  main.cpp
+C:\GL\glad\glad.h(322,1): warning C4005: 'GL_ALL_ATTRIB_BITS': macro redefinition
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\GL\gl.h(107): message : see previous definition of 'GL_ALL_ATTRIB_BITS'
+C:\GL\glad\glad.h(410,1): warning C4005: 'GL_LOGIC_OP': macro redefinition
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\GL\gl.h(1152): message : see previous definition of 'GL_LOGIC_OP'
+C:\GL\glad\glad.h(494,1): warning C4005: 'GL_TEXTURE_COMPONENTS': macro redefinition
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\GL\gl.h(1153): message : see previous definition of 'GL_TEXTURE_COMPONENTS'
+C:\GL\glad\glad.h(588,1): warning C4005: 'GL_CLIENT_ALL_ATTRIB_BITS': macro redefinition
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\GL\gl.h(973): message : see previous definition of 'GL_CLIENT_ALL_ATTRIB_BITS'
 C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(34,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
 C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(35,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
 C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(36,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
 C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Camera.h(17,10): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
 C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Camera.h(18,10): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\main.cpp(191,28): warning C4244: 'argument': conversion from 'float' to 'unsigned char', possible loss of data
   15418RayTracer.vcxproj -> C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\x64\Debug\15418RayTracer.exe

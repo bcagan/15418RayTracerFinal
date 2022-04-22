@@ -21,6 +21,7 @@ bool Scene::intersect(Ray ray, Hit& hit) {
         if (obj->bbox.hit(ray,temp)) {
             if (obj->hit(ray, hit)) {
                 if (hit.t < ray.maxt) {
+                    //if (o == 1) printf("WOW!\n");
                     ray.maxt = hit.t;
                     hit.Mat = obj->Mat;
                 }
@@ -39,7 +40,12 @@ Color3 Scene::renderC(Ray r, int numBounces) {
             Vec3 bouncedHit = hit.bounce(r);
             Ray newR = Ray(hit.t * r.d + r.o, bouncedHit);
             Vec3 renderCRes = renderC(newR, numBounces - 1).toVec3();
+            //if (hit.emitted().toVec3().x == 0 && abs(bouncedHit.y) < 0.1f && abs(bouncedHit.z) < 0.2f && hit.normS.x > 0.9f) std::cout << "the bounce was" << bouncedHit.x << " " << bouncedHit.y << " " << bouncedHit.z <<
+            //    "while the surface normal was " << hit.normS.x << " " << hit.normS.y << " " << hit.normS.z << std::endl;
+            //if(numBounces < 15) std::cout << "num bounces " << numBounces << std::endl;
             Vec3 colorVec = hit.emitted().toVec3() + hit.albedo().toVec3() * renderCRes;
+            //if (hit.emitted().toVec3().x == 0 ) std::cout << " albedo " << hit.albedo().toVec3().x << " " << hit.albedo().toVec3().y << " " << hit.albedo().toVec3().z << std::endl;
+            //if (numBounces < 15 ) std::cout << " outColor == " << colorVec.x << " " << colorVec.y << " " << colorVec.z << " and the emitted r " << (int) hit.emitted().r << std::endl;
             return Color3(colorVec);
         }
     }
@@ -48,6 +54,7 @@ Color3 Scene::renderC(Ray r, int numBounces) {
     return background;
 
 }
+
 void Scene::render() {
 
     // resolution
@@ -59,7 +66,7 @@ void Scene::render() {
     float vFov = cam.vFov;
     // float scale = tan(deg2rad(options.fov * 0.5));
     // float imageAspectRatio = width / (float)height;
-    
+    int lastPerc = 0;
     for (int j = 0; j < height; ++j) {
         for (int i = 0; i < width; ++i) {
             Color3 rgb;
@@ -94,6 +101,12 @@ void Scene::render() {
 
             //*(pix++) = rgb.toVec3();
             cam.image[j][i] = rgb;
+            int idx = j * width + i + 1;
+            int per = 100 * idx / (width * height);
+            if (per > lastPerc) {
+                lastPerc = per;
+                std::cout << "Render: " << per << "%\n";
+            }
         }
     }
 }

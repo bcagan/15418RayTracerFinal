@@ -31,15 +31,15 @@ struct Color3
 		auto round = [](float f) {
 			return floor(f + 0.5f);
 		};
-		r = round(v.x);
-		g = round(v.y);
-		b = round(v.z);
+		r = round(v.x*255.f);
+		g = round(v.y*255.f);
+		b = round(v.z*255.f);
 	};
 	Color3() {
 		r = 255; g = 255; b = 255;
 	};
 	Vec3 toVec3() {
-		return Vec3(r,g,b);
+		return Vec3((float)r/255.f,(float)g/255.f,(float)b/255.f);
 	};
 	unsigned char r;
 	unsigned char g;

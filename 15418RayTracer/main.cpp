@@ -190,10 +190,14 @@ int main() {
     //Create scene and camera
     sc.background = Color3(0.f);
     //Assume camera is facing -z with up as +y as default
-    Sphere sph = Sphere(Vec3(0.f,0.f,-10.f),1.f);
-    sph.Mat.albedo = Color3(255, 255, 0);
-    sph.Mat.emitted = Color3(255,255,0);
+    Sphere sph = Sphere(Vec3(33.5f, 0.f, -10.f), 40.f);
+    sph.Mat.albedo = Color3(255, 255, 255);
+    sph.Mat.emitted = Color3(255, 255, 255);
+    Sphere sph2 = Sphere(Vec3(-15.f, 0.f, -10.f), 10.f);
+    sph2.Mat.albedo = Color3(255, 255, 255);
+    sph2.Mat.emitted = Color3(0, 0, 0);
     sc.addObj(&sph);
+    sc.addObj(&sph2);
 
     int val = 255;
     float vertices[] = {
