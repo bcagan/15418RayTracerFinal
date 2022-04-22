@@ -215,7 +215,7 @@ int main() {
     Cube cuback = Cube(Vec3(0.f, 0.f, -10.f), 10.f);
     cuback.Mat.albedo = Color3(255, 255, 255);
     cuback.Mat.emitted = Color3(0, 0, 0);
-    Sphere diffuseSphere = Sphere(Vec3(0.f, 0.f, -5.f), 3.f);
+    Sphere diffuseSphere = Sphere(Vec3(0.f, -3.f, -5.f), 3.f);
     diffuseSphere.Mat.albedo = Color3(255, 255, 255);
     diffuseSphere.Mat.emitted = Color3(0, 0, 0);
     sc.addObj(&cufloor);
