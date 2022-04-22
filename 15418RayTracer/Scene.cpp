@@ -18,10 +18,9 @@ bool Scene::intersect(Ray ray, Hit& hit) {
     for (int o = 0; o < sceneObjs.size(); o++) {
         auto obj = sceneObjs[o];
         Hit temp;
-        if (obj->bbox.hit(ray,temp)) {
+        if (true){//(obj->bbox.hit(ray,temp)) {
             if (obj->hit(ray, hit)) {
                 if (hit.t < ray.maxt) {
-                    //if (o == 1) printf("WOW!\n");
                     ray.maxt = hit.t;
                     hit.Mat = obj->Mat;
                 }
@@ -40,13 +39,14 @@ Color3 Scene::renderC(Ray r, int numBounces) {
             Vec3 bouncedHit = hit.bounce(r);
             Ray newR = Ray(hit.t * r.d + r.o, bouncedHit);
             Vec3 renderCRes = renderC(newR, numBounces - 1).toVec3();
-            //if (hit.emitted().toVec3().x == 0 && abs(bouncedHit.y) < 0.1f && abs(bouncedHit.z) < 0.2f && hit.normS.x > 0.9f) std::cout << "the bounce was" << bouncedHit.x << " " << bouncedHit.y << " " << bouncedHit.z <<
-            //    "while the surface normal was " << hit.normS.x << " " << hit.normS.y << " " << hit.normS.z << std::endl;
+            Vec3 pos = hit.t * r.d + r.o;
+            //if (hit.emitted().toVec3().x == 0 && abs(bouncedHit.y) < 0.1f && abs(bouncedHit.z) < 0.1f  && hit.normS.x > 0.95f) std::cout << "the bounce was" << bouncedHit.x << " " << bouncedHit.y << " " << bouncedHit.z <<
+            //    "while the surface hit pos was " << pos.x << " " << pos.y << " " << pos.z << std::endl;
             //if(numBounces < 15) std::cout << "num bounces " << numBounces << std::endl;
             Vec3 colorVec = hit.emitted().toVec3() + hit.albedo().toVec3() * renderCRes;
-            //if (hit.emitted().toVec3().x == 0 ) std::cout << " albedo " << hit.albedo().toVec3().x << " " << hit.albedo().toVec3().y << " " << hit.albedo().toVec3().z << std::endl;
+            //if (hit.emitted().toVec3().x == 0 && abs(bouncedHit.y) < 0.1f && abs(bouncedHit.z) < 0.1f  && hit.normS.x > 0.95f) std::cout << " albedo " << colorVec.x << " " << colorVec.y << " " << colorVec.z << std::endl;
             //if (numBounces < 15 ) std::cout << " outColor == " << colorVec.x << " " << colorVec.y << " " << colorVec.z << " and the emitted r " << (int) hit.emitted().r << std::endl;
-            return Color3(colorVec);
+            return Color3(colorVec) ;
         }
     }
 

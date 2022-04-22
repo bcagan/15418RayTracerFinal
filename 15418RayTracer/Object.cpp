@@ -43,7 +43,7 @@ bool BBox::hit(const Ray &r, Hit& hit) {
 bool Sphere::hit(const Ray& r, Hit& h) {
     
     double t0, t1;
-    Vec3 L = t.pos - r.o;
+    Vec3 L = t.pos - r.o + r.mint*r.d;
     double tca = dot(L, r.d);
     // ignore if vector is facing the opposite way in any direction
     if (tca < 0) return false;
@@ -61,9 +61,11 @@ bool Sphere::hit(const Ray& r, Hit& h) {
         if (t0 < 0) return false; // both t0 and t1 are negative 
     }
 
-    h.t = std::max(t0, 0.0);
-    h.normG = glm::normalize((r.o + h.t * r.d) - t.pos);
-    h.normS = h.normG;
-    h.uv = Vec2(0.f);
+    if (h.t >= t0 && t0 > r.mint) {
+        h.t = std::max((float)t0, r.mint);
+        h.normG = glm::normalize((r.o + h.t * r.d) - t.pos);
+        h.normS = h.normG;
+        h.uv = Vec2(0.f);
+    }
     return true;
 }

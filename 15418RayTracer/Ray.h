@@ -43,7 +43,7 @@ class Hit
 public:
 
 	Material Mat;
-	float t; //t when ray hits
+	float t = INFINITY; //t when ray hits
 	Vec3 normS; //Surface normal
 	Vec3 normG; //Geometric normal
 	Vec2 uv; //uv for texture if we decide to go that route, I dont think we will

@@ -190,10 +190,10 @@ int main() {
     //Create scene and camera
     sc.background = Color3(0.f);
     //Assume camera is facing -z with up as +y as default
-    Sphere sph = Sphere(Vec3(33.5f, 0.f, -10.f), 40.f);
+    Sphere sph = Sphere(Vec3(6.f, 0.f, -10.f), 3.f);
     sph.Mat.albedo = Color3(255, 255, 255);
     sph.Mat.emitted = Color3(255, 255, 255);
-    Sphere sph2 = Sphere(Vec3(-15.f, 0.f, -10.f), 10.f);
+    Sphere sph2 = Sphere(Vec3(-6.f, 0.f, -10.f), 3.f);
     sph2.Mat.albedo = Color3(255, 255, 255);
     sph2.Mat.emitted = Color3(0, 0, 0);
     sc.addObj(&sph);
