@@ -4,7 +4,7 @@
 #include "glm/glm.hpp"
 #include <utility>
 
-bool BBox::hit(const Ray &r, Hit& hit) {
+bool BBox::hit( Ray &r, Hit& hit) {
     double tmin = -INFINITY, tmax = INFINITY;
 
     Vec3 invdir = 1.f / r.d; 
@@ -29,19 +29,17 @@ bool BBox::hit(const Ray &r, Hit& hit) {
     tmin = std::max(tmin, std::min(t1, t2));
     tmax = std::min(tmax, std::max(t1, t2));
 
-    if(tmax >= std::max(tmin, 0.0)){
-        hit.t = std::max(tmin, 0.0);
+    if(r.maxt >= tmin && tmin > EPSILON){
+        hit.t = tmin;
         Vec3 pos = ((max + min) / 2.0f);
-        hit.normG = glm::normalize((r.o + hit.t * r.d) - pos);
-        hit.normS = hit.normG;
         hit.uv = Vec2(0.f);
         return true;
     }
     return false;
 }
 
-bool Sphere::hit(const Ray& r, Hit& h) {
-    
+bool Sphere::hit( Ray& r, Hit& h) {
+   
     double t0, t1;
     Vec3 L = t.pos - r.o + r.mint*r.d;
     double tca = dot(L, r.d);

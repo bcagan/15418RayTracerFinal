@@ -17,7 +17,7 @@ public:
 
 	Camera cam;
 private:
-	float numSamples = 5; //Default 5 samples per bounce
+	float numSamples = 10; //Default 10 samples per bounce
 	//To make the code easier, I'm going to assume that the objects are always in world space, and that the rays will be transformed from camera to world space.
 	std::vector<Object*> sceneObjs;
 };

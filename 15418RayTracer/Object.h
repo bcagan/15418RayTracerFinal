@@ -10,7 +10,7 @@ public:
 	BBox() : min(Vec3(0.f)), max(Vec3(1.f)) {}
 	Vec3 min;
 	Vec3 max;
-	bool hit(const Ray& ray, Hit& hit);
+	bool hit( Ray& ray, Hit& hit);
 };
 
 class Object
@@ -18,7 +18,7 @@ class Object
 public:
 	Material Mat;
 	BBox bbox;
-	virtual bool hit(const Ray& ray, Hit& hit) {
+	virtual bool hit( Ray& ray, Hit& hit) {
 		printf("generic\n");
 		return false;
 	}//I assumne info of the material will be populated in scene intersection func
@@ -49,17 +49,31 @@ public:
 	float size;
 	Transform t;
 
-	bool hit(const Ray &ray, Hit& hit) override {
+	bool hit(Ray &ray, Hit& hit) override {
 		Hit temp;
 		if (bbox.hit(ray, temp)) {
 			if (temp.t < ray.maxt) {
-				hit = temp;
+				hit.t = temp.t;
+				hit.uv = temp.uv;
 				hit.Mat = Mat;
-				hit.normG = glm::normalize((ray.o + hit.t * ray.d) - pos);
+				Vec3 normVec = glm::normalize((ray.o + hit.t * ray.d) - pos); 
+				if (abs(normVec.x) > abs(normVec.y) && abs(normVec.x) > abs(normVec.z)){
+					if (normVec.x < 0) hit.normG = Vec3(-1.f, 0.f, 0.f);
+					else hit.normG = Vec3(1.f, 0.f, 0.f);
+				}
+				else if (abs(normVec.y) > abs(normVec.x) && abs(normVec.y) > abs(normVec.z)){
+					if (normVec.y < 0) hit.normG = Vec3(0.f, -1.f, 0.f);
+					else hit.normG = Vec3(0.f, 1.f, 0.f);
+				}
+				else {
+					if (normVec.z < 0) hit.normG = Vec3(0.f, 0.f, -1.f);
+					else hit.normG = Vec3(0.f, 0.f, 1.f);
+				}
 				hit.normS = hit.normG;
 				hit.uv = Vec2(0.f);//Not doing right now
+				ray.maxt = temp.t;
+				return true;
 			}
-			return true;
 		}
 		return false;
 	};
@@ -80,5 +94,5 @@ public:
 	Transform t;
 	float radius = 1.f;
 
-	bool hit(const Ray& ray, Hit& hit) override;
+	bool hit( Ray& ray, Hit& hit) override;
 };

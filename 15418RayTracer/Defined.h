@@ -31,9 +31,9 @@ struct Color3
 		auto round = [](float f) {
 			return floor(f + 0.5f);
 		};
-		r = round(v.x*255.f);
-		g = round(v.y*255.f);
-		b = round(v.z*255.f);
+		r = round(v.x * 255.f);
+		g = round(v.y * 255.f);
+		b = round(v.z * 255.f);
 	};
 	Color3() {
 		r = 255; g = 255; b = 255;
@@ -45,6 +45,23 @@ struct Color3
 	unsigned char g;
 	unsigned char b;
 };
+
+inline void printVec3(Vec3 v) {
+	std::cout << v.x << " " << v.y << " " << v.z;
+}
+
+inline Color3 normToColor(Vec3 n) {
+	float x = n.x;
+	float y = n.y;
+	float z = n.z;
+	if (x < 0) x = 0.5f;
+	else if (x < 0.5) x = 0.f;
+	if (y < 0) y = 0.5f;
+	else if (y < 0.5f) y = 0.f;
+	if (z < 0) z = 0.5f;
+	else if (z < 0.5f) z = 0.f;
+	return Color3(Vec3(x, y, z));
+}
 
 //Note on coordinates:
 

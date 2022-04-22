@@ -18,13 +18,13 @@ bool Scene::intersect(Ray ray, Hit& hit) {
     for (int o = 0; o < sceneObjs.size(); o++) {
         auto obj = sceneObjs[o];
         Hit temp;
-        if (true){//(obj->bbox.hit(ray,temp)) {
+        if (obj->bbox.hit(ray,temp)) {
             if (obj->hit(ray, hit)) {
                 if (hit.t < ray.maxt) {
                     ray.maxt = hit.t;
                     hit.Mat = obj->Mat;
                 }
-                hitBool = true; //hit itself must be updated here
+                hitBool = true;
             }
         }
     }
@@ -40,12 +40,7 @@ Color3 Scene::renderC(Ray r, int numBounces) {
             Ray newR = Ray(hit.t * r.d + r.o, bouncedHit);
             Vec3 renderCRes = renderC(newR, numBounces - 1).toVec3();
             Vec3 pos = hit.t * r.d + r.o;
-            //if (hit.emitted().toVec3().x == 0 && abs(bouncedHit.y) < 0.1f && abs(bouncedHit.z) < 0.1f  && hit.normS.x > 0.95f) std::cout << "the bounce was" << bouncedHit.x << " " << bouncedHit.y << " " << bouncedHit.z <<
-            //    "while the surface hit pos was " << pos.x << " " << pos.y << " " << pos.z << std::endl;
-            //if(numBounces < 15) std::cout << "num bounces " << numBounces << std::endl;
             Vec3 colorVec = hit.emitted().toVec3() + hit.albedo().toVec3() * renderCRes;
-            //if (hit.emitted().toVec3().x == 0 && abs(bouncedHit.y) < 0.1f && abs(bouncedHit.z) < 0.1f  && hit.normS.x > 0.95f) std::cout << " albedo " << colorVec.x << " " << colorVec.y << " " << colorVec.z << std::endl;
-            //if (numBounces < 15 ) std::cout << " outColor == " << colorVec.x << " " << colorVec.y << " " << colorVec.z << " and the emitted r " << (int) hit.emitted().r << std::endl;
             return Color3(colorVec) ;
         }
     }

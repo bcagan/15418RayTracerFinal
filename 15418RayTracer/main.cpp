@@ -190,14 +190,41 @@ int main() {
     //Create scene and camera
     sc.background = Color3(0.f);
     //Assume camera is facing -z with up as +y as default
-    Sphere sph = Sphere(Vec3(6.f, 0.f, -10.f), 3.f);
+    /*Sphere sph = Sphere(Vec3(12.f, 0.f, -10.f), 10.f);
     sph.Mat.albedo = Color3(255, 255, 255);
     sph.Mat.emitted = Color3(255, 255, 255);
-    Sphere sph2 = Sphere(Vec3(-6.f, 0.f, -10.f), 3.f);
+    Sphere sph2 = Sphere(Vec3(-12.f, 0.f, -10.f), 10.f);
     sph2.Mat.albedo = Color3(255, 255, 255);
     sph2.Mat.emitted = Color3(0, 0, 0);
     sc.addObj(&sph);
     sc.addObj(&sph2);
+    */
+
+    Cube cufloor = Cube(Vec3(0.f, -10.f, -5.f), 10.f);
+    cufloor.Mat.albedo = Color3(255,255,255);
+    cufloor.Mat.emitted = Color3(0,0,0);
+    Cube culeft = Cube(Vec3(10.f, 0.f, -5.f), 10.f);
+    culeft.Mat.albedo = Color3(255, 0, 0);
+    culeft.Mat.emitted = Color3(0, 0, 0);
+    Cube curight = Cube(Vec3(-10.f, 0.f, -5.f), 10.f);
+    curight.Mat.albedo = Color3(0, 255, 0);
+    curight.Mat.emitted = Color3(0, 0, 0);
+    Cube curoof = Cube(Vec3(0.f, 10.f, -5.f), 10.f);
+    curoof.Mat.albedo = Color3(255, 255, 255);
+    curoof.Mat.emitted = Color3(255, 255, 255);
+    Cube cuback = Cube(Vec3(0.f, 0.f, -10.f), 10.f);
+    cuback.Mat.albedo = Color3(255, 255, 255);
+    cuback.Mat.emitted = Color3(0, 0, 0);
+    Sphere diffuseSphere = Sphere(Vec3(0.f, 0.f, -5.f), 3.f);
+    diffuseSphere.Mat.albedo = Color3(255, 255, 255);
+    diffuseSphere.Mat.emitted = Color3(0, 0, 0);
+    sc.addObj(&cufloor);
+    sc.addObj(&curoof);
+    sc.addObj(&culeft);
+    sc.addObj(&curight);
+    sc.addObj(&cuback);
+    sc.addObj(&diffuseSphere);
+
 
     int val = 255;
     float vertices[] = {
