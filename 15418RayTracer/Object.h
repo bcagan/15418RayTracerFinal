@@ -36,11 +36,13 @@ public:
 	Cube(Vec3 p, float s, Transform t =Transform()) {
 		pos = p;
 		size = s;
+		bbox = BBox(p - (s / 2), p + (s / 2));
 		//Set bbox
 	}
 	Cube() {
 		pos = Vec3(0.f);
 		size = 1.f;
+		bbox = BBox(Vec3(-1.f), Vec3(1.f));
 		//set bbox
 	}
 	Vec3 pos;
@@ -67,11 +69,12 @@ class Sphere : public Object {
 public:
 	Sphere(Vec3 c, float r) : radius(r) {
 		t.pos = c; 
-		//Set bbox
+		bbox = BBox(c - r, c + r);
 	}
 
 	Sphere(){
-		//set bbox
+		t.pos = Vec3(0.f);
+		bbox = BBox(Vec3(-1.f), Vec3(1.f));
 	}
 
 	Transform t;
