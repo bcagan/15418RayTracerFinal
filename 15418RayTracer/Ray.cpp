@@ -27,5 +27,5 @@ inline Vec3 randomOnUnitSphere(float cosphi, float theta){
 Vec3 Hit::bounce(Ray out) {
 	float theta = 2.f* randf()*PI;
 	float cosphi = 2.f * randf() - 1.f;
-	return glm::normalize(normS +randomOnUnitSphere(cosphi, theta));
+	return vecNormalize((normS +randomOnUnitSphere(cosphi, theta));
 }

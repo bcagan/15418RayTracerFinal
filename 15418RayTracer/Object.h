@@ -56,7 +56,7 @@ public:
 				hit.t = temp.t;
 				hit.uv = temp.uv;
 				hit.Mat = Mat;
-				Vec3 normVec = glm::normalize((ray.o + hit.t * ray.d) - pos); 
+				Vec3 normVec = vecNormalize((ray.o + hit.t * ray.d) - pos); 
 				if (abs(normVec.x) > abs(normVec.y) && abs(normVec.x) > abs(normVec.z)){
 					if (normVec.x < 0) hit.normG = Vec3(-1.f, 0.f, 0.f);
 					else hit.normG = Vec3(1.f, 0.f, 0.f);

@@ -18,11 +18,19 @@ public:
 		return glm::inverse(M);
 	}
 	Mat4x3 matInverse(Mat4x3 M) {
-		//return Mat4x3( glm::inverse(Mat4x4(M)));
-		return M;
+		return Mat4x3( glm::inverse(Mat4x4(M)));
 	}
 	Mat3x3 matInverse(Mat3x3 M) {
 		return glm::inverse(M);
+	}
+	Mat4x4 matTranspose(Mat4x4 M) {
+		return glm::transpose(M);
+	}
+	Mat4x3 matTranspose(Mat4x3 M) {
+		return glm::transpose(M);
+	}
+	Mat3x3 matTranspose(Mat3x3 M) {
+		return glm::transpose(M);
 	}
 	Vec4 matVecMult(Mat4x4 M, Vec4 v) {
 		return M * v;
@@ -69,7 +77,7 @@ public:
 
 	//Need to implement in a way thatll work on cuda
 	Vec3 normTransform(Vec3 v) {
-		return glm::normalize(glm::transpose(glm::inverse(localToWorld())) * Vec4(v, 0.f));
+		return vecNormalize(matTranspose(matInverse(localToWorld())) * Vec4(v, 0.f));
 	}
 
 	Transform(Vec3 p, Vec3 r, Vec3 s) {

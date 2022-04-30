@@ -61,7 +61,7 @@ bool Sphere::hit( Ray& r, Hit& h) {
 
     if (h.t >= t0 && t0 > r.mint) {
         h.t = std::max((float)t0, r.mint);
-        h.normG = glm::normalize((r.o + h.t * r.d) - t.pos);
+        h.normG = vecNormalize((r.o + h.t * r.d) - t.pos);
         h.normS = h.normG;
         h.uv = Vec2(0.f);
     }
