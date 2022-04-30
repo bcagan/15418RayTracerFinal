@@ -68,5 +68,6 @@
     <ClInclude Include="GLFW\glfw3native.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Header.cuh" />
   </ItemGroup>
 </Project>

@@ -223,7 +223,7 @@ int main() {
     sc.addObj(&culeft);
     sc.addObj(&curight);
     sc.addObj(&cuback);
-    sc.addObj(&diffuseSphere);
+    //sc.addObj(&diffuseSphere);
 
 
     int val = 255;
