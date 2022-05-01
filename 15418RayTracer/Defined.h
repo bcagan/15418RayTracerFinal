@@ -23,6 +23,11 @@ Vec2 vecNormalize(Vec2 v) {
 }
 
 struct Vec3 {
+	Vec3() {
+		x = 0.f;
+		y = 0.f;
+		z = 0.f;
+	}
 	Vec3(float a, float b, float c) {
 		x = a; y = b; z = c;
 	}
@@ -35,6 +40,12 @@ struct Vec3 {
 };
 
 struct Vec4 {
+	Vec4() {
+		x = 0.f;
+		y = 0.f;
+		z = 0.f;
+		w = 0.f;
+	}
 	Vec4(float a, float b, float c, float d) {
 		x = a; y = b; z = c, w = d;
 	}
@@ -52,6 +63,10 @@ struct Vec4 {
 };
 
 struct Vec2 {
+	Vec2() {
+		x = 0.f;
+		y = 0.f;
+	}
 	Vec2(float a) {
 		x = a; y = a;
 	}
@@ -122,3 +137,75 @@ inline Color3 normToColor(Vec3 n) {
 //Camera normally points along -z in camera space. For convinience then, world space will use right hand rule if need be, and have y be up
 //Spherical coordinates: Vertical: phi [0,pi], theta [0,2pi]
 
+
+
+
+inline Vec4 constVecMult(float a, Vec4 v) {
+	glm::vec4 temp = a * glm::vec4(v.x, v.y, v.z, v.w);
+	return Vec4(temp.w, temp.x, temp.y, temp.z);
+}
+inline Vec3 constVecMult(float a, Vec3 v) {
+	glm::vec3 temp = (a * (glm::vec3(v.x, v.y, v.z)));
+	return Vec3(temp.x, temp.y, temp.z);
+}
+inline Vec2 constVecMult(float a, Vec2 v) {
+	glm::vec2 temp = a * glm::vec2(v.x, v.y);
+	return Vec2(temp.x, temp.y);
+}
+inline Vec4 vecVecMult(Vec4 a, Vec4 v) {
+	glm::vec4 temp = glm::vec4(a.x, a.y, a.z, a.w) * glm::vec4(v.x, v.y, v.z, v.w);
+	return Vec4(temp.w, temp.x, temp.y, temp.z);
+}
+inline Vec3 vecVecMult(Vec3 a, Vec3 v) {
+	glm::vec3 temp = (glm::vec3(a.x, a.y, a.z) * (glm::vec3(v.x, v.y, v.z)));
+	return Vec3(temp.x, temp.y, temp.z);
+}
+inline Vec2 vecVecMult(Vec2 a, Vec2 v) {
+	glm::vec2 temp = glm::vec2(a.x, a.y) * glm::vec2(v.x, v.y);
+	return Vec2(temp.x, temp.y);
+}
+inline Vec4 vecVecAdd(Vec4 a, Vec4 v) {
+	glm::vec4 temp = glm::vec4(a.x, a.y, a.z, a.w) + glm::vec4(v.x, v.y, v.z, v.w);
+	return Vec4(temp.w, temp.x, temp.y, temp.z);
+}
+inline Vec3 vecVecAdd(Vec3 a, Vec3 v) {
+	glm::vec3 temp = (glm::vec3(a.x, a.y, a.z) + (glm::vec3(v.x, v.y, v.z)));
+	return Vec3(temp.x, temp.y, temp.z);
+}
+inline Vec2 vecVecAdd(Vec2 a, Vec2 v) {
+	glm::vec2 temp = glm::vec2(a.x, a.y) + glm::vec2(v.x, v.y);
+	return Vec2(temp.x, temp.y);
+}
+inline Vec4 vecVecSub(Vec4 a, Vec4 v) {
+	glm::vec4 temp = glm::vec4(a.x, a.y, a.z, a.w) - glm::vec4(v.x, v.y, v.z, v.w);
+	return Vec4(temp.w, temp.x, temp.y, temp.z);
+}
+inline Vec3 vecVecSub(Vec3 a, Vec3 v) {
+	glm::vec3 temp = (glm::vec3(a.x, a.y, a.z) - (glm::vec3(v.x, v.y, v.z)));
+	return Vec3(temp.x, temp.y, temp.z);
+}
+inline Vec2 vecVecSub(Vec2 a, Vec2 v) {
+	glm::vec2 temp = glm::vec2(a.x, a.y) - glm::vec2(v.x, v.y);
+	return Vec2(temp.x, temp.y);
+}
+inline Vec4 vecVecDiv(Vec4 a, Vec4 v) {
+	glm::vec4 temp = glm::vec4(a.x, a.y, a.z, a.w) / glm::vec4(v.x, v.y, v.z, v.w);
+	return Vec4(temp.w, temp.x, temp.y, temp.z);
+}
+inline Vec3 vecVecDiv(Vec3 a, Vec3 v) {
+	glm::vec3 temp = (glm::vec3(a.x, a.y, a.z) / (glm::vec3(v.x, v.y, v.z)));
+	return Vec3(temp.x, temp.y, temp.z);
+}
+inline Vec2 vecVecDiv(Vec2 a, Vec2 v) {
+	glm::vec2 temp = glm::vec2(a.x, a.y) / glm::vec2(v.x, v.y);
+	return Vec2(temp.x, temp.y);
+}
+inline float dot(Vec2 a, Vec2 b) {
+	return a.x * b.x + a.y * b.y;
+}
+inline float dot(Vec3 a, Vec3 b) {
+	return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+inline float dot(Vec4 a, Vec4 b) {
+	return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+}

@@ -36,7 +36,7 @@ public:
 	Cube(Vec3 p, float s, Transform t =Transform()) {
 		pos = p;
 		size = s;
-		bbox = BBox(p - (s / 2), p + (s / 2));
+		bbox = BBox(vecVecAdd(p, Vec3(s / -2.f)), vecVecAdd(p , Vec3(s / 2.f)));
 		//Set bbox
 	}
 	Cube() {
@@ -56,7 +56,7 @@ public:
 				hit.t = temp.t;
 				hit.uv = temp.uv;
 				hit.Mat = Mat;
-				Vec3 normVec = vecNormalize((ray.o + hit.t * ray.d) - pos); 
+				Vec3 normVec = vecNormalize(vecVecAdd((vecVecAdd(ray.o , constVecMult(hit.t , ray.d))), constVecMult(-1.f, pos))); 
 				if (abs(normVec.x) > abs(normVec.y) && abs(normVec.x) > abs(normVec.z)){
 					if (normVec.x < 0) hit.normG = Vec3(-1.f, 0.f, 0.f);
 					else hit.normG = Vec3(1.f, 0.f, 0.f);
@@ -83,7 +83,7 @@ class Sphere : public Object {
 public:
 	Sphere(Vec3 c, float r) : radius(r) {
 		t.pos = c; 
-		bbox = BBox(c - r, c + r);
+		bbox = BBox(vecVecAdd(c,Vec3( - r)), vecVecAdd(c ,Vec3( r)));
 	}
 
 	Sphere(){

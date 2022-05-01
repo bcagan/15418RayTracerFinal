@@ -7,7 +7,7 @@
 bool BBox::hit( Ray &r, Hit& hit) {
     double tmin = -INFINITY, tmax = INFINITY;
 
-    Vec3 invdir = 1.f / r.d; 
+    Vec3 invdir = vecVecDiv(Vec3(1.f), r.d); 
 
     // value of t in the parametric ray equation where ray intersects min coordinate with dimension i
     double t1 = (min.x - r.o.x) * invdir.x;
@@ -31,7 +31,7 @@ bool BBox::hit( Ray &r, Hit& hit) {
 
     if(r.maxt >= tmin && tmin > EPSILON){
         hit.t = tmin;
-        Vec3 pos = ((max + min) / 2.0f);
+        Vec3 pos = vecVecDiv(vecVecAdd(max , min) , Vec3(2.0f));
         hit.uv = Vec2(0.f);
         return true;
     }
@@ -41,7 +41,7 @@ bool BBox::hit( Ray &r, Hit& hit) {
 bool Sphere::hit( Ray& r, Hit& h) {
    
     double t0, t1;
-    Vec3 L = t.pos - r.o + r.mint*r.d;
+    Vec3 L = vecVecAdd(vecVecSub(t.pos , r.o) , constVecMult(r.mint,r.d));
     double tca = dot(L, r.d);
     // ignore if vector is facing the opposite way in any direction
     if (tca < 0) return false;
@@ -61,7 +61,7 @@ bool Sphere::hit( Ray& r, Hit& h) {
 
     if (h.t >= t0 && t0 > r.mint) {
         h.t = std::max((float)t0, r.mint);
-        h.normG = vecNormalize((r.o + h.t * r.d) - t.pos);
+        h.normG = vecNormalize(vecVecSub(vecVecAdd(r.o , constVecMult( h.t , r.d)) , t.pos));
         h.normS = h.normG;
         h.uv = Vec2(0.f);
     }

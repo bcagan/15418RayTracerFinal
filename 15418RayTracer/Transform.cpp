@@ -11,7 +11,7 @@ Mat4x4 Transform::makeTransform() {
 	//Mat3x3 defined by each column 
 
 	//Rotation
-	Mat3x3 Rx = Mat3x3(Vec3(1.f,0.f,0.f),Vec3(0.f,cos(rot.x),sin(rot.x)),Vec3(0.f,-sin(rot.x),cos(rot.x)));
+	Mat3x3 Rx = Mat3x3(glm::Vec3(1.f,0.f,0.f),Vec3(0.f,cos(rot.x),sin(rot.x)),Vec3(0.f,-sin(rot.x),cos(rot.x)));
 	Mat3x3 Ry = Mat3x3(Vec3(cos(rot.y), 0.f, -sin(rot.y)), Vec3(0.f, 1.f,0.f ), Vec3(sin(rot.y), 0.f, cos(rot.y)));
 	Mat3x3 Rz = Mat3x3(Vec3(cos(rot.z), sin(rot.z), 0.f), Vec3(-sin(rot.z),cos(rot.z) , 0.f), Vec3(0.f, 0.f, 1.f));
 	Mat3x3 R = Rx * Ry * Rz;
