@@ -47,14 +47,14 @@ Mat4x4 Transform::parentToLocal() {
 Mat4x4 Transform::localToWorld() {
 	if (!tempMatrixFilled) makeAndSaveTransform();
 	Mat4x4 res = tempMatrix; //So, take the local spa
-	if (parent != nullptr) res = (parent->localToWorld()) * (Mat4x4)res;
+	if (parent != nullptr) res = matMult((parent->localToWorld()),  (Mat4x4)res);
 	return res;
 }
 
 Mat4x4 Transform::worldToLocal() {
 	if (!tempMatrixFilled) makeAndSaveTransform();
 	Mat4x4 res = tempMatrix; //So, take the local spa
-	if (parent != nullptr) res = (parent->localToWorld()) * (Mat4x4)res;
+	if (parent != nullptr) res = matMult((parent->localToWorld()) , (Mat4x4)res);
 	return matInverse(res);
 
 }

@@ -3,11 +3,65 @@
 #include "glm/glm.hpp"
 #include <iostream>
 #include <io.h>
-#define vecNormalize glm::normalize
 
-#define Vec4 glm::vec4
-#define Vec3 glm::vec3
-#define Vec2 glm::vec2
+Vec3 vecNormalize(Vec3 v) {
+	glm::vec3 temp = glm::vec3(v.x, v.y, v.z);
+	temp = glm::normalize(temp);
+	return Vec3(temp.x, temp.y, temp.z);
+}
+
+Vec4 vecNormalize(Vec4 v) {
+	glm::vec4 temp = glm::vec4(v.x, v.y, v.z, v.w);
+	temp = glm::normalize(temp);
+	return Vec4(temp.w, temp.x, temp.y, temp.z);
+}
+
+Vec2 vecNormalize(Vec2 v) {
+	glm::vec2 temp = glm::vec2(v.x, v.y);
+	temp = glm::normalize(temp);
+	return Vec2(temp.x, temp.y);
+}
+
+struct Vec3 {
+	Vec3(float a, float b, float c) {
+		x = a; y = b; z = c;
+	}
+	Vec3(float a) {
+		x = a; y = a; z = a;
+	}
+	float x;
+	float y;
+	float z;
+};
+
+struct Vec4 {
+	Vec4(float a, float b, float c, float d) {
+		x = a; y = b; z = c, w = d;
+	}
+	Vec4(float a) {
+		w = a;  x = a; y = a; z = a;
+	}
+	Vec4(Vec3 v, float a) {
+		x = v.x; y = v.y; z = v.z;
+		w = a;
+	}
+	float x;
+	float y;
+	float z;
+	float w;
+};
+
+struct Vec2 {
+	Vec2(float a) {
+		x = a; y = a;
+	}
+	Vec2(float a, float b) {
+		x = a; y = b;
+	}
+	float x;
+	float y;
+};
+
 #define Mat4x4 glm::mat4x4
 #define Mat3x3 glm::mat3x3
 #define Mat4x3 glm::mat4x3

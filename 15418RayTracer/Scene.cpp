@@ -8,6 +8,9 @@
 #include <io.h>
 #include <iostream>
 
+
+//Note while Vec3 is used in this code, it will instead be using a redesigned struct, as using cuda's LA library wouldnt be useful here
+
 void Scene::addObj(Object* o) {
     sceneObjs.push_back(o);
 }
@@ -37,10 +40,10 @@ Color3 Scene::renderC(Ray r, int numBounces) {
         Hit hit = Hit(); //initialize hit here
         if (Scene::intersect(r, hit)) { 
             Vec3 bouncedHit = hit.bounce(r);
-            Ray newR = Ray(hit.t * r.d + r.o, bouncedHit);
+            Ray newR = Ray(vecVecAdd(constVecMult(hit.t , r.d) , r.o), bouncedHit);
             Vec3 renderCRes = renderC(newR, numBounces - 1).toVec3();
-            Vec3 pos = hit.t * r.d + r.o;
-            Vec3 colorVec = hit.emitted().toVec3() + hit.albedo().toVec3() * renderCRes;
+            Vec3 pos = vecVecAdd(constVecMult(hit.t, r.d) , r.o);
+            Vec3 colorVec = vecVecAdd(hit.emitted().toVec3() , vecVecMult(hit.albedo().toVec3() , renderCRes));
             return Color3(colorVec) ;
         }
     }

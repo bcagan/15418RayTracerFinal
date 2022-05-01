@@ -70,4 +70,7 @@
     </ClInclude>
     <ClInclude Include="Header.cuh" />
   </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="LinAlgebra.cu" />
+  </ItemGroup>
 </Project>

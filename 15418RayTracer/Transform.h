@@ -33,22 +33,25 @@ public:
 		return glm::transpose(M);
 	}
 	Vec4 matVecMult(Mat4x4 M, Vec4 v) {
-		return M * v;
+		glm::vec4 temp = M * glm::vec4(v.x, v.y, v.z, v.w);
+		return Vec4(temp.w, temp.x, temp.y, temp.z);
 	}
 	Vec3 matVecMult(Mat4x4 M, Vec3 v) {
-		return Vec3(M * Vec4(v,1.f));
+		glm::vec3 temp = (M * glm::vec4(glm::vec3(v.x, v.y, v.z), 1.f));
+		return Vec3(temp.x, temp.y, temp.z);
 	}
 	Vec3 matVecMult(Mat3x3 M, Vec3 v) {
-		return M * v;
+		glm::vec3 temp = M * glm::vec3(v.x, v.y, v.z);
+		return Vec3(temp.x, temp.y, temp.z);
 	}
 	float dot(Vec2 a, Vec2 b) {
-		return glm::dot(a, b);
+		return a.x * b.x + a.y * b.y;
 	}
 	float dot(Vec3 a, Vec3 b) {
-		return glm::dot(a, b);
+		return a.x * b.x + a.y * b.y + a.z*b.z;
 	}
 	float dot(Vec4 a, Vec4 b) {
-		return glm::dot(a, b);
+		return a.x * b.x + a.y * b.y + a.z * b.z + a.w*b.w;
 	}
 
 	//Transform structure
@@ -77,7 +80,8 @@ public:
 
 	//Need to implement in a way thatll work on cuda
 	Vec3 normTransform(Vec3 v) {
-		return vecNormalize(matTranspose(matInverse(localToWorld())) * Vec4(v, 0.f));
+		Vec4 newV = vecNormalize(matVecMult(matTranspose(matInverse(localToWorld())), Vec4(v.x, v.y, v.z, 0.f)));
+		return Vec3(newV.x,newV.y,newV.z);
 	}
 
 	Transform(Vec3 p, Vec3 r, Vec3 s) {
@@ -98,3 +102,40 @@ public:
 		scale = Vec3(sx,sy,sz);
 	}
 };
+
+inline Vec4 constVecMult(float a, Vec4 v) {
+	glm::vec4 temp = a * glm::vec4(v.x, v.y, v.z, v.w);
+	return Vec4(temp.w, temp.x, temp.y, temp.z);
+}
+inline Vec3 constVecMult(float a, Vec3 v) {
+	glm::vec3 temp = (a * (glm::vec3(v.x, v.y, v.z)));
+	return Vec3(temp.x, temp.y, temp.z);
+}
+inline Vec2 constVecMult(float a, Vec2 v) {
+	glm::vec2 temp = a * glm::vec2(v.x, v.y);
+	return Vec2(temp.x, temp.y);
+}
+inline Vec4 vecVecMult(Vec4 a, Vec4 v) {
+	glm::vec4 temp = glm::vec4(a.x, a.y, a.z, a.w) * glm::vec4(v.x, v.y, v.z, v.w);
+	return Vec4(temp.w, temp.x, temp.y, temp.z);
+}
+inline Vec3 vecVecMult(Vec3 a, Vec3 v) {
+	glm::vec3 temp = (glm::vec3(a.x, a.y, a.z) * (glm::vec3(v.x, v.y, v.z)));
+	return Vec3(temp.x, temp.y, temp.z);
+}
+inline Vec2 vecVecMult(Vec2 a, Vec2 v) {
+	glm::vec2 temp = glm::vec2(a.x, a.y) * glm::vec2(v.x, v.y);
+	return Vec2(temp.x, temp.y);
+}
+inline Vec4 vecVecAdd(Vec4 a, Vec4 v) {
+	glm::vec4 temp = glm::vec4(a.x, a.y, a.z, a.w) + glm::vec4(v.x, v.y, v.z, v.w);
+	return Vec4(temp.w, temp.x, temp.y, temp.z);
+}
+inline Vec3 vecVecAdd(Vec3 a, Vec3 v) {
+	glm::vec3 temp = (glm::vec3(a.x, a.y, a.z) + (glm::vec3(v.x, v.y, v.z)));
+	return Vec3(temp.x, temp.y, temp.z);
+}
+inline Vec2 vecVecAdd(Vec2 a, Vec2 v) {
+	glm::vec2 temp = glm::vec2(a.x, a.y) + glm::vec2(v.x, v.y);
+	return Vec2(temp.x, temp.y);
+}
