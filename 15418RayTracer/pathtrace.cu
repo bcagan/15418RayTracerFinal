@@ -1,5 +1,7 @@
 #include <cstdio>
 #include <cuda.h>
+#include <cuda_runtime.h>
+#include <driver_functions.h>
 #include <cmath>
 
 #include "Scene.h"
@@ -7,9 +9,16 @@
 #include "glm/glm.hpp"
 #include "glm/gtx/norm.hpp"
 
+static Scene* hst_scene = NULL;
+static glm::vec3* dev_image = NULL;
+static Object* dev_objs = NULL;
+static Material* dev_materials = NULL;
+static Ray* dev_rays = NULL;
+static Hit* dev_hits = NULL;
+
 void pathtraceInit(Scene* scene) {
 	hst_scene = scene;
-	const Camera& cam = hst_scene->state.cam;
+	const Camera& cam = hst_scene->cam;
 	const int pixelcount = cam.resX * cam.resY;
 
 	cudaMalloc(&dev_image, pixelcount * sizeof(glm::vec3));
@@ -28,9 +37,9 @@ void pathtraceInit(Scene* scene) {
 
 void pathtraceFree() {
 	cudaFree(dev_image);  
-	cudaFree(dev_paths);
+	cudaFree(dev_rays);
 	cudaFree(dev_objs);
-	cudaFree(dev_intersections);
+	cudaFree(dev_hits);
 
 }
 
@@ -65,7 +74,7 @@ __global__ void generateRayFromCamera(Camera cam, int iter, int traceDepth, Ray*
 }
 
 __global__ void computeIntersections(
-	int depth, int num_rays, Ray* rays, int objs_size, Objs* objs, Hit* hits
+	int depth, int num_rays, Ray* rays, int objs_size, Object* objs, Hit* hits
 )
 {
 	int ray_index = blockIdx.x * blockDim.x + threadIdx.x;
@@ -74,49 +83,45 @@ __global__ void computeIntersections(
 	{
 		Ray ray = rays[ray_index];
 
-		if (pathSegment.pixelIndex == 400) {
-			int pixelIndex = pathSegment.pixelIndex;
-			pixelIndex++;
-		}
-
 		float t;
 		glm::vec3 intersect_point;
 		glm::vec3 normal;
 		float t_min = FLT_MAX;
 		int hit_obj_index = -1;
-		Hit& h;
+		Hit h;
 
 		for (int i = 0; i < objs_size; i++)
 		{
 			Object& obj = objs[i];
 
 			
-			t = obj.hit(ray, h)
+			t = obj.hit(ray, h);
 			
 			if (t > 0.0f && t_min > t)
 			{
 				t_min = t;
-				hit_geom_index = i;
+				hit_obj_index = i;
 			}
 		}
 
-		if (hit_geom_index == -1)
+		if (hit_obj_index == -1)
 		{
-			hits[path_index].t = -1.0f;
+			hits[ray_index].t = -1.0f;
 		}
 		else
 		{
 			//The ray hits something
 			hits[ray_index].t = t_min;
 			hits[ray_index].Mat = objs[hit_obj_index].Mat;
-			hits[ray_index].surfaceNormal = h.normS;
+			hits[ray_index].normS = h.normS;
 		}
 	}
 }
 
-void pathtrace(uchar4* pbo, int frame, int iter) {
-	const int traceDepth = hst_scene->state.traceDepth;
-	const Camera& cam = hst_scene->state.camera;
+void pathtrace(int frame, int iter) {
+	// it might make more sense to define number of ray bounces in the scene rather than the ray
+	const int traceDepth = 15;
+	const Camera& cam = hst_scene->cam;
 	const int pixelcount = cam.resX * cam.resY;
 	// 2D block for generating ray from camera
 	const dim3 blockSize2d(8, 8);
@@ -128,13 +133,11 @@ void pathtrace(uchar4* pbo, int frame, int iter) {
 	const int blockSize1d = 128;
 
 	generateRayFromCamera << <blocksPerGrid2d, blockSize2d >> > (cam, iter, traceDepth, dev_rays);
-	checkCUDAError("generate camera ray");
 
 	int depth = 0;
-	PathSegment* dev_ray_end = dev_rays + pixelcount;
+	Ray* dev_ray_end = dev_rays + pixelcount;
 	int num_rays = dev_ray_end - dev_rays;
 
-	startCpuTimer();
 	// --- PathSegment Tracing Stage ---
 	// Shoot ray into scene, bounce between objects, push shading chunks
 	bool iterationComplete = false;
@@ -155,7 +158,7 @@ void pathtrace(uchar4* pbo, int frame, int iter) {
 			, dev_hits
 			);
 
-		checkCUDAError("trace one bounce");
+		
 		cudaDeviceSynchronize();
 		depth++;
 
@@ -167,8 +170,7 @@ void pathtrace(uchar4* pbo, int frame, int iter) {
 	}
 	num_rays = dev_ray_end - dev_rays;
 	printf("Iteration Done\n");
-	endCpuTimer();
-	printTime();
+	
 	// Assemble this iteration and apply it to the image
 	dim3 numBlocksPixels = (pixelcount + blockSize1d - 1) / blockSize1d;
 	// finalGather << <numBlocksPixels, blockSize1d >> > (num_rays, dev_image, dev_rays);
@@ -176,11 +178,10 @@ void pathtrace(uchar4* pbo, int frame, int iter) {
 	///////////////////////////////////////////////////////////////////////////
 
 	// Send results to OpenGL buffer for rendering
-	sendImageToPBO << <blocksPerGrid2d, blockSize2d >> > (pbo, cam.resolution, iter, dev_image);
+	// sendImageToPBO << <blocksPerGrid2d, blockSize2d >> > (cam.resolution, iter, dev_image);
 
 	// Retrieve image from GPU
 	cudaMemcpy(hst_scene->cam.image.data(), dev_image,
 		pixelcount * sizeof(glm::vec3), cudaMemcpyDeviceToHost);
 
-	checkCUDAError("pathtrace");
 }
