@@ -3,25 +3,6 @@
 #include "glm/glm.hpp"
 #include <iostream>
 #include <io.h>
-
-Vec3 vecNormalize(Vec3 v) {
-	glm::vec3 temp = glm::vec3(v.x, v.y, v.z);
-	temp = glm::normalize(temp);
-	return Vec3(temp.x, temp.y, temp.z);
-}
-
-Vec4 vecNormalize(Vec4 v) {
-	glm::vec4 temp = glm::vec4(v.x, v.y, v.z, v.w);
-	temp = glm::normalize(temp);
-	return Vec4(temp.w, temp.x, temp.y, temp.z);
-}
-
-Vec2 vecNormalize(Vec2 v) {
-	glm::vec2 temp = glm::vec2(v.x, v.y);
-	temp = glm::normalize(temp);
-	return Vec2(temp.x, temp.y);
-}
-
 struct Vec3 {
 	Vec3() {
 		x = 0.f;
@@ -37,6 +18,27 @@ struct Vec3 {
 	float x;
 	float y;
 	float z;
+	float get(int ind) {
+		switch (ind)
+		{
+		case (0):
+			return x;
+		case(1):
+			return y;
+		default:
+			return z;
+		}
+	}
+	void set(int ind, float a) {
+		switch (ind) {
+		case(0):
+			x = a;
+		case(1):
+			y = a;
+		default:
+			z = a;
+		}
+	}
 };
 
 struct Vec4 {
@@ -60,6 +62,32 @@ struct Vec4 {
 	float y;
 	float z;
 	float w;
+	float get(int ind) {
+		switch (ind)
+		{
+		case (0):
+			return x;
+		case(1):
+			return y;
+		case(2):
+			return z;
+		default:
+			return w;
+		}
+	}
+	void set(int ind, float a) {
+		switch (ind)
+		{
+		case (0):
+			 x = a;
+		case(1):
+			y = a;
+		case(2):
+			z = a;
+		default:
+			w = a;
+		}
+	}
 };
 
 struct Vec2 {
@@ -75,11 +103,197 @@ struct Vec2 {
 	}
 	float x;
 	float y;
+	float get(int ind) {
+		switch (ind)
+		{
+		case (0):
+			return x;
+		default:
+			return y;
+		}
+	}
+	void set(int ind, float a) {
+		switch (ind)
+		{
+		case (0):
+			x = a;
+		default:
+			y = a;
+		}
+	}
+};
+inline float vecNorm(Vec2 v) {
+	return sqrt(v.x * v.x + v.y * v.y);
+}
+inline float vecNorm(Vec3 v) {
+	return sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+inline float vecNorm(Vec4 v) {
+	return sqrt(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w);
+}
+
+struct Mat3x3 {
+	Mat3x3() {
+		a = Vec3(0.f);
+		b = Vec3(0.f);
+		c = Vec3(0.f);
+	}
+	Mat3x3(Vec3 v1, Vec3 v2, Vec3 v3) {
+		a = v1;
+		b = v2;
+		c = v3;
+	}
+	Mat3x3(float f) {
+		a = Vec3(f);
+		b = Vec3(f);
+		c = Vec3(f);
+	}
+
+	Vec3 a;
+	Vec3 b;
+	Vec3 c;
+	float get(int x, int y) {
+		switch (x) {
+		case(0):
+			return a.get(y);
+		case(1):
+			return b.get(y);
+		default:
+			return c.get(y);
+		}
+	}
+	void set(int x, int y, float z) {
+		switch (x) {
+		case(0):
+			a.set(y, z);
+		case(1):
+			b.set(y, z);
+		default:
+			c.set(y, z);
+		}
+	}
 };
 
-#define Mat4x4 glm::mat4x4
-#define Mat3x3 glm::mat3x3
-#define Mat4x3 glm::mat4x3
+struct Mat4x3 {
+	Mat4x3(float f) {
+		a = Vec3(f);
+		b = Vec3(f);
+		c = Vec3(f);
+		d = Vec3(f);
+	}
+	Mat4x3() {
+		a = Vec3(0.f);
+		b = Vec3(0.f);
+		c = Vec3(0.f);
+		d = Vec3(0.f);
+	}
+	Mat4x3(Vec3 v1, Vec3 v2, Vec3 v3, Vec3 v4) {
+		a = v1;
+		b = v2;
+		c = v3;
+		d = v4;
+	}
+	Mat4x3(Mat3x3 M) {
+		a = M.a;
+		b = M.b;
+		c = M.c;
+		d = Vec3(0.f);
+	}
+
+	Vec3 a;
+	Vec3 b;
+	Vec3 c;
+	Vec3 d;
+	float get(int x, int y) {
+		switch (x) {
+		case(0):
+			return a.get(y);
+		case(1):
+			return b.get(y);
+		case(2):
+			return c.get(y);
+		default:
+			return d.get(y);
+		}
+	}
+	void set(int x, int y, float z) {
+		switch (x) {
+		case(0):
+			a.set(y, z);
+		case(1):
+			b.set(y, z);
+		case(2):
+			c.set(y, z);
+		default:
+			d.set(y, z);
+		}
+	}
+};
+struct Mat4x4 {
+	Mat4x4(float f) {
+		a = Vec4(f);
+		b = Vec4(f);
+		c = Vec4(f);
+		d = Vec4(f);
+	}
+	Mat4x4() {
+		a = Vec4(0.f);
+		b = Vec4(0.f);
+		c = Vec4(0.f);
+		d = Vec4(0.f);
+	}
+	Mat4x4(Vec4 v1, Vec4 v2, Vec4 v3, Vec4 v4) {
+		a = v1;
+		b = v2;
+		c = v3;
+		d = v4;
+	}
+	Mat4x4(Mat4x3 M) {
+		a = Vec4(M.a, 0.f);
+		b = Vec4(M.b, 0.f);
+		c = Vec4(M.c, 0.f);
+		d = Vec4(M.d, 1.f);
+	}
+	Mat4x4(Mat3x3 M) {
+		a = Vec4(M.a, 0.f);
+		b = Vec4(M.b, 0.f);
+		c = Vec4(M.c, 0.f);
+		d = Vec4(0.f,0.f,0.f, 1.f);
+	}
+
+	Vec4 a;
+	Vec4 b;
+	Vec4 c;
+	Vec4 d;
+	float get(int x, int y) {
+		switch (x) {
+		case(0):
+			return a.get(y);
+		case(1):
+			return b.get(y);
+		case(2):
+			return c.get(y);
+		default:
+			return d.get(y);
+		}
+	}
+	void set(int x, int y, float z) {
+		switch (x) {
+		case(0):
+			a.set(y, z);
+		case(1):
+			b.set(y, z);
+		case(2):
+			c.set(y, z);
+		default:
+			d.set(y, z);
+		}
+	}
+};
+
+
+
+
 #define EPSILON 0.00001f
 #define PI 3.1415926f
 //https://stackoverflow.com/questions/686353/random-float-number-generation
@@ -141,64 +355,49 @@ inline Color3 normToColor(Vec3 n) {
 
 
 inline Vec4 constVecMult(float a, Vec4 v) {
-	glm::vec4 temp = a * glm::vec4(v.x, v.y, v.z, v.w);
-	return Vec4(temp.w, temp.x, temp.y, temp.z);
+	return Vec4(a * v.x, a * v.y, a * v.z, a * v.w);
 }
 inline Vec3 constVecMult(float a, Vec3 v) {
-	glm::vec3 temp = (a * (glm::vec3(v.x, v.y, v.z)));
-	return Vec3(temp.x, temp.y, temp.z);
+	return Vec3(a * v.x, a * v.y, a * v.z);
 }
 inline Vec2 constVecMult(float a, Vec2 v) {
-	glm::vec2 temp = a * glm::vec2(v.x, v.y);
-	return Vec2(temp.x, temp.y);
+	return Vec2(a * v.x, a * v.y);
 }
 inline Vec4 vecVecMult(Vec4 a, Vec4 v) {
-	glm::vec4 temp = glm::vec4(a.x, a.y, a.z, a.w) * glm::vec4(v.x, v.y, v.z, v.w);
-	return Vec4(temp.w, temp.x, temp.y, temp.z);
+	return Vec4(a.x * v.x, a.y * v.y, a.z * v.z, a.w * v.w);
 }
 inline Vec3 vecVecMult(Vec3 a, Vec3 v) {
-	glm::vec3 temp = (glm::vec3(a.x, a.y, a.z) * (glm::vec3(v.x, v.y, v.z)));
-	return Vec3(temp.x, temp.y, temp.z);
+	return Vec3(a.x * v.x, a.y * v.y, a.z * v.z);
 }
 inline Vec2 vecVecMult(Vec2 a, Vec2 v) {
-	glm::vec2 temp = glm::vec2(a.x, a.y) * glm::vec2(v.x, v.y);
-	return Vec2(temp.x, temp.y);
+	return Vec2(a.x * v.x, a.y * v.y);
 }
 inline Vec4 vecVecAdd(Vec4 a, Vec4 v) {
-	glm::vec4 temp = glm::vec4(a.x, a.y, a.z, a.w) + glm::vec4(v.x, v.y, v.z, v.w);
-	return Vec4(temp.w, temp.x, temp.y, temp.z);
+	return Vec4(a.x + v.x, a.y + v.y, a.z + v.z, a.w + v.w);
 }
 inline Vec3 vecVecAdd(Vec3 a, Vec3 v) {
-	glm::vec3 temp = (glm::vec3(a.x, a.y, a.z) + (glm::vec3(v.x, v.y, v.z)));
-	return Vec3(temp.x, temp.y, temp.z);
+	return Vec3(a.x + v.x, a.y + v.y, a.z + v.z);
 }
 inline Vec2 vecVecAdd(Vec2 a, Vec2 v) {
-	glm::vec2 temp = glm::vec2(a.x, a.y) + glm::vec2(v.x, v.y);
-	return Vec2(temp.x, temp.y);
+	return Vec2(a.x + v.x, a.y + v.y);
 }
 inline Vec4 vecVecSub(Vec4 a, Vec4 v) {
-	glm::vec4 temp = glm::vec4(a.x, a.y, a.z, a.w) - glm::vec4(v.x, v.y, v.z, v.w);
-	return Vec4(temp.w, temp.x, temp.y, temp.z);
+	return Vec4(a.x - v.x, a.y - v.y, a.z - v.z, a.w - v.w);
 }
 inline Vec3 vecVecSub(Vec3 a, Vec3 v) {
-	glm::vec3 temp = (glm::vec3(a.x, a.y, a.z) - (glm::vec3(v.x, v.y, v.z)));
-	return Vec3(temp.x, temp.y, temp.z);
+	return Vec3(a.x - v.x, a.y - v.y, a.z - v.z);
 }
 inline Vec2 vecVecSub(Vec2 a, Vec2 v) {
-	glm::vec2 temp = glm::vec2(a.x, a.y) - glm::vec2(v.x, v.y);
-	return Vec2(temp.x, temp.y);
+	return Vec2(a.x - v.x, a.y - v.y);
 }
 inline Vec4 vecVecDiv(Vec4 a, Vec4 v) {
-	glm::vec4 temp = glm::vec4(a.x, a.y, a.z, a.w) / glm::vec4(v.x, v.y, v.z, v.w);
-	return Vec4(temp.w, temp.x, temp.y, temp.z);
+	return Vec4(a.x / v.x, a.y / v.y, a.z / v.z, a.w/v.w);
 }
 inline Vec3 vecVecDiv(Vec3 a, Vec3 v) {
-	glm::vec3 temp = (glm::vec3(a.x, a.y, a.z) / (glm::vec3(v.x, v.y, v.z)));
-	return Vec3(temp.x, temp.y, temp.z);
+	return Vec3(a.x / v.x, a.y / v.y, a.z / v.z);
 }
 inline Vec2 vecVecDiv(Vec2 a, Vec2 v) {
-	glm::vec2 temp = glm::vec2(a.x, a.y) / glm::vec2(v.x, v.y);
-	return Vec2(temp.x, temp.y);
+	return Vec2(a.x / v.x, a.y / v.y);
 }
 inline float dot(Vec2 a, Vec2 b) {
 	return a.x * b.x + a.y * b.y;
@@ -208,4 +407,15 @@ inline float dot(Vec3 a, Vec3 b) {
 }
 inline float dot(Vec4 a, Vec4 b) {
 	return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+}
+inline Vec3 vecNormalize(Vec3 v) {
+	return vecVecDiv(v, Vec3(vecNorm(v)));
+}
+
+inline Vec4 vecNormalize(Vec4 v) {
+	return vecVecDiv(v, Vec4(vecNorm(v)));
+}
+
+inline Vec2 vecNormalize(Vec2 v) {
+	return vecVecDiv(v, Vec2(vecNorm(v)));;
 }
