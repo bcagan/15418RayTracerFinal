@@ -1,6 +1,10 @@
 #pragma once
 #include "Defined.h"
 #include "glm/glm.hpp"
+#include "cublas_v2.h"
+#include <cuda.h>
+#include <driver_functions.h>
+#include <cuda_runtime.h>
 
 
 inline float rowCol(Mat3x3 A, Mat3x3 B, int a, int b) {
@@ -66,6 +70,13 @@ public:
 	} 
 	//THESE 2 WILL NEED TO USE CUDA LA LIBRARY
 	Mat4x4 matInverse(Mat4x4 M) {
+
+		float* devMatrix;
+		cudaMalloc(&devMatrix, sizeof(float) * 16);
+		assert(cublasSetMatrix(4, 4, sizeof(float), (void*)&M, 4, devMatrix, 4) == CUBLAS_STATUS_SUCCESS);
+		//Calc inverse
+		assert(cublasGetMatrix(4,4,sizeof(float),devMatrix,4,&M,4) == CUBLAS_STATUS_SUCCESS);
+
 		glm::mat4x4 temp = glm::inverse(toMat(M));
 		Vec4 a = Vec4(temp[0][0], temp[0][1], temp[0][2], temp[0][3]);
 		Vec4 b = Vec4(temp[1][0], temp[1][1], temp[1][2], temp[1][3]);
