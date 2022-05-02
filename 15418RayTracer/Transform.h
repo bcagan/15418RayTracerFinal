@@ -68,28 +68,13 @@ public:
 		res.d = Vec3(temp.d.x, temp.d.y, temp.d.z);
 		return res;
 	} 
-	//THESE 2 WILL NEED TO USE CUDA LA LIBRARY
 	Mat4x4 matInverse(Mat4x4 M) {
-
-		float* devMatrix;
-		cudaMalloc(&devMatrix, sizeof(float) * 16);
-		assert(cublasSetMatrix(4, 4, sizeof(float), (void*)&M, 4, devMatrix, 4) == CUBLAS_STATUS_SUCCESS);
-		//Calc inverse
-		assert(cublasGetMatrix(4,4,sizeof(float),devMatrix,4,&M,4) == CUBLAS_STATUS_SUCCESS);
-
-		glm::mat4x4 temp = glm::inverse(toMat(M));
-		Vec4 a = Vec4(temp[0][0], temp[0][1], temp[0][2], temp[0][3]);
-		Vec4 b = Vec4(temp[1][0], temp[1][1], temp[1][2], temp[1][3]);
-		Vec4 c = Vec4(temp[2][0], temp[2][1], temp[2][2], temp[2][3]);
-		Vec4 d = Vec4(temp[3][0], temp[3][1], temp[3][2], temp[3][3]);
-		return Mat4x4(a,b,c,d);
+		return inverse(M);
 	}
 	Mat3x3 matInverse(Mat3x3 M) {
-		glm::mat3x3 temp = glm::inverse(toMat(M));
-		Vec3 a = Vec3(temp[0][0], temp[0][1], temp[0][2]);
-		Vec3 b = Vec3(temp[1][0], temp[1][1], temp[1][2]);
-		Vec3 c = Vec3(temp[2][0], temp[2][1], temp[2][2]);
-		return Mat3x3(a, b, c);
+		Mat4x4 temp(M);
+		temp = inverse(temp);
+		return Mat3x3(temp);
 	}
 	Mat4x4 matTranspose(Mat4x4 M) {
 		Mat4x4 res;
@@ -191,3 +176,88 @@ public:
 		scale = Vec3(sx,sy,sz);
 	}
 };
+
+//Inverse code nonsense
+
+inline Mat4x4 inverse(const Mat4x4& m) {
+	Mat4x4 r;
+	r[0][0] = m[1][2] * m[2][3] * m[3][1] - m[1][3] * m[2][2] * m[3][1] +
+		m[1][3] * m[2][1] * m[3][2] - m[1][1] * m[2][3] * m[3][2] -
+		m[1][2] * m[2][1] * m[3][3] + m[1][1] * m[2][2] * m[3][3];
+	r[0][1] = m[0][3] * m[2][2] * m[3][1] - m[0][2] * m[2][3] * m[3][1] -
+		m[0][3] * m[2][1] * m[3][2] + m[0][1] * m[2][3] * m[3][2] +
+		m[0][2] * m[2][1] * m[3][3] - m[0][1] * m[2][2] * m[3][3];
+	r[0][2] = m[0][2] * m[1][3] * m[3][1] - m[0][3] * m[1][2] * m[3][1] +
+		m[0][3] * m[1][1] * m[3][2] - m[0][1] * m[1][3] * m[3][2] -
+		m[0][2] * m[1][1] * m[3][3] + m[0][1] * m[1][2] * m[3][3];
+	r[0][3] = m[0][3] * m[1][2] * m[2][1] - m[0][2] * m[1][3] * m[2][1] -
+		m[0][3] * m[1][1] * m[2][2] + m[0][1] * m[1][3] * m[2][2] +
+		m[0][2] * m[1][1] * m[2][3] - m[0][1] * m[1][2] * m[2][3];
+	r[1][0] = m[1][3] * m[2][2] * m[3][0] - m[1][2] * m[2][3] * m[3][0] -
+		m[1][3] * m[2][0] * m[3][2] + m[1][0] * m[2][3] * m[3][2] +
+		m[1][2] * m[2][0] * m[3][3] - m[1][0] * m[2][2] * m[3][3];
+	r[1][1] = m[0][2] * m[2][3] * m[3][0] - m[0][3] * m[2][2] * m[3][0] +
+		m[0][3] * m[2][0] * m[3][2] - m[0][0] * m[2][3] * m[3][2] -
+		m[0][2] * m[2][0] * m[3][3] + m[0][0] * m[2][2] * m[3][3];
+	r[1][2] = m[0][3] * m[1][2] * m[3][0] - m[0][2] * m[1][3] * m[3][0] -
+		m[0][3] * m[1][0] * m[3][2] + m[0][0] * m[1][3] * m[3][2] +
+		m[0][2] * m[1][0] * m[3][3] - m[0][0] * m[1][2] * m[3][3];
+	r[1][3] = m[0][2] * m[1][3] * m[2][0] - m[0][3] * m[1][2] * m[2][0] +
+		m[0][3] * m[1][0] * m[2][2] - m[0][0] * m[1][3] * m[2][2] -
+		m[0][2] * m[1][0] * m[2][3] + m[0][0] * m[1][2] * m[2][3];
+	r[2][0] = m[1][1] * m[2][3] * m[3][0] - m[1][3] * m[2][1] * m[3][0] +
+		m[1][3] * m[2][0] * m[3][1] - m[1][0] * m[2][3] * m[3][1] -
+		m[1][1] * m[2][0] * m[3][3] + m[1][0] * m[2][1] * m[3][3];
+	r[2][1] = m[0][3] * m[2][1] * m[3][0] - m[0][1] * m[2][3] * m[3][0] -
+		m[0][3] * m[2][0] * m[3][1] + m[0][0] * m[2][3] * m[3][1] +
+		m[0][1] * m[2][0] * m[3][3] - m[0][0] * m[2][1] * m[3][3];
+	r[2][2] = m[0][1] * m[1][3] * m[3][0] - m[0][3] * m[1][1] * m[3][0] +
+		m[0][3] * m[1][0] * m[3][1] - m[0][0] * m[1][3] * m[3][1] -
+		m[0][1] * m[1][0] * m[3][3] + m[0][0] * m[1][1] * m[3][3];
+	r[2][3] = m[0][3] * m[1][1] * m[2][0] - m[0][1] * m[1][3] * m[2][0] -
+		m[0][3] * m[1][0] * m[2][1] + m[0][0] * m[1][3] * m[2][1] +
+		m[0][1] * m[1][0] * m[2][3] - m[0][0] * m[1][1] * m[2][3];
+	r[3][0] = m[1][2] * m[2][1] * m[3][0] - m[1][1] * m[2][2] * m[3][0] -
+		m[1][2] * m[2][0] * m[3][1] + m[1][0] * m[2][2] * m[3][1] +
+		m[1][1] * m[2][0] * m[3][2] - m[1][0] * m[2][1] * m[3][2];
+	r[3][1] = m[0][1] * m[2][2] * m[3][0] - m[0][2] * m[2][1] * m[3][0] +
+		m[0][2] * m[2][0] * m[3][1] - m[0][0] * m[2][2] * m[3][1] -
+		m[0][1] * m[2][0] * m[3][2] + m[0][0] * m[2][1] * m[3][2];
+	r[3][2] = m[0][2] * m[1][1] * m[3][0] - m[0][1] * m[1][2] * m[3][0] -
+		m[0][2] * m[1][0] * m[3][1] + m[0][0] * m[1][2] * m[3][1] +
+		m[0][1] * m[1][0] * m[3][2] - m[0][0] * m[1][1] * m[3][2];
+	r[3][3] = m[0][1] * m[1][2] * m[2][0] - m[0][2] * m[1][1] * m[2][0] +
+		m[0][2] * m[1][0] * m[2][1] - m[0][0] * m[1][2] * m[2][1] -
+		m[0][1] * m[1][0] * m[2][2] + m[0][0] * m[1][1] * m[2][2];
+	r /= det(m);
+	return r;
+}
+
+/// Returns determinant (brute force).
+inline float det(Mat4x4 cols) {
+	return cols[0][3] * cols[1][2] * cols[2][1] * cols[3][0] -
+		cols[0][2] * cols[1][3] * cols[2][1] * cols[3][0] -
+		cols[0][3] * cols[1][1] * cols[2][2] * cols[3][0] +
+		cols[0][1] * cols[1][3] * cols[2][2] * cols[3][0] +
+		cols[0][2] * cols[1][1] * cols[2][3] * cols[3][0] -
+		cols[0][1] * cols[1][2] * cols[2][3] * cols[3][0] -
+		cols[0][3] * cols[1][2] * cols[2][0] * cols[3][1] +
+		cols[0][2] * cols[1][3] * cols[2][0] * cols[3][1] +
+		cols[0][3] * cols[1][0] * cols[2][2] * cols[3][1] -
+		cols[0][0] * cols[1][3] * cols[2][2] * cols[3][1] -
+		cols[0][2] * cols[1][0] * cols[2][3] * cols[3][1] +
+		cols[0][0] * cols[1][2] * cols[2][3] * cols[3][1] +
+		cols[0][3] * cols[1][1] * cols[2][0] * cols[3][2] -
+		cols[0][1] * cols[1][3] * cols[2][0] * cols[3][2] -
+		cols[0][3] * cols[1][0] * cols[2][1] * cols[3][2] +
+		cols[0][0] * cols[1][3] * cols[2][1] * cols[3][2] +
+		cols[0][1] * cols[1][0] * cols[2][3] * cols[3][2] -
+		cols[0][0] * cols[1][1] * cols[2][3] * cols[3][2] -
+		cols[0][2] * cols[1][1] * cols[2][0] * cols[3][3] +
+		cols[0][1] * cols[1][2] * cols[2][0] * cols[3][3] +
+		cols[0][2] * cols[1][0] * cols[2][1] * cols[3][3] -
+		cols[0][0] * cols[1][2] * cols[2][1] * cols[3][3] -
+		cols[0][1] * cols[1][0] * cols[2][2] * cols[3][3] +
+		cols[0][0] * cols[1][1] * cols[2][2] * cols[3][3];
+}
+//Both sourced from 15-462's Scotty3D

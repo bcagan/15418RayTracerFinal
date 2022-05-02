@@ -134,10 +134,6 @@ void debugAssist(int* from, int N) {
 }
 
 int concat_rays(int num_rays, int numblocksPathSegmentTracing, int blockSize1d, int* device_output) {
-    
-
-	//int indexIndex = blockIdx.x * blockDim.x + threadIdx.x;
-	//int ray_index = hitIndices[indexIndex];
 
     //Peaks have been found in dev_hitPeaks
 

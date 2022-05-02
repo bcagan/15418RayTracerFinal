@@ -3,6 +3,10 @@
 #include "glm/glm.hpp"
 #include <iostream>
 #include <io.h>
+
+//All vec operators based on equivalent implementations in Scotty3D
+
+
 struct Vec3 {
 	Vec3() {
 		x = 0.f;
@@ -39,6 +43,119 @@ struct Vec3 {
 			z = a;
 		}
 	}
+
+
+
+	float& operator[](int idx) {
+		assert(idx >= 0 && idx <= 2);
+		switch (idx)
+		{
+		case(0):
+			return x;
+		case(1):
+			return y;
+		default:
+			return z;
+		};
+	}
+	float operator[](int idx) const {
+		assert(idx >= 0 && idx <= 2);
+		switch (idx)
+		{
+		case(0):
+			return x;
+		case(1):
+			return y;
+		default:
+			return z;
+		};
+	}
+
+
+	Vec3 operator+=(Vec3 v) {
+		x += v.x;
+		y += v.y;
+		z += v.z;
+		return *this;
+	}
+	Vec3 operator-=(Vec3 v) {
+		x -= v.x;
+		y -= v.y;
+		z -= v.z;
+		return *this;
+	}
+	Vec3 operator*=(Vec3 v) {
+		x *= v.x;
+		y *= v.y;
+		z *= v.z;
+		return *this;
+	}
+	Vec3 operator/=(Vec3 v) {
+		x /= v.x;
+		y /= v.y;
+		z /= v.z;
+		return *this;
+	}
+
+	Vec3 operator+=(float s) {
+		x += s;
+		y += s;
+		z += s;
+		return *this;
+	}
+	Vec3 operator-=(float s) {
+		x -= s;
+		y -= s;
+		z -= s;
+		return *this;
+	}
+	Vec3 operator*=(float s) {
+		x *= s;
+		y *= s;
+		z *= s;
+		return *this;
+	}
+	Vec3 operator/=(float s) {
+		x /= s;
+		y /= s;
+		z /= s;
+		return *this;
+	}
+
+	Vec3 operator+(Vec3 v) const {
+		return Vec3(x + v.x, y + v.y, z + v.z);
+	}
+	Vec3 operator-(Vec3 v) const {
+		return Vec3(x - v.x, y - v.y, z - v.z);
+	}
+	Vec3 operator*(Vec3 v) const {
+		return Vec3(x * v.x, y * v.y, z * v.z);
+	}
+	Vec3 operator/(Vec3 v) const {
+		return Vec3(x / v.x, y / v.y, z / v.z);
+	}
+
+	Vec3 operator+(float s) const {
+		return Vec3(x + s, y + s, z + s);
+	}
+	Vec3 operator-(float s) const {
+		return Vec3(x - s, y - s, z - s);
+	}
+	Vec3 operator*(float s) const {
+		return Vec3(x * s, y * s, z * s);
+	}
+	Vec3 operator/(float s) const {
+		return Vec3(x / s, y / s, z / s);
+	}
+
+	bool operator==(Vec3 v) const {
+		return x == v.x && y == v.y && z == v.z;
+	}
+	bool operator!=(Vec3 v) const {
+		return x != v.x || y != v.y || z != v.z;
+	}
+
+
 };
 
 struct Vec4 {
@@ -61,7 +178,129 @@ struct Vec4 {
 	float x;
 	float y;
 	float z;
-	float w;
+	float w; 
+	
+	float& operator[](int idx) {
+		assert(idx >= 0 && idx <= 3);
+		switch (idx)
+		{
+		case(0):
+			return x;
+		case(1):
+			return y;
+		case(2):
+			return z;
+		default:
+			return w;
+		};
+	}
+	float operator[](int idx) const {
+		assert(idx >= 0 && idx <= 3);
+		switch (idx)
+		{
+		case(0):
+			return x;
+		case(1):
+			return y;
+		case(2):
+			return z;
+		default:
+			return w;
+		};
+	}
+
+	Vec4 operator+=(Vec4 v) {
+		x += v.x;
+		y += v.y;
+		z += v.z;
+		w += v.w;
+		return *this;
+	}
+	Vec4 operator-=(Vec4 v) {
+		x -= v.x;
+		y -= v.y;
+		z -= v.z;
+		w -= v.w;
+		return *this;
+	}
+	Vec4 operator*=(Vec4 v) {
+		x *= v.x;
+		y *= v.y;
+		z *= v.z;
+		w *= v.w;
+		return *this;
+	}
+	Vec4 operator/=(Vec4 v) {
+		x /= v.x;
+		y /= v.y;
+		z /= v.z;
+		w /= v.w;
+		return *this;
+	}
+
+	Vec4 operator+=(float s) {
+		x += s;
+		y += s;
+		z += s;
+		w += s;
+		return *this;
+	}
+	Vec4 operator-=(float s) {
+		x -= s;
+		y -= s;
+		z -= s;
+		w -= s;
+		return *this;
+	}
+	Vec4 operator*=(float s) {
+		x *= s;
+		y *= s;
+		z *= s;
+		w *= s;
+		return *this;
+	}
+	Vec4 operator/=(float s) {
+		x /= s;
+		y /= s;
+		z /= s;
+		w /= s;
+		return *this;
+	}
+
+	Vec4 operator+(Vec4 v) const {
+		return Vec4(x + v.x, y + v.y, z + v.z, w + v.w);
+	}
+	Vec4 operator-(Vec4 v) const {
+		return Vec4(x - v.x, y - v.y, z - v.z, w - v.w);
+	}
+	Vec4 operator*(Vec4 v) const {
+		return Vec4(x * v.x, y * v.y, z * v.z, w * v.w);
+	}
+	Vec4 operator/(Vec4 v) const {
+		return Vec4(x / v.x, y / v.y, z / v.z, w / v.w);
+	}
+
+	Vec4 operator+(float s) const {
+		return Vec4(x + s, y + s, z + s, w + s);
+	}
+	Vec4 operator-(float s) const {
+		return Vec4(x - s, y - s, z - s, w - s);
+	}
+	Vec4 operator*(float s) const {
+		return Vec4(x * s, y * s, z * s, w * s);
+	}
+	Vec4 operator/(float s) const {
+		return Vec4(x / s, y / s, z / s, w / s);
+	}
+
+	bool operator==(Vec4 v) const {
+		return x == v.x && y == v.y && z == v.z && w == v.w;
+	}
+	bool operator!=(Vec4 v) const {
+		return x != v.x || y != v.y || z != v.z || w != v.w;
+	}
+
+
 	float get(int ind) {
 		switch (ind)
 		{
@@ -91,6 +330,27 @@ struct Vec4 {
 };
 
 struct Vec2 {
+
+	float& operator[](int idx) {
+		assert(idx >= 0 && idx <= 1);
+		switch (idx)
+		{
+		case(0):
+			return x;
+		default:
+			return y;
+		};
+	}
+	float operator[](int idx) const {
+		assert(idx >= 0 && idx <= 1);
+		switch (idx)
+		{
+		case(0):
+			return x;
+		default:
+			return y;
+		};
+	}
 	Vec2() {
 		x = 0.f;
 		y = 0.f;
@@ -121,6 +381,83 @@ struct Vec2 {
 			y = a;
 		}
 	}
+
+
+
+	Vec2 operator+=(Vec2 v) {
+		x += v.x;
+		y += v.y;
+		return *this;
+	}
+	Vec2 operator-=(Vec2 v) {
+		x -= v.x;
+		y -= v.y;
+		return *this;
+	}
+	Vec2 operator*=(Vec2 v) {
+		x *= v.x;
+		y *= v.y;
+		return *this;
+	}
+	Vec2 operator/=(Vec2 v) {
+		x /= v.x;
+		y /= v.y;
+		return *this;
+	}
+
+	Vec2 operator+=(float s) {
+		x += s;
+		y += s;
+		return *this;
+	}
+	Vec2 operator-=(float s) {
+		x -= s;
+		y -= s;
+		return *this;
+	}
+	Vec2 operator*=(float s) {
+		x *= s;
+		y *= s;
+		return *this;
+	}
+	Vec2 operator/=(float s) {
+		x /= s;
+		y /= s;
+		return *this;
+	}
+
+	Vec2 operator+(Vec2 v) const {
+		return Vec2(x + v.x, y + v.y);
+	}
+	Vec2 operator-(Vec2 v) const {
+		return Vec2(x - v.x, y - v.y);
+	}
+	Vec2 operator*(Vec2 v) const {
+		return Vec2(x * v.x, y * v.y);
+	}
+	Vec2 operator/(Vec2 v) const {
+		return Vec2(x / v.x, y / v.y);
+	}
+
+	Vec2 operator+(float s) const {
+		return Vec2(x + s, y + s);
+	}
+	Vec2 operator-(float s) const {
+		return Vec2(x - s, y - s);
+	}
+	Vec2 operator*(float s) const {
+		return Vec2(x * s, y * s);
+	}
+	Vec2 operator/(float s) const {
+		return Vec2(x / s, y / s);
+	}
+
+	bool operator==(Vec2 v) const {
+		return x == v.x && y == v.y;
+	}
+	bool operator!=(Vec2 v) const {
+		return x != v.x || y != v.y;
+	}
 };
 inline float vecNorm(Vec2 v) {
 	return sqrt(v.x * v.x + v.y * v.y);
@@ -132,7 +469,150 @@ inline float vecNorm(Vec4 v) {
 	return sqrt(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w);
 }
 
+//All operators based on equivalent implementations
+//From Scotty3D
+
+
 struct Mat3x3 {
+
+	Mat3x3(Mat4x4 M) {
+		a[0] = M[0][0];
+		a[1] = M[0][1];
+		a[2] = M[0][2];
+		b[0] = M[1][0];
+		b[1] = M[1][1];
+		b[2] = M[1][2];
+		c[0] = M[2][0];
+		c[1] = M[2][1];
+		c[2] = M[2][2];
+	}
+
+
+	Vec3& operator[](int idx) {
+		assert(idx >= 0 && idx <= 2);
+		switch (idx) {
+		case(0):
+			return a;
+		case(1):
+			return b;
+		default:
+			return c;
+		}
+	}
+	Vec3 operator[](int idx) const {
+		assert(idx >= 0 && idx <= 2);
+		switch (idx) {
+		case(0):
+			return a;
+		case(1):
+			return b;
+		default:
+			return c;
+		}
+	}
+
+	Mat3x3 operator+=(const Mat3x3& m) {
+		a += m.a;
+		b += m.b;
+		c += m.c;
+		return *this;
+	}
+	Mat3x3 operator-=(const Mat3x3& m) {
+		a -= m.a;
+		b -= m.b;
+		c -= m.c;
+		return *this;
+	}
+
+	Mat3x3 operator+=(float s) {
+		a += s;
+		b += s;
+		c += s;
+		return *this;
+	}
+	Mat3x3 operator-=(float s) {
+		a -= s;
+		b -= s;
+		c -= s;
+		return *this;
+	}
+	Mat3x3 operator*=(float s) {
+		a *= s;
+		b *= s;
+		c *= s;
+		return *this;
+	}
+	Mat3x3 operator/=(float s) {
+		a /= s;
+		b /= s;
+		c /= s;
+		return *this;
+	}
+
+	Mat3x3 operator+(const Mat3x3& m) const {
+		Mat3x3 r;
+		r.a = a + m.a;
+		r.b = b + m.b;
+		r.c = c + m.c;
+		return r;
+	}
+	Mat3x3 operator-(const Mat3x3& m) const {
+		Mat3x3 r;
+		r.a = a - m.a;
+		r.b = b - m.b;
+		r.c = c - m.c;
+		return r;
+	}
+
+	Mat3x3 operator+(float s) const {
+		Mat3x3 r;
+		r.a = a + s;
+		r.b = b + s;
+		r.c = c + s;
+		return r;
+	}
+	Mat3x3 operator-(float s) const {
+		Mat3x3 r;
+		r.a = a - s;
+		r.b = b - s;
+		r.c = c - s;
+		return r;
+	}
+	Mat3x3 operator*(float s) const {
+		Mat3x3 r;
+		r.a = a * s;
+		r.b = b * s;
+		r.c = c * s;
+		return r;
+	}
+	Mat3x3 operator/(float s) const {
+		Mat3x3 r;
+		r.a = a / s;
+		r.b = b / s;
+		r.c = c / s;
+		return r;
+	}
+
+	Mat3x3 operator*=(const Mat3x3& v) {
+		*this = *this * v;
+		return *this;
+	}
+	Mat3x3 operator*(const Mat3x3& m) const {
+		Mat3x3 ret;
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				ret[i][j] = 0.0f;
+				ret[i][j] += m[i][0] * a[j];
+				ret[i][j] += m[i][1] * b[j];
+				ret[i][j] += m[i][2] * c[j];
+			}
+		}
+		return ret;
+	}
+
+	Vec3 operator*(Vec3 v) const {
+		return a * v[0] + b * v[1] + c * v[2];
+	}
 	Mat3x3() {
 		a = Vec3(0.f);
 		b = Vec3(0.f);
@@ -175,6 +655,150 @@ struct Mat3x3 {
 };
 
 struct Mat4x3 {
+
+
+	Vec3& operator[](int idx) {
+		assert(idx >= 0 && idx <= 3);
+		switch (idx) {
+		case(0):
+			return a;
+		case(1):
+			return b;
+		case(2):
+			return c;
+		default:
+			return d;
+		}
+	}
+	Vec3 operator[](int idx) const {
+		assert(idx >= 0 && idx <= 3);
+		switch (idx) {
+		case(0):
+			return a;
+		case(1):
+			return b;
+		case(2):
+			return c;
+		default:
+			return d;
+		}
+	}
+
+	Mat4x3 operator+=(const Mat4x3& m) {
+		a += m.a;
+		b += m.b;
+		c += m.c;
+		d += m.d;
+		return *this;
+	}
+	Mat4x3 operator-=(const Mat4x3& m) {
+		a -= m.a;
+		b -= m.b;
+		c -= m.c;
+		d -= m.d;
+		return *this;
+	}
+
+	Mat4x3 operator+=(float s) {
+		a += s;
+		b += s;
+		c += s;
+		d += s;
+		return *this;
+	}
+	Mat4x3 operator-=(float s) {
+		a -= s;
+		b -= s;
+		c -= s;
+		d -= s;
+		return *this;
+	}
+	Mat4x3 operator*=(float s) {
+		a *= s;
+		b *= s;
+		c *= s;
+		d *= s;
+		return *this;
+	}
+	Mat4x3 operator/=(float s) {
+		a /= s;
+		b /= s;
+		c /= s;
+		d /= s;
+		return *this;
+	}
+
+	Mat4x3 operator+(const Mat4x3& m) const {
+		Mat4x3 r;
+		r.a = a + m.a;
+		r.b = b + m.b;
+		r.c = c + m.c;
+		r.d = d + m.d;
+		return r;
+	}
+	Mat4x3 operator-(const Mat4x3& m) const {
+		Mat4x3 r;
+		r.a = a - m.a;
+		r.b = b - m.b;
+		r.c = c - m.c;
+		r.d = d - m.d;
+		return r;
+	}
+
+	Mat4x3 operator+(float s) const {
+		Mat4x3 r;
+		r.a = a + s;
+		r.b = b + s;
+		r.c = c + s;
+		r.d = d + s;
+		return r;
+	}
+	Mat4x3 operator-(float s) const {
+		Mat4x3 r;
+		r.a = a - s;
+		r.b = b - s;
+		r.c = c - s;
+		r.d = d - s;
+		return r;
+	}
+	Mat4x3 operator*(float s) const {
+		Mat4x3 r;
+		r.a = a * s;
+		r.b = b * s;
+		r.c = c * s;
+		r.d = d * s;
+		return r;
+	}
+	Mat4x3 operator/(float s) const {
+		Mat4x3 r;
+		r.a = a / s;
+		r.b = b / s;
+		r.c = c / s;
+		r.d = d / s;
+		return r;
+	}
+
+	Mat4x3 operator*=(const Mat4x3& v) {
+		*this = *this * v;
+		return *this;
+	}
+	Mat4x3 operator*(const Mat4x4& m) const {
+		Mat4x3 ret;
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 3; j++) {
+				ret[i][j] = 0.0f;
+				ret[i][j] += m[i][0] * a[j];
+				ret[i][j] += m[i][1] * b[j];
+				ret[i][j] += m[i][2] * c[j];
+				ret[i][j] += m[i][3] * d[j];
+			}
+		}
+		return ret;
+	}
+
+	Vec3 operator*(Vec4 v) const {
+		return a * v[0] + b * v[1] + c * v[2] + d * v[3];
+	}
 	Mat4x3(float f) {
 		a = Vec3(f);
 		b = Vec3(f);
@@ -229,7 +853,157 @@ struct Mat4x3 {
 		}
 	}
 };
+
+
+
 struct Mat4x4 {
+
+
+	
+	Vec4& operator[](int idx) {
+		assert(idx >= 0 && idx <= 3);
+		switch (idx) {
+		case(0):
+			return a;
+		case(1):
+			return b;
+		case(2):
+			return c;
+		default:
+			return d;
+		}
+	}
+	Vec4 operator[](int idx) const {
+		assert(idx >= 0 && idx <= 3);
+		switch (idx) {
+		case(0):
+			return a;
+		case(1):
+			return b;
+		case(2):
+			return c;
+		default:
+			return d;
+		}
+	}
+
+	Mat4x4 operator+=(const Mat4x4& m) {
+		a += m.a;
+		b += m.b;
+		c += m.c;
+		d += m.d;
+		return *this;
+	}
+	Mat4x4 operator-=(const Mat4x4& m) {
+		a -= m.a;
+		b -= m.b;
+		c -= m.c;
+		d -= m.d;
+		return *this;
+	}
+
+	Mat4x4 operator+=(float s) {
+		a += s;
+		b += s;
+		c += s;
+		d += s;
+		return *this;
+	}
+	Mat4x4 operator-=(float s) {
+		a -= s;
+		b -= s;
+		c -= s;
+		d -= s; 
+		return *this;
+	}
+	Mat4x4 operator*=(float s) {
+		a *= s;
+		b *= s;
+		c *= s;
+		d *= s;
+		return *this;
+	}
+	Mat4x4 operator/=(float s) {
+		a /= s;
+		b /= s;
+		c /= s;
+		d /= s;
+		return *this;
+	}
+
+	Mat4x4 operator+(const Mat4x4& m) const {
+		Mat4x4 r;
+		r.a = a + m.a;
+		r.b = b + m.b;
+		r.c = c + m.c;
+		r.d = d + m.d;
+		return r;
+	}
+	Mat4x4 operator-(const Mat4x4& m) const {
+		Mat4x4 r;
+		r.a = a - m.a;
+		r.b = b - m.b;
+		r.c = c - m.c;
+		r.d = d - m.d;
+		return r;
+	}
+
+	Mat4x4 operator+(float s) const {
+		Mat4x4 r;
+		r.a = a + s;
+		r.b = b + s;
+		r.c = c + s;
+		r.d = d + s;
+		return r;
+	}
+	Mat4x4 operator-(float s) const {
+		Mat4x4 r;
+		r.a = a - s;
+		r.b = b - s;
+		r.c = c - s;
+		r.d = d - s;
+		return r;
+	}
+	Mat4x4 operator*(float s) const {
+		Mat4x4 r;
+		r.a = a * s;
+		r.b = b * s;
+		r.c = c * s;
+		r.d = d * s;
+		return r;
+	}
+	Mat4x4 operator/(float s) const {
+		Mat4x4 r;
+		r.a = a / s;
+		r.b = b / s;
+		r.c = c / s;
+		r.d = d / s;
+		return r;
+	}
+
+	Mat4x4 operator*=(const Mat4x4& v) {
+		*this = *this * v;
+		return *this;
+	}
+	Mat4x4 operator*(const Mat4x4& m) const {
+		Mat4x4 ret;
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				ret[i][j] = 0.0f;
+				ret[i][j] += m[i][0] * a[j];
+				ret[i][j] += m[i][1] * b[j];
+				ret[i][j] += m[i][2] * c[j];
+				ret[i][j] += m[i][3] * d[j];
+			}
+		}
+		return ret;
+	}
+
+	Vec4 operator*(Vec4 v) const {
+		return a*v[0]  + b*v[1] + c*v[2] + d*v[3];
+	}
+
+
 	Mat4x4(float f) {
 		a = Vec4(f);
 		b = Vec4(f);
@@ -355,49 +1129,49 @@ inline Color3 normToColor(Vec3 n) {
 
 
 inline Vec4 constVecMult(float a, Vec4 v) {
-	return Vec4(a * v.x, a * v.y, a * v.z, a * v.w);
+	return v * a;
 }
 inline Vec3 constVecMult(float a, Vec3 v) {
-	return Vec3(a * v.x, a * v.y, a * v.z);
+	return v * a;
 }
 inline Vec2 constVecMult(float a, Vec2 v) {
-	return Vec2(a * v.x, a * v.y);
+	return v * a;
 }
 inline Vec4 vecVecMult(Vec4 a, Vec4 v) {
-	return Vec4(a.x * v.x, a.y * v.y, a.z * v.z, a.w * v.w);
+	return a * v;
 }
 inline Vec3 vecVecMult(Vec3 a, Vec3 v) {
-	return Vec3(a.x * v.x, a.y * v.y, a.z * v.z);
+	return a * v;
 }
 inline Vec2 vecVecMult(Vec2 a, Vec2 v) {
-	return Vec2(a.x * v.x, a.y * v.y);
+	return a * v;
 }
 inline Vec4 vecVecAdd(Vec4 a, Vec4 v) {
-	return Vec4(a.x + v.x, a.y + v.y, a.z + v.z, a.w + v.w);
+	return a + v;
 }
 inline Vec3 vecVecAdd(Vec3 a, Vec3 v) {
-	return Vec3(a.x + v.x, a.y + v.y, a.z + v.z);
+	return a + v;
 }
 inline Vec2 vecVecAdd(Vec2 a, Vec2 v) {
-	return Vec2(a.x + v.x, a.y + v.y);
+	return a + v;
 }
 inline Vec4 vecVecSub(Vec4 a, Vec4 v) {
-	return Vec4(a.x - v.x, a.y - v.y, a.z - v.z, a.w - v.w);
+	return a - v;
 }
 inline Vec3 vecVecSub(Vec3 a, Vec3 v) {
-	return Vec3(a.x - v.x, a.y - v.y, a.z - v.z);
+	return a - v;
 }
 inline Vec2 vecVecSub(Vec2 a, Vec2 v) {
-	return Vec2(a.x - v.x, a.y - v.y);
+	return a - v;
 }
 inline Vec4 vecVecDiv(Vec4 a, Vec4 v) {
-	return Vec4(a.x / v.x, a.y / v.y, a.z / v.z, a.w/v.w);
+	return a / v;
 }
 inline Vec3 vecVecDiv(Vec3 a, Vec3 v) {
-	return Vec3(a.x / v.x, a.y / v.y, a.z / v.z);
+	return a / v;
 }
 inline Vec2 vecVecDiv(Vec2 a, Vec2 v) {
-	return Vec2(a.x / v.x, a.y / v.y);
+	return a / v;
 }
 inline float dot(Vec2 a, Vec2 b) {
 	return a.x * b.x + a.y * b.y;
@@ -419,3 +1193,4 @@ inline Vec4 vecNormalize(Vec4 v) {
 inline Vec2 vecNormalize(Vec2 v) {
 	return vecVecDiv(v, Vec2(vecNorm(v)));;
 }
+
