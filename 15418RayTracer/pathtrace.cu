@@ -8,6 +8,13 @@
 #include "Scene.cpp"
 #include "glm/glm.hpp"
 #include "glm/gtx/norm.hpp"
+#define cudaCheckError() {                                          \
+ cudaError_t e=cudaGetLastError();                                 \
+ if(e!=cudaSuccess) {                                              \
+   printf("Cuda failure %s:%d: '%s'\n",__FILE__,__LINE__,cudaGetErrorString(e));           \
+   exit(0); \
+ }                                                                 \
+}
 
 static Scene* hst_scene = NULL;
 static glm::vec3* dev_image = NULL;
@@ -185,7 +192,7 @@ void pathtraceFree() {
 	cudaFree(dev_rays);
 	cudaFree(dev_objs);
 	cudaFree(dev_hits);
-	cudaFree(dev_blockHits);
+	cudaFree(dev_hitPeaks);
 	cudaFree(dev_hitIndices);
 }
 
@@ -306,7 +313,7 @@ void pathtrace(int frame, int iter) {
 		cudaMemset(dev_hits, 0, pixelcount * sizeof(Hit));
 
 		// tracing
-		dim3 numblocksPathSegmentTracing = (num_rays + blockSize1d - 1) / blockSize1d;
+		int numblocksPathSegmentTracing = (num_rays + blockSize1d - 1) / blockSize1d;
 
 		fillIndices << <numblocksPathSegmentTracing, blockSize1d >> > (num_rays, dev_hitIndices); //Fill init indices to 1...num_rays
 
@@ -314,8 +321,8 @@ void pathtrace(int frame, int iter) {
 			depth
 			, num_rays
 			, dev_rays
+			, hst_scene->sceneObjs.size()
 			, dev_objs
-			, hst_scene->objs.size()
 			, dev_hits
 			, dev_hitPeaks
 			, dev_hitIndices
@@ -327,7 +334,7 @@ void pathtrace(int frame, int iter) {
 
 		//Use find rays to contract rays into those that have ended and those that havent
 
-		num_rays = concat_rays(num_rays, numblocksPathSegmentTracing, blockSize1d, dev_hitIndices) {
+		num_rays = concat_rays(num_rays, numblocksPathSegmentTracing, blockSize1d, dev_hitIndices);
 
 		//printf("num paths: %i , depth: %i \n", num_paths, depth);
 		if (num_rays == 0 || depth > traceDepth) {
