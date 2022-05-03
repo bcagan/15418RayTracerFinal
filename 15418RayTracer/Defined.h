@@ -1,5 +1,9 @@
 #pragma once
 
+#ifndef  DEF_h
+#define DEF_h
+
+
 #include "glm/glm.hpp"
 #include <iostream>
 #include <io.h>
@@ -471,21 +475,12 @@ inline float vecNorm(Vec4 v) {
 
 //All operators based on equivalent implementations
 //From Scotty3D
-
+struct Mat3x3;
+struct Mat4x3;
+struct Mat4x4;
 
 struct Mat3x3 {
 
-	Mat3x3(Mat4x4 M) {
-		a[0] = M[0][0];
-		a[1] = M[0][1];
-		a[2] = M[0][2];
-		b[0] = M[1][0];
-		b[1] = M[1][1];
-		b[2] = M[1][2];
-		c[0] = M[2][0];
-		c[1] = M[2][1];
-		c[2] = M[2][2];
-	}
 
 
 	Vec3& operator[](int idx) {
@@ -778,23 +773,7 @@ struct Mat4x3 {
 		return r;
 	}
 
-	Mat4x3 operator*=(const Mat4x3& v) {
-		*this = *this * v;
-		return *this;
-	}
-	Mat4x3 operator*(const Mat4x4& m) const {
-		Mat4x3 ret;
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 3; j++) {
-				ret[i][j] = 0.0f;
-				ret[i][j] += m[i][0] * a[j];
-				ret[i][j] += m[i][1] * b[j];
-				ret[i][j] += m[i][2] * c[j];
-				ret[i][j] += m[i][3] * d[j];
-			}
-		}
-		return ret;
-	}
+	Mat4x3 operator*(const Mat4x4& m) const;
 
 	Vec3 operator*(Vec4 v) const {
 		return a * v[0] + b * v[1] + c * v[2] + d * v[3];
@@ -859,6 +838,19 @@ struct Mat4x3 {
 struct Mat4x4 {
 
 
+	Mat3x3 toMat3x3() {
+		Mat3x3 ret;
+		ret.a[0] = (*this)[0][0];
+		ret.a[1] = (*this)[0][1];
+		ret.a[2] = (*this)[0][2];
+		ret.b[0] = (*this)[1][0];
+		ret.b[1] = (*this)[1][1];
+		ret.b[2] = (*this)[1][2];
+		ret.c[0] = (*this)[2][0];
+		ret.c[1] = (*this)[2][1];
+		ret.c[2] = (*this)[2][2];
+		return ret;
+	}
 	
 	Vec4& operator[](int idx) {
 		assert(idx >= 0 && idx <= 3);
@@ -1194,3 +1186,21 @@ inline Vec2 vecNormalize(Vec2 v) {
 	return vecVecDiv(v, Vec2(vecNorm(v)));;
 }
 
+
+
+inline Mat4x3 Mat4x3::operator*(const Mat4x4& m) const {
+	Mat4x3 ret;
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 3; j++) {
+			ret[i][j] = 0.0f;
+			ret[i][j] += m[i][0] * a[j];
+			ret[i][j] += m[i][1] * b[j];
+			ret[i][j] += m[i][2] * c[j];
+			ret[i][j] += m[i][3] * d[j];
+		}
+	}
+	return ret;
+}
+
+
+#endif // ! DEF_h
