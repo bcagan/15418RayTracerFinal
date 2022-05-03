@@ -8,12 +8,16 @@
 #include "Scene.cpp"
 #include "glm/glm.hpp"
 #include "glm/gtx/norm.hpp"
-#define cudaCheckError() {                                          \
- cudaError_t e=cudaGetLastError();                                 \
- if(e!=cudaSuccess) {                                              \
-   printf("Cuda failure %s:%d: '%s'\n",__FILE__,__LINE__,cudaGetErrorString(e));           \
-   exit(0); \
- }                                                                 \
+
+#define cudaCheckError(ans)  cudaAssert((ans), __FILE__, __LINE__);
+inline void cudaAssert(cudaError_t code, const char* file, int line, bool abort = true)
+{
+	if (code != cudaSuccess)
+	{
+		fprintf(stderr, "CUDA Error: %s at %s:%d\n",
+			cudaGetErrorString(code), file, line);
+		if (abort) exit(code);
+	}
 }
 
 static Scene* hst_scene = NULL;
@@ -73,7 +77,6 @@ __global__ void set0(int N, int* deviceData) {
 void exclusive_scan(int* device_data, int length) {
  
     int N = nextPow2(length);
-    int printArr[N];
     const int threadsPerBlock = 512;
     int blocks = (N + threadsPerBlock - 1) / threadsPerBlock;
     for (int twod = 1; twod < N; twod *= 2) {
@@ -132,7 +135,7 @@ __global__ void contractOut(int N, int* rays, int* indices, int* out, int x, int
 
 void debugAssist(int* from, int N) {
     //    printf("deb\n");
-    int printArr[N];
+	int printArr[1000]; // int printArr[N];
     cudaCheckError(cudaMemcpy(printArr, from, N * sizeof(int), cudaMemcpyDeviceToHost));
     for (int c = 0; c < N; c++) {
         printf("%d ", printArr[c]);
@@ -249,7 +252,7 @@ __global__ void computeIntersections(
 		{
 			Object& obj = objs[i];
 
-			
+			// hmm... maybe specifically defining tests depending on the object type ?
 			t = obj.hit(ray, h);
 			
 			if (t > 0.0f && t_min > t)
