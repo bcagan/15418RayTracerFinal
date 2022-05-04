@@ -21,7 +21,7 @@ inline void cudaAssert(cudaError_t code, const char* file, int line, bool abort 
 }
 
 static Scene* hst_scene = NULL;
-static glm::vec3* dev_image = NULL;
+static Vec3* dev_image = NULL;
 static Object* dev_objs = NULL;
 static Material* dev_materials = NULL;
 static Ray* dev_rays = NULL;
@@ -170,8 +170,8 @@ void pathtraceInit(Scene* scene) {
 	const Camera& cam = hst_scene->cam;
 	const int pixelcount = cam.resX * cam.resY;
 
-	cudaMalloc(&dev_image, pixelcount * sizeof(glm::vec3));
-	cudaMemset(dev_image, 0, pixelcount * sizeof(glm::vec3));
+	cudaMalloc(&dev_image, pixelcount * sizeof(Vec3));
+	cudaMemset(dev_image, 0, pixelcount * sizeof(Vec3));
 
 	cudaMalloc(&dev_rays, pixelcount * sizeof(Ray));
 
@@ -225,6 +225,34 @@ __global__ void generateRayFromCamera(Camera cam, int iter, int traceDepth, Ray*
 		vecTransform.pos = Vec3(0.f);
 		ray.d = vecTransform.matVecMult(vecTransform.localToWorld(), d);
 		ray.o = cam.transform.matVecMult(cam.transform.localToWorld(), o);
+		ray.pixelIndex = index;
+
+	}
+}
+
+__global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int num_rays)
+{
+	int ray_index = (blockIdx.x * blockDim.x) + threadIdx.x;
+
+	if (ray_index < num_rays) {
+		
+		Ray& r = rays[ray_index];
+		Hit& hit = hits[ray_index];
+
+		Color3 rgb;
+
+		if (hits[ray_index].t != -1.0f) {
+			// calculate bounce ray
+			Vec3 bouncedHit = hits[ray_index].bounce(r);
+			Ray newR = Ray(vecVecAdd(constVecMult(hit.t, r.d), r.o), bouncedHit);
+			newR.color = vecVecAdd(hit.emitted().toVec3(), vecVecMult(hit.albedo().toVec3(), r.color));
+
+			// set up for next bounce 
+			rays[ray_index] = newR;
+			//Vec3 renderCRes = renderC(newR, numBounces - 1).toVec3();
+			Vec3 pos = vecVecAdd(constVecMult(hit.t, r.d), r.o);
+		}
+		
 
 	}
 }
@@ -234,16 +262,15 @@ __global__ void computeIntersections(
 	int depth, int num_rays, Ray* rays, int objs_size, Object* objs, Hit* hits, int* hitPeaks, int* hitIndices
 )
 {
-	int indexIndex = blockIdx.x * blockDim.x + threadIdx.x;
-	int ray_index = hitIndices[indexIndex];
+	int ray_index = blockIdx.x * blockDim.x + threadIdx.x;
 
-	if (indexIndex < num_rays)
+	if (ray_index < num_rays)
 	{
 		Ray ray = rays[ray_index];
 
 		float t;
-		glm::vec3 intersect_point;
-		glm::vec3 normal;
+		Vec3 intersect_point;
+		Vec3 normal;
 		float t_min = FLT_MAX;
 		int hit_obj_index = -1;
 		Hit h;
@@ -274,6 +301,7 @@ __global__ void computeIntersections(
 			hits[ray_index].Mat = objs[hit_obj_index].Mat;
 			hits[ray_index].normS = h.normS;
 			hitPeaks[ray_index + 1] = 1;
+			
 		}
 
 		
@@ -284,6 +312,17 @@ __global__ void fillIndices(int num_rays, int* hitIndices) {
 	int indexIndex = blockIdx.x * blockDim.x + threadIdx.x;
 	if (indexIndex < num_rays) {
 		hitIndices[indexIndex] = indexIndex;
+	}
+}
+
+__global__ void finalGather(int num_rays, Vec3* image, Ray* rays)
+{
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+
+	if (index < num_rays)
+	{
+		Ray ray = rays[index];
+		image[ray.pixelIndex] += ray.color;
 	}
 }
 
@@ -331,6 +370,8 @@ void pathtrace(int frame, int iter) {
 			, dev_hitIndices
 			);
 
+		calculateColor << <numblocksPathSegmentTracing, blockSize1d >> > (cam, dev_rays, dev_hits, depth, num_rays);
+
 		
 		cudaDeviceSynchronize();
 		depth++;
@@ -349,7 +390,7 @@ void pathtrace(int frame, int iter) {
 	
 	// Assemble this iteration and apply it to the image
 	dim3 numBlocksPixels = (pixelcount + blockSize1d - 1) / blockSize1d;
-	// finalGather << <numBlocksPixels, blockSize1d >> > (num_rays, dev_image, dev_rays);
+	finalGather << <numBlocksPixels, blockSize1d >> > (num_rays, dev_image, dev_rays);
 
 	///////////////////////////////////////////////////////////////////////////
 
@@ -358,6 +399,6 @@ void pathtrace(int frame, int iter) {
 
 	// Retrieve image from GPU
 	cudaMemcpy(hst_scene->cam.image.data(), dev_image,
-		pixelcount * sizeof(glm::vec3), cudaMemcpyDeviceToHost);
+		pixelcount * sizeof(Vec3), cudaMemcpyDeviceToHost);
 
 }

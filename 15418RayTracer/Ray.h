@@ -8,12 +8,14 @@
 class Ray
 {
 public:
+	
 	Vec3 o; //Origin
 	Vec3 d; //ray direction - For consistency's sake I'm going to have as treat this as always normalized. 1 d's worth = 1 time's worth of ray travel
 	float mint, maxt; //min distance of ray intersection, max distance of ray intersection
 	//Example: mint may have a use I dont remember but we might not use it however when navigating the bvh tree, if we know we intersect at t = 10,
 	//then any other intersection at t >= 10 can be ruled out
-
+	Vec3 color;
+	int pixelIndex;
 	Ray transformRay(Transform transform);
 
 	Ray(Vec3 origin, Vec3 dir) {
