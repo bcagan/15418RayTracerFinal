@@ -5,6 +5,8 @@
 #include <cmath>
 
 #include "Scene.h"
+#include "device_launch_parameters.h"
+#include "Intersections.h"
 #include "Scene.cpp"
 #include "glm/glm.hpp"
 #include "glm/gtx/norm.hpp"
@@ -83,7 +85,7 @@ void exclusive_scan(int* device_data, int length) {
         int twod1 = twod * 2;
         blocks = (N / twod1 + 1 + threadsPerBlock - 1) / threadsPerBlock;
 
-        upsweepKernel << <blocks, threadsPerBlock >> > (N, device_data, twod1, twod);
+        upsweepKernel <<<blocks, threadsPerBlock>>> (N, device_data, twod1, twod);
     }
     blocks = (N + threadsPerBlock - 1) / threadsPerBlock;
     set0 << <blocks, threadsPerBlock >> > (N, device_data);
@@ -126,7 +128,7 @@ __global__ void intSet(int N, int* set, int to) {
     set[index] = to;
 }
 
-__global__ void contractOut(int N, int* rays, int* indices, int* out, int x, int y) {
+__global__ void contractOut(int N, int* rays, int* indices, int* out) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
     if (index < N && rays[index] != 0) {
         out[indices[index]] = index;
@@ -154,7 +156,7 @@ int concat_rays(int num_rays, int numblocksPathSegmentTracing, int blockSize1d, 
     int numberRays = 0;
     cudaCheckError(cudaMemcpy(&numberRays, device_num + (num_rays), sizeof(int), cudaMemcpyDeviceToHost));
 
-    contractOut <<<numblocksPathSegmentTracing, blockSize1d >> > (num_rays, dev_hitPeaks, device_num, device_output, x, y);
+    contractOut <<<numblocksPathSegmentTracing, blockSize1d >> > (num_rays, dev_hitPeaks, device_num, device_output);
 
     cudaCheckError(cudaDeviceSynchronize());
 	cudaFree(device_num);
@@ -241,15 +243,14 @@ __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int n
 
 		Color3 rgb;
 
-		if (hits[ray_index].t != -1.0f) {
+		if (hit.t != -1.0f) {
 			// calculate bounce ray
-			Vec3 bouncedHit = hits[ray_index].bounce(r);
+			Vec3 bouncedHit = hit.bounce(r);
 			Ray newR = Ray(vecVecAdd(constVecMult(hit.t, r.d), r.o), bouncedHit);
 			newR.color = vecVecAdd(hit.emitted().toVec3(), vecVecMult(hit.albedo().toVec3(), r.color));
 
 			// set up for next bounce 
 			rays[ray_index] = newR;
-			//Vec3 renderCRes = renderC(newR, numBounces - 1).toVec3();
 			Vec3 pos = vecVecAdd(constVecMult(hit.t, r.d), r.o);
 		}
 		
@@ -278,9 +279,22 @@ __global__ void computeIntersections(
 		for (int i = 0; i < objs_size; i++)
 		{
 			Object& obj = objs[i];
+			Hit temp;
 
-			// hmm... maybe specifically defining tests depending on the object type ?
-			t = obj.hit(ray, h);
+			if (obj.bbox.hit(ray, temp)) {
+				if (obj.type == gcube) {
+					cubeHit(obj, ray, h, temp);
+				}
+				else if (obj.type == gsphere) {
+					sphereHit(obj, ray, h);
+				}
+				else {
+					t_min = -1.0f;
+					hit_obj_index = -1;
+				}
+				
+			}
+			
 			
 			if (t > 0.0f && t_min > t)
 			{

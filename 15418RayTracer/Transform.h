@@ -220,6 +220,7 @@ public:
 	Vec3 pos = Vec3(0.0f, 0.0f, 0.0f);
 	Vec3 rot = Vec3(0.f, 0.f, 0.f); //Rotations are
 	Vec3 scale = Vec3(1.0f, 1.0f, 1.0f);
+	float radius = 1.0f;
 
 	//Take above structures and create transformation matrix
 	Mat4x4 makeTransform();//Of note, 4 columns, 3 rows, homogenous coordinate row not accounted for. GLM has a weird naming format

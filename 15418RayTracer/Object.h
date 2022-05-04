@@ -4,6 +4,11 @@
 #include "Ray.h"
 #include "Transform.h"
 
+enum GeomType {
+	gcube,
+	gsphere
+};
+
 class BBox {
 public:
 	BBox(Vec3 minn, Vec3 maxx) : min(minn), max(maxx) {}
@@ -18,6 +23,9 @@ class Object
 public:
 	Material Mat;
 	BBox bbox;
+	Transform t;
+	// added since hit is a host function and cannot be called from global functions in pathtrace.cu
+	GeomType type;
 	virtual bool hit( Ray& ray, Hit& hit) {
 		printf("generic\n");
 		return false;
@@ -34,20 +42,20 @@ public:
 class Cube : public Object  {
 public:
 	Cube(Vec3 p, float s, Transform t =Transform()) {
-		pos = p;
+		t.pos = p;
 		size = s;
+		type = gcube;
 		bbox = BBox(vecVecAdd(p, Vec3(s / -2.f)), vecVecAdd(p , Vec3(s / 2.f)));
 		//Set bbox
 	}
 	Cube() {
-		pos = Vec3(0.f);
+		t.pos = Vec3(0.f);
 		size = 1.f;
 		bbox = BBox(Vec3(-1.f), Vec3(1.f));
 		//set bbox
 	}
-	Vec3 pos;
+
 	float size;
-	Transform t;
 
 	bool hit(Ray &ray, Hit& hit) override {
 		Hit temp;
@@ -56,7 +64,7 @@ public:
 				hit.t = temp.t;
 				hit.uv = temp.uv;
 				hit.Mat = Mat;
-				Vec3 normVec = vecNormalize(vecVecAdd((vecVecAdd(ray.o , constVecMult(hit.t , ray.d))), constVecMult(-1.f, pos))); 
+				Vec3 normVec = vecNormalize(vecVecAdd((vecVecAdd(ray.o , constVecMult(hit.t , ray.d))), constVecMult(-1.f, t.pos))); 
 				if (abs(normVec.x) > abs(normVec.y) && abs(normVec.x) > abs(normVec.z)){
 					if (normVec.x < 0) hit.normG = Vec3(-1.f, 0.f, 0.f);
 					else hit.normG = Vec3(1.f, 0.f, 0.f);
@@ -83,15 +91,17 @@ class Sphere : public Object {
 public:
 	Sphere(Vec3 c, float r) : radius(r) {
 		t.pos = c; 
+		type = gsphere;
+		t.radius = r;
 		bbox = BBox(vecVecAdd(c,Vec3( - r)), vecVecAdd(c ,Vec3( r)));
 	}
 
 	Sphere(){
 		t.pos = Vec3(0.f);
+		t.radius = 1.f;
 		bbox = BBox(Vec3(-1.f), Vec3(1.f));
 	}
 
-	Transform t;
 	float radius = 1.f;
 
 	bool hit( Ray& ray, Hit& hit) override;
