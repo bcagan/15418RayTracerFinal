@@ -11,6 +11,13 @@
 #include "glm/glm.hpp"
 #include "glm/gtx/norm.hpp"
 
+//https://stackoverflow.com/questions/6061565/setting-up-visual-studio-intellisense-for-cuda-kernel-calls
+#ifdef __INTELLISENSE__
+#define CUDA_KERNEL(...)
+#else
+#define CUDA_KERNEL(...) <<< __VA_ARGS__ >>>
+#endif
+
 #define cudaCheckError(ans)  cudaAssert((ans), __FILE__, __LINE__);
 inline void cudaAssert(cudaError_t code, const char* file, int line, bool abort = true)
 {
@@ -85,15 +92,15 @@ void exclusive_scan(int* device_data, int length) {
         int twod1 = twod * 2;
         blocks = (N / twod1 + 1 + threadsPerBlock - 1) / threadsPerBlock;
 
-        upsweepKernel <<<blocks, threadsPerBlock>>> (N, device_data, twod1, twod);
+        upsweepKernel CUDA_KERNEL(blocks, threadsPerBlock) (N, device_data, twod1, twod);
     }
     blocks = (N + threadsPerBlock - 1) / threadsPerBlock;
-    set0 << <blocks, threadsPerBlock >> > (N, device_data);
+    set0 CUDA_KERNEL(blocks, threadsPerBlock) (N, device_data);
 
     for (int twod = N / 2; twod >= 1; twod /= 2) {
         int twod1 = twod * 2;
         blocks = (N / twod1 + 1 + threadsPerBlock - 1) / threadsPerBlock;
-        downsweepKernel << <blocks, threadsPerBlock >> > (N, device_data, twod1, twod);
+        downsweepKernel CUDA_KERNEL(blocks, threadsPerBlock) (N, device_data, twod1, twod);
     }
 
 }
@@ -156,7 +163,7 @@ int concat_rays(int num_rays, int numblocksPathSegmentTracing, int blockSize1d, 
     int numberRays = 0;
     cudaCheckError(cudaMemcpy(&numberRays, device_num + (num_rays), sizeof(int), cudaMemcpyDeviceToHost));
 
-    contractOut <<<numblocksPathSegmentTracing, blockSize1d >> > (num_rays, dev_hitPeaks, device_num, device_output);
+    contractOut CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (num_rays, dev_hitPeaks, device_num, device_output);
 
     cudaCheckError(cudaDeviceSynchronize());
 	cudaFree(device_num);
@@ -354,7 +361,7 @@ void pathtrace(int frame, int iter) {
 	// 1D block for path tracing
 	const int blockSize1d = 128;
 
-	generateRayFromCamera << <blocksPerGrid2d, blockSize2d >> > (cam, iter, traceDepth, dev_rays);
+	generateRayFromCamera CUDA_KERNEL(blocksPerGrid2d, blockSize2d) (cam, iter, traceDepth, dev_rays);
 
 	int depth = 0;
 	Ray* dev_ray_end = dev_rays + pixelcount;
@@ -371,9 +378,9 @@ void pathtrace(int frame, int iter) {
 		// tracing
 		int numblocksPathSegmentTracing = (num_rays + blockSize1d - 1) / blockSize1d;
 
-		fillIndices << <numblocksPathSegmentTracing, blockSize1d >> > (num_rays, dev_hitIndices); //Fill init indices to 1...num_rays
+		fillIndices CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (num_rays, dev_hitIndices); //Fill init indices to 1...num_rays
 
-		computeIntersections << <numblocksPathSegmentTracing, blockSize1d >> > (
+		computeIntersections CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (
 			depth
 			, num_rays
 			, dev_rays
@@ -384,7 +391,7 @@ void pathtrace(int frame, int iter) {
 			, dev_hitIndices
 			);
 
-		calculateColor << <numblocksPathSegmentTracing, blockSize1d >> > (cam, dev_rays, dev_hits, depth, num_rays);
+		calculateColor CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (cam, dev_rays, dev_hits, depth, num_rays);
 
 		
 		cudaDeviceSynchronize();
@@ -404,7 +411,7 @@ void pathtrace(int frame, int iter) {
 	
 	// Assemble this iteration and apply it to the image
 	dim3 numBlocksPixels = (pixelcount + blockSize1d - 1) / blockSize1d;
-	finalGather << <numBlocksPixels, blockSize1d >> > (num_rays, dev_image, dev_rays);
+	finalGather CUDA_KERNEL(numBlocksPixels, blockSize1d) (num_rays, dev_image, dev_rays);
 
 	///////////////////////////////////////////////////////////////////////////
 

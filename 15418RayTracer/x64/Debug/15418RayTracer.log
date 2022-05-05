@@ -1,56 +1,114 @@
-﻿  Camera.cpp
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1083,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1084,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1085,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-  crt/host_defines.h is an internal header file and must not be used directly.  Please use cuda_runtime_api.h or cuda_runtime.h instead.
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Camera.h(17,10): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Camera.h(18,10): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-  Material.cpp
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1083,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1084,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1085,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-  Object.cpp
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1083,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1084,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1085,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-  crt/host_defines.h is an internal header file and must not be used directly.  Please use cuda_runtime_api.h or cuda_runtime.h instead.
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Object.cpp(33,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-  Ray.cpp
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1083,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1084,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1085,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-  crt/host_defines.h is an internal header file and must not be used directly.  Please use cuda_runtime_api.h or cuda_runtime.h instead.
-  Scene.cpp
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1083,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1084,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1085,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-  crt/host_defines.h is an internal header file and must not be used directly.  Please use cuda_runtime_api.h or cuda_runtime.h instead.
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Camera.h(17,10): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Camera.h(18,10): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Scene.cpp(72,58): warning C4244: 'initializing': conversion from 'float' to 'size_t', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Scene.cpp(77,35): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-  Transform.cpp
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1083,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1084,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1085,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-  crt/host_defines.h is an internal header file and must not be used directly.  Please use cuda_runtime_api.h or cuda_runtime.h instead.
-  main.cpp
-C:\GL\glad\glad.h(322,1): warning C4005: 'GL_ALL_ATTRIB_BITS': macro redefinition
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\GL\gl.h(107): message : see previous definition of 'GL_ALL_ATTRIB_BITS'
-C:\GL\glad\glad.h(410,1): warning C4005: 'GL_LOGIC_OP': macro redefinition
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\GL\gl.h(1152): message : see previous definition of 'GL_LOGIC_OP'
-C:\GL\glad\glad.h(494,1): warning C4005: 'GL_TEXTURE_COMPONENTS': macro redefinition
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\GL\gl.h(1153): message : see previous definition of 'GL_TEXTURE_COMPONENTS'
-C:\GL\glad\glad.h(588,1): warning C4005: 'GL_CLIENT_ALL_ATTRIB_BITS': macro redefinition
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\GL\gl.h(973): message : see previous definition of 'GL_CLIENT_ALL_ATTRIB_BITS'
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1083,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1084,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Defined.h(1085,12): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-  crt/host_defines.h is an internal header file and must not be used directly.  Please use cuda_runtime_api.h or cuda_runtime.h instead.
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Camera.h(17,10): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Camera.h(18,10): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\main.cpp(191,28): warning C4244: 'argument': conversion from 'float' to 'unsigned char', possible loss of data
-  Generating Code...
-     Creating library C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\x64\Debug\15418RayTracer.lib and object C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\x64\Debug\15418RayTracer.exp
-LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
-  15418RayTracer.vcxproj -> C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\x64\Debug\15418RayTracer.exe
+﻿  Compiling CUDA source file Pathtrace.cu...
+  
+  C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.6\bin\nvcc.exe" -gencode=arch=compute_52,code=\"sm_52,compute_52\" --use-local-env -ccbin "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\bin\HostX86\x64" -x cu   -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.6\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.6\include"  -G   --keep-dir x64\Debug  -maxrregcount=0  --machine 64 --compile -cudart static  -g  -D_DEBUG -D_CONSOLE -D_UNICODE -DUNICODE -Xcompiler "/EHsc /W3 /nologo /Od /Fdx64\Debug\vc142.pdb /FS /Zi /RTC1 /MDd " -o "C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\x64\Debug\Pathtrace.cu.obj" "C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Pathtrace.cu" 
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_vec2.hpp(97): warning #20012-D: __device__ annotation is ignored on a function("vec") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_vec2.hpp(97): warning #20012-D: __host__ annotation is ignored on a function("vec") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_vec2.hpp(98): warning #20012-D: __device__ annotation is ignored on a function("vec") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_vec2.hpp(98): warning #20012-D: __host__ annotation is ignored on a function("vec") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_vec2.hpp(146): warning #20012-D: __device__ annotation is ignored on a function("operator=") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_vec2.hpp(146): warning #20012-D: __host__ annotation is ignored on a function("operator=") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_vec3.hpp(101): warning #20012-D: __device__ annotation is ignored on a function("vec") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_vec3.hpp(101): warning #20012-D: __host__ annotation is ignored on a function("vec") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_vec3.hpp(102): warning #20012-D: __device__ annotation is ignored on a function("vec") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_vec3.hpp(102): warning #20012-D: __host__ annotation is ignored on a function("vec") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_vec3.hpp(179): warning #20012-D: __device__ annotation is ignored on a function("operator=") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_vec3.hpp(179): warning #20012-D: __host__ annotation is ignored on a function("operator=") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_vec4.hpp(100): warning #20012-D: __device__ annotation is ignored on a function("vec") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_vec4.hpp(100): warning #20012-D: __host__ annotation is ignored on a function("vec") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_vec4.hpp(101): warning #20012-D: __device__ annotation is ignored on a function("vec") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_vec4.hpp(101): warning #20012-D: __host__ annotation is ignored on a function("vec") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_vec4.hpp(252): warning #20012-D: __device__ annotation is ignored on a function("operator=") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_vec4.hpp(252): warning #20012-D: __host__ annotation is ignored on a function("operator=") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_mat2x2.hpp(35): warning #20012-D: __device__ annotation is ignored on a function("mat") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_mat2x2.hpp(35): warning #20012-D: __host__ annotation is ignored on a function("mat") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_mat2x3.hpp(36): warning #20012-D: __device__ annotation is ignored on a function("mat") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_mat2x3.hpp(36): warning #20012-D: __host__ annotation is ignored on a function("mat") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_mat2x4.hpp(36): warning #20012-D: __device__ annotation is ignored on a function("mat") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_mat2x4.hpp(36): warning #20012-D: __host__ annotation is ignored on a function("mat") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_mat3x2.hpp(36): warning #20012-D: __device__ annotation is ignored on a function("mat") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_mat3x2.hpp(36): warning #20012-D: __host__ annotation is ignored on a function("mat") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_mat3x3.hpp(35): warning #20012-D: __device__ annotation is ignored on a function("mat") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_mat3x3.hpp(35): warning #20012-D: __host__ annotation is ignored on a function("mat") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_mat3x4.hpp(36): warning #20012-D: __device__ annotation is ignored on a function("mat") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_mat3x4.hpp(36): warning #20012-D: __host__ annotation is ignored on a function("mat") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_mat4x2.hpp(36): warning #20012-D: __device__ annotation is ignored on a function("mat") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_mat4x2.hpp(36): warning #20012-D: __host__ annotation is ignored on a function("mat") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_mat4x3.hpp(36): warning #20012-D: __device__ annotation is ignored on a function("mat") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_mat4x3.hpp(36): warning #20012-D: __host__ annotation is ignored on a function("mat") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_mat4x4.hpp(35): warning #20012-D: __device__ annotation is ignored on a function("mat") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_mat4x4.hpp(35): warning #20012-D: __host__ annotation is ignored on a function("mat") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\detail/type_vec1.hpp(95): warning #20012-D: __device__ annotation is ignored on a function("vec") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\detail/type_vec1.hpp(95): warning #20012-D: __host__ annotation is ignored on a function("vec") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\detail/type_vec1.hpp(96): warning #20012-D: __device__ annotation is ignored on a function("vec") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\detail/type_vec1.hpp(96): warning #20012-D: __host__ annotation is ignored on a function("vec") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\detail/type_vec1.hpp(132): warning #20012-D: __device__ annotation is ignored on a function("operator=") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\detail/type_vec1.hpp(132): warning #20012-D: __host__ annotation is ignored on a function("operator=") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Scene.cpp(63): warning #177-D: variable "lensDistance" was declared but never referenced
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Scene.cpp(64): warning #177-D: variable "vFov" was declared but never referenced
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_quat.hpp(83): warning #20012-D: __device__ annotation is ignored on a function("qua") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_quat.hpp(83): warning #20012-D: __host__ annotation is ignored on a function("qua") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_quat.hpp(84): warning #20012-D: __device__ annotation is ignored on a function("qua") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_quat.hpp(84): warning #20012-D: __host__ annotation is ignored on a function("qua") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_quat.hpp(124): warning #20012-D: __device__ annotation is ignored on a function("operator=") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\glm\ext\../detail/type_quat.hpp(124): warning #20012-D: __host__ annotation is ignored on a function("operator=") that is explicitly defaulted on its first declaration
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Pathtrace.cu(157): error : identifier "x" is undefined
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Pathtrace.cu(157): error : identifier "y" is undefined
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Pathtrace.cu(283): error : calling a __host__ function("hit") from a __global__ function("computeIntersections") is not allowed
+  
+C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Pathtrace.cu(26): warning #177-D: variable "dev_materials" was declared but never referenced
+  
+  3 errors detected in the compilation of "C:/Users/blcag/Documents/CMU 2021-2022/15-418/15418RayTracer/15418RayTracerFinal/15418RayTracer/Pathtrace.cu".
+  Pathtrace.cu
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\BuildCustomizations\CUDA 11.6.targets(790,9): error MSB3721: The command ""C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.6\bin\nvcc.exe" -gencode=arch=compute_52,code=\"sm_52,compute_52\" --use-local-env -ccbin "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\bin\HostX86\x64" -x cu   -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.6\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.6\include"  -G   --keep-dir x64\Debug  -maxrregcount=0  --machine 64 --compile -cudart static  -g  -D_DEBUG -D_CONSOLE -D_UNICODE -DUNICODE -Xcompiler "/EHsc /W3 /nologo /Od /Fdx64\Debug\vc142.pdb /FS /Zi /RTC1 /MDd " -o "C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\x64\Debug\Pathtrace.cu.obj" "C:\Users\blcag\Documents\CMU 2021-2022\15-418\15418RayTracer\15418RayTracerFinal\15418RayTracer\Pathtrace.cu"" exited with code 1.
