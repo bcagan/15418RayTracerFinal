@@ -15,7 +15,7 @@ void Scene::addObj(Object* o) {
     sceneObjs.push_back(o);
 }
 
-bool Scene::intersect(Ray ray, Hit& hit) {
+__device__ bool Scene::intersect(Ray ray, Hit& hit) {
     //Presume transform is just position, not rotation or scaling, so transform defines objects world space pos
     bool hitBool = false;
     for (int o = 0; o < sceneObjs.size(); o++) {
@@ -35,7 +35,7 @@ bool Scene::intersect(Ray ray, Hit& hit) {
 }
 
 // helper function for render (recursion as deep as the original ray's bounce count)
-Color3 Scene::renderC(Ray r, int numBounces) {
+__device__ Color3 Scene::renderC(Ray r, int numBounces) {
     if (numBounces > 0) {
         Hit hit = Hit(); //initialize hit here
         if (Scene::intersect(r, hit)) { 
@@ -53,7 +53,7 @@ Color3 Scene::renderC(Ray r, int numBounces) {
 
 }
 
-void Scene::render() {
+__device__ void Scene::render() {
 
     // resolution
     int height = cam.resY;
@@ -103,7 +103,7 @@ void Scene::render() {
             int per = 100 * idx / (width * height);
             if (per > lastPerc) {
                 lastPerc = per;
-                std::cout << "Render: " << per << "%\n";
+                // std::cout << "Render: " << per << "%\n";
             }
         }
     }

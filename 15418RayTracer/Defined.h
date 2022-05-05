@@ -7,7 +7,7 @@
 #include "glm/glm.hpp"
 #include <iostream>
 #include <io.h>
-#include <crt/host_defines.h>
+#include <cuda_runtime.h>
 
 
 //All vec operators based on equivalent implementations in Scotty3D
@@ -485,7 +485,7 @@ struct Mat3x3 {
 
 
 
-	Vec3& operator[](int idx) {
+	__device__ Vec3& operator[](int idx) {
 		assert(idx >= 0 && idx <= 2);
 		switch (idx) {
 		case(0):
@@ -496,7 +496,7 @@ struct Mat3x3 {
 			return c;
 		}
 	}
-	Vec3 operator[](int idx) const {
+	__device__ Vec3 operator[](int idx) const {
 		assert(idx >= 0 && idx <= 2);
 		switch (idx) {
 		case(0):
@@ -508,52 +508,52 @@ struct Mat3x3 {
 		}
 	}
 
-	Mat3x3 operator+=(const Mat3x3& m) {
+	__device__ Mat3x3 operator+=(const Mat3x3& m) {
 		a += m.a;
 		b += m.b;
 		c += m.c;
 		return *this;
 	}
-	Mat3x3 operator-=(const Mat3x3& m) {
+	__device__ Mat3x3 operator-=(const Mat3x3& m) {
 		a -= m.a;
 		b -= m.b;
 		c -= m.c;
 		return *this;
 	}
 
-	Mat3x3 operator+=(float s) {
+	__device__ Mat3x3 operator+=(float s) {
 		a += s;
 		b += s;
 		c += s;
 		return *this;
 	}
-	Mat3x3 operator-=(float s) {
+	__device__ Mat3x3 operator-=(float s) {
 		a -= s;
 		b -= s;
 		c -= s;
 		return *this;
 	}
-	Mat3x3 operator*=(float s) {
+	__device__ Mat3x3 operator*=(float s) {
 		a *= s;
 		b *= s;
 		c *= s;
 		return *this;
 	}
-	Mat3x3 operator/=(float s) {
+	__device__ Mat3x3 operator/=(float s) {
 		a /= s;
 		b /= s;
 		c /= s;
 		return *this;
 	}
 
-	Mat3x3 operator+(const Mat3x3& m) const {
+	__device__ Mat3x3 operator+(const Mat3x3& m) const {
 		Mat3x3 r;
 		r.a = a + m.a;
 		r.b = b + m.b;
 		r.c = c + m.c;
 		return r;
 	}
-	Mat3x3 operator-(const Mat3x3& m) const {
+	__device__ Mat3x3 operator-(const Mat3x3& m) const {
 		Mat3x3 r;
 		r.a = a - m.a;
 		r.b = b - m.b;
@@ -561,28 +561,28 @@ struct Mat3x3 {
 		return r;
 	}
 
-	Mat3x3 operator+(float s) const {
+	__device__ Mat3x3 operator+(float s) const {
 		Mat3x3 r;
 		r.a = a + s;
 		r.b = b + s;
 		r.c = c + s;
 		return r;
 	}
-	Mat3x3 operator-(float s) const {
+	__device__ Mat3x3 operator-(float s) const {
 		Mat3x3 r;
 		r.a = a - s;
 		r.b = b - s;
 		r.c = c - s;
 		return r;
 	}
-	Mat3x3 operator*(float s) const {
+	__device__ Mat3x3 operator*(float s) const {
 		Mat3x3 r;
 		r.a = a * s;
 		r.b = b * s;
 		r.c = c * s;
 		return r;
 	}
-	Mat3x3 operator/(float s) const {
+	__device__ Mat3x3 operator/(float s) const {
 		Mat3x3 r;
 		r.a = a / s;
 		r.b = b / s;
@@ -590,11 +590,11 @@ struct Mat3x3 {
 		return r;
 	}
 
-	Mat3x3 operator*=(const Mat3x3& v) {
+	__device__ Mat3x3 operator*=(const Mat3x3& v) {
 		*this = *this * v;
 		return *this;
 	}
-	Mat3x3 operator*(const Mat3x3& m) const {
+	__device__ Mat3x3 operator*(const Mat3x3& m) const {
 		Mat3x3 ret;
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
@@ -607,20 +607,20 @@ struct Mat3x3 {
 		return ret;
 	}
 
-	Vec3 operator*(Vec3 v) const {
+	__device__ Vec3 operator*(Vec3 v) const {
 		return a * v[0] + b * v[1] + c * v[2];
 	}
-	Mat3x3() {
+	__device__ Mat3x3() {
 		a = Vec3(0.f);
 		b = Vec3(0.f);
 		c = Vec3(0.f);
 	}
-	Mat3x3(Vec3 v1, Vec3 v2, Vec3 v3) {
+	__device__ Mat3x3(Vec3 v1, Vec3 v2, Vec3 v3) {
 		a = v1;
 		b = v2;
 		c = v3;
 	}
-	Mat3x3(float f) {
+	__device__ Mat3x3(float f) {
 		a = Vec3(f);
 		b = Vec3(f);
 		c = Vec3(f);
@@ -654,7 +654,7 @@ struct Mat3x3 {
 struct Mat4x3 {
 
 
-	Vec3& operator[](int idx) {
+	__device__ Vec3& operator[](int idx) {
 		assert(idx >= 0 && idx <= 3);
 		switch (idx) {
 		case(0):
@@ -667,7 +667,7 @@ struct Mat4x3 {
 			return d;
 		}
 	}
-	Vec3 operator[](int idx) const {
+	__device__ Vec3 operator[](int idx) const {
 		assert(idx >= 0 && idx <= 3);
 		switch (idx) {
 		case(0):
@@ -681,14 +681,14 @@ struct Mat4x3 {
 		}
 	}
 
-	Mat4x3 operator+=(const Mat4x3& m) {
+	__device__ Mat4x3 operator+=(const Mat4x3& m) {
 		a += m.a;
 		b += m.b;
 		c += m.c;
 		d += m.d;
 		return *this;
 	}
-	Mat4x3 operator-=(const Mat4x3& m) {
+	__device__ Mat4x3 operator-=(const Mat4x3& m) {
 		a -= m.a;
 		b -= m.b;
 		c -= m.c;
@@ -696,28 +696,28 @@ struct Mat4x3 {
 		return *this;
 	}
 
-	Mat4x3 operator+=(float s) {
+	__device__ Mat4x3 operator+=(float s) {
 		a += s;
 		b += s;
 		c += s;
 		d += s;
 		return *this;
 	}
-	Mat4x3 operator-=(float s) {
+	__device__ Mat4x3 operator-=(float s) {
 		a -= s;
 		b -= s;
 		c -= s;
 		d -= s;
 		return *this;
 	}
-	Mat4x3 operator*=(float s) {
+	__device__ Mat4x3 operator*=(float s) {
 		a *= s;
 		b *= s;
 		c *= s;
 		d *= s;
 		return *this;
 	}
-	Mat4x3 operator/=(float s) {
+	__device__ Mat4x3 operator/=(float s) {
 		a /= s;
 		b /= s;
 		c /= s;
@@ -725,7 +725,7 @@ struct Mat4x3 {
 		return *this;
 	}
 
-	Mat4x3 operator+(const Mat4x3& m) const {
+	__device__ Mat4x3 operator+(const Mat4x3& m) const {
 		Mat4x3 r;
 		r.a = a + m.a;
 		r.b = b + m.b;
@@ -733,7 +733,7 @@ struct Mat4x3 {
 		r.d = d + m.d;
 		return r;
 	}
-	Mat4x3 operator-(const Mat4x3& m) const {
+	__device__ Mat4x3 operator-(const Mat4x3& m) const {
 		Mat4x3 r;
 		r.a = a - m.a;
 		r.b = b - m.b;
@@ -742,7 +742,7 @@ struct Mat4x3 {
 		return r;
 	}
 
-	Mat4x3 operator+(float s) const {
+	__device__ Mat4x3 operator+(float s) const {
 		Mat4x3 r;
 		r.a = a + s;
 		r.b = b + s;
@@ -750,7 +750,7 @@ struct Mat4x3 {
 		r.d = d + s;
 		return r;
 	}
-	Mat4x3 operator-(float s) const {
+	__device__ Mat4x3 operator-(float s) const {
 		Mat4x3 r;
 		r.a = a - s;
 		r.b = b - s;
@@ -758,7 +758,7 @@ struct Mat4x3 {
 		r.d = d - s;
 		return r;
 	}
-	Mat4x3 operator*(float s) const {
+	__device__ Mat4x3 operator*(float s) const {
 		Mat4x3 r;
 		r.a = a * s;
 		r.b = b * s;
@@ -766,7 +766,7 @@ struct Mat4x3 {
 		r.d = d * s;
 		return r;
 	}
-	Mat4x3 operator/(float s) const {
+	__device__ Mat4x3 operator/(float s) const {
 		Mat4x3 r;
 		r.a = a / s;
 		r.b = b / s;
@@ -775,30 +775,30 @@ struct Mat4x3 {
 		return r;
 	}
 
-	Mat4x3 operator*(const Mat4x4& m) const;
+	__device__ Mat4x3 operator*(const Mat4x4& m) const;
 
-	Vec3 operator*(Vec4 v) const {
+	__device__ Vec3 operator*(Vec4 v) const {
 		return a * v[0] + b * v[1] + c * v[2] + d * v[3];
 	}
-	Mat4x3(float f) {
+	__device__ Mat4x3(float f) {
 		a = Vec3(f);
 		b = Vec3(f);
 		c = Vec3(f);
 		d = Vec3(f);
 	}
-	Mat4x3() {
+	__device__ Mat4x3() {
 		a = Vec3(0.f);
 		b = Vec3(0.f);
 		c = Vec3(0.f);
 		d = Vec3(0.f);
 	}
-	Mat4x3(Vec3 v1, Vec3 v2, Vec3 v3, Vec3 v4) {
+	__device__ Mat4x3(Vec3 v1, Vec3 v2, Vec3 v3, Vec3 v4) {
 		a = v1;
 		b = v2;
 		c = v3;
 		d = v4;
 	}
-	Mat4x3(Mat3x3 M) {
+	__device__ Mat4x3(Mat3x3 M) {
 		a = M.a;
 		b = M.b;
 		c = M.c;
@@ -840,7 +840,7 @@ struct Mat4x3 {
 struct Mat4x4 {
 
 
-	Mat3x3 toMat3x3() {
+	__device__ Mat3x3 toMat3x3() {
 		Mat3x3 ret;
 		ret.a[0] = (*this)[0][0];
 		ret.a[1] = (*this)[0][1];
@@ -854,7 +854,7 @@ struct Mat4x4 {
 		return ret;
 	}
 
-	Vec4& operator[](int idx) {
+	__device__ Vec4& operator[](int idx) {
 		assert(idx >= 0 && idx <= 3);
 		switch (idx) {
 		case(0):
@@ -867,7 +867,7 @@ struct Mat4x4 {
 			return d;
 		}
 	}
-	Vec4 operator[](int idx) const {
+	__device__ Vec4 operator[](int idx) const {
 		assert(idx >= 0 && idx <= 3);
 		switch (idx) {
 		case(0):
@@ -881,14 +881,14 @@ struct Mat4x4 {
 		}
 	}
 
-	Mat4x4 operator+=(const Mat4x4& m) {
+	__device__ Mat4x4 operator+=(const Mat4x4& m) {
 		a += m.a;
 		b += m.b;
 		c += m.c;
 		d += m.d;
 		return *this;
 	}
-	Mat4x4 operator-=(const Mat4x4& m) {
+	__device__ Mat4x4 operator-=(const Mat4x4& m) {
 		a -= m.a;
 		b -= m.b;
 		c -= m.c;
@@ -896,28 +896,28 @@ struct Mat4x4 {
 		return *this;
 	}
 
-	Mat4x4 operator+=(float s) {
+	__device__ Mat4x4 operator+=(float s) {
 		a += s;
 		b += s;
 		c += s;
 		d += s;
 		return *this;
 	}
-	Mat4x4 operator-=(float s) {
+	__device__ Mat4x4 operator-=(float s) {
 		a -= s;
 		b -= s;
 		c -= s;
 		d -= s;
 		return *this;
 	}
-	Mat4x4 operator*=(float s) {
+	__device__ Mat4x4 operator*=(float s) {
 		a *= s;
 		b *= s;
 		c *= s;
 		d *= s;
 		return *this;
 	}
-	Mat4x4 operator/=(float s) {
+	__device__ Mat4x4 operator/=(float s) {
 		a /= s;
 		b /= s;
 		c /= s;
@@ -925,7 +925,7 @@ struct Mat4x4 {
 		return *this;
 	}
 
-	Mat4x4 operator+(const Mat4x4& m) const {
+	__device__ Mat4x4 operator+(const Mat4x4& m) const {
 		Mat4x4 r;
 		r.a = a + m.a;
 		r.b = b + m.b;
@@ -933,7 +933,7 @@ struct Mat4x4 {
 		r.d = d + m.d;
 		return r;
 	}
-	Mat4x4 operator-(const Mat4x4& m) const {
+	__device__ Mat4x4 operator-(const Mat4x4& m) const {
 		Mat4x4 r;
 		r.a = a - m.a;
 		r.b = b - m.b;
@@ -942,7 +942,7 @@ struct Mat4x4 {
 		return r;
 	}
 
-	Mat4x4 operator+(float s) const {
+	__device__ Mat4x4 operator+(float s) const {
 		Mat4x4 r;
 		r.a = a + s;
 		r.b = b + s;
@@ -950,7 +950,7 @@ struct Mat4x4 {
 		r.d = d + s;
 		return r;
 	}
-	Mat4x4 operator-(float s) const {
+	__device__ Mat4x4 operator-(float s) const {
 		Mat4x4 r;
 		r.a = a - s;
 		r.b = b - s;
@@ -958,7 +958,7 @@ struct Mat4x4 {
 		r.d = d - s;
 		return r;
 	}
-	Mat4x4 operator*(float s) const {
+	__device__ Mat4x4 operator*(float s) const {
 		Mat4x4 r;
 		r.a = a * s;
 		r.b = b * s;
@@ -966,7 +966,7 @@ struct Mat4x4 {
 		r.d = d * s;
 		return r;
 	}
-	Mat4x4 operator/(float s) const {
+	__device__ Mat4x4 operator/(float s) const {
 		Mat4x4 r;
 		r.a = a / s;
 		r.b = b / s;
@@ -975,11 +975,11 @@ struct Mat4x4 {
 		return r;
 	}
 
-	Mat4x4 operator*=(const Mat4x4& v) {
+	__device__ Mat4x4 operator*=(const Mat4x4& v) {
 		*this = *this * v;
 		return *this;
 	}
-	Mat4x4 operator*(const Mat4x4& m) const {
+	__device__ Mat4x4 operator*(const Mat4x4& m) const {
 		Mat4x4 ret;
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
@@ -993,36 +993,36 @@ struct Mat4x4 {
 		return ret;
 	}
 
-	Vec4 operator*(Vec4 v) const {
+	__device__ Vec4 operator*(Vec4 v) const {
 		return a * v[0] + b * v[1] + c * v[2] + d * v[3];
 	}
 
 
-	Mat4x4(float f) {
+	__device__ Mat4x4(float f) {
 		a = Vec4(f);
 		b = Vec4(f);
 		c = Vec4(f);
 		d = Vec4(f);
 	}
-	Mat4x4() {
+	__device__ Mat4x4() {
 		a = Vec4(0.f);
 		b = Vec4(0.f);
 		c = Vec4(0.f);
 		d = Vec4(0.f);
 	}
-	Mat4x4(Vec4 v1, Vec4 v2, Vec4 v3, Vec4 v4) {
+	__device__ Mat4x4(Vec4 v1, Vec4 v2, Vec4 v3, Vec4 v4) {
 		a = v1;
 		b = v2;
 		c = v3;
 		d = v4;
 	}
-	Mat4x4(Mat4x3 M) {
+	__device__ Mat4x4(Mat4x3 M) {
 		a = Vec4(M.a, 0.f);
 		b = Vec4(M.b, 0.f);
 		c = Vec4(M.c, 0.f);
 		d = Vec4(M.d, 1.f);
 	}
-	Mat4x4(Mat3x3 M) {
+	__device__ Mat4x4(Mat3x3 M) {
 		a = Vec4(M.a, 0.f);
 		b = Vec4(M.b, 0.f);
 		c = Vec4(M.c, 0.f);
@@ -1097,11 +1097,11 @@ struct Color3
 	unsigned char b;
 };
 
-inline void printVec3(Vec3 v) {
+__device__ inline void printVec3(Vec3 v) {
 	std::cout << v.x << " " << v.y << " " << v.z;
 }
 
-inline Color3 normToColor(Vec3 n) {
+__device__ inline Color3 normToColor(Vec3 n) {
 	float x = n.x;
 	float y = n.y;
 	float z = n.z;
