@@ -248,8 +248,9 @@ __device__ Mat4x4 tmakeTransform(Transform* t) {
 __device__ Mat4x4 localToWorld(Transform t) {
 	if (!t.tempMatrixFilled) tmakeTransform(&t);
 	Mat4x4 res = t.tempMatrix; //So, take the local spa
-	//printf("parent: %d", t->parent);
-	if (t.parent != 0) printf("lol");//res = t->matMult((localToWorld(t->parent)), (Mat4x4)res);
+	printf("parent: %lu", (unsigned long) t.parent);
+	if (t.parent != nullptr) 
+	res = localToWorld(*(t.parent)) * res;
 	return res;
 }
 
