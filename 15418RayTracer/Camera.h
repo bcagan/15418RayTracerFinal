@@ -12,6 +12,7 @@ public:
 		for (int yi = 0; yi < resY; yi++) {
 			image[yi] = std::vector<Color3>(resX);
 		}
+		img = std::vector<Color3>(resX * resY);
 	};
 	Camera(float x, float y) {
 		resX = x;
@@ -20,7 +21,7 @@ public:
 		for (int yi = 0; yi < resY; yi++) {
 			image[yi] = std::vector<Color3>(resX);
 		}
-
+		img = std::vector<Color3>(resX * resY);
 	};
 	Transform transform;
 	float lensDistance = 1.f; //Zoom
@@ -32,5 +33,6 @@ public:
 	Ray castRay(int pixX, int pixY);
 
 	std::vector<std::vector<Color3>> image;
+	std::vector<Color3> img;
 };
 

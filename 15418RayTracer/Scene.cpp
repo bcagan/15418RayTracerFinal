@@ -11,7 +11,7 @@
 
 //Note while Vec3 is used in this code, it will instead be using a redesigned struct, as using cuda's LA library wouldnt be useful here
 
-void Scene::addObj(Object* o) {
+void Scene::addObj(Object o) {
     sceneObjs.push_back(o);
 }
 
@@ -21,11 +21,11 @@ __device__ bool Scene::intersect(Ray ray, Hit& hit) {
     for (int o = 0; o < sceneObjs.size(); o++) {
         auto obj = sceneObjs[o];
         Hit temp;
-        if (obj->bbox.hit(ray,temp)) {
-            if (obj->hit(ray, hit)) {
+        if (obj.bbox.hit(ray,temp)) {
+            if (obj.hit(ray, hit)) {
                 if (hit.t < ray.maxt) {
                     ray.maxt = hit.t;
-                    hit.Mat = obj->Mat;
+                    hit.Mat = obj.Mat;
                 }
                 hitBool = true;
             }

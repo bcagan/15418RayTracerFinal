@@ -39,7 +39,7 @@ inline void cudaAssert(cudaError_t code, const char* file, int line, bool abort 
 
 
 static Scene* hst_scene = NULL;
-static Vec3* dev_image = NULL;
+static Color3* dev_image = NULL;
 static Object* dev_objs = NULL;
 static Material* dev_materials = NULL;
 static Ray* dev_rays = NULL;
@@ -192,8 +192,8 @@ void pathtraceInit(Scene* scene) {
 	const Camera& cam = hst_scene->cam;
 	const int pixelcount = cam.resX * cam.resY;
 
-	cudaMalloc(&dev_image, pixelcount * sizeof(Vec3));
-	cudaMemset(dev_image, 0, pixelcount * sizeof(Vec3));
+	cudaMalloc(&dev_image, pixelcount * sizeof(Color3));
+	cudaMemset(dev_image, 0, pixelcount * sizeof(Color3));
 
 	cudaMalloc(&dev_rays, pixelcount * sizeof(Ray));
 	cudaMemset(dev_rays, 0, pixelcount * sizeof(Ray));
@@ -248,9 +248,14 @@ __device__ Mat4x4 tmakeTransform(Transform* t) {
 __device__ Mat4x4 localToWorld(Transform t) {
 	if (!t.tempMatrixFilled) tmakeTransform(&t);
 	Mat4x4 res = t.tempMatrix; //So, take the local spa
-	printf("parent: %lu", (unsigned long) t.parent);
-	if (t.parent != nullptr) 
-	res = localToWorld(*(t.parent)) * res;
+	//printf("parent: %lu\n", (unsigned long) t.parent);
+	Transform* tp = t.parent;
+	while (tp != nullptr) {
+		res = (t.parent)->tempMatrix * res;
+		tp = t.parent;
+	}
+	/*if (t.parent != nullptr) 
+	res = localToWorld(*(t.parent)) * res;*/
 	return res;
 }
 
@@ -290,16 +295,17 @@ __global__ void generateRayFromCamera(Camera cam, int traceDepth, Ray* rays)
 		Transform vecTransform = cam.transform;
 		vecTransform.pos = Vec3(0.f);
 
-		rays[index].d = vecTransform.matVecMult(localToWorld(vecTransform), d);
-		rays[index].o = cam.transform.matVecMult(localToWorld(cam.transform), o);
-		rays[index].pixelIndex = index;
-		rays[index].maxt = INFINITY;
-		rays[index].mint = EPSILON;
-		rays[index].numBounces = traceDepth;
+		ray.d = vecTransform.matVecMult(localToWorld(vecTransform), d);
+		ray.o = cam.transform.matVecMult(localToWorld(cam.transform), o);
+		ray.pixelIndex = index;
+		ray.maxt = INFINITY;
+		ray.mint = EPSILON;
+		ray.numBounces = traceDepth;
+		ray.color = Color3().toVec3();
 
 
 		//printf("pixX %d pixY %d minX maxX miny maxY %f %f %f %f x y %f %f \n", ix, iy, minX, maxX, minY, maxY, x, y);
-		//if(index == 200) printf("x y z %f %f %f \n", rays[index].maxt, rays[index].mint, rays[index].d.z);
+		// if(index == 200) printf("xx y z %f %f %f \n", rays[index].maxt, rays[index].mint, rays[index].d.z);
 
 	}
 }
@@ -313,7 +319,8 @@ __device__ inline Vec3 rrandomOnUnitSphere(float cosphi, float theta) {
 	return Vec3(x, y, z);
 }
 
-__device__ Vec3 bounce(Hit h) {
+__device__ Vec3 bounce(Hit* hits, int ray_index) {
+	Hit& h = hits[ray_index];
 	curandState state;
 	curand_init(4321, 0, 0, &state);
 
@@ -335,10 +342,15 @@ __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int n
 		Hit& hit = hits[ray_index];
 
 		// printf("hit: %f \n", hit.t);
+		// if(ray_index == 200) printf("x y z %f %f %f \n", rays[ray_index].maxt, rays[ray_index].mint, rays[ray_index].d.z);
 
 		if (hit.t != -1.0f) {
 			// calculate bounce ray
-			Vec3 bouncedHit = bounce(hit);
+			/*if (ray_index == 200) {
+				printf("pre rgb r: %f, g: %f, b: %f asdf %f %f %f \n", r.color.x, r.color.y, r.color.z, hit.albedo().toVec3().x, hit.albedo().toVec3().y, hit.albedo().toVec3().z);
+				printf("emitasdf %f %f %f ", hit.emitted().toVec3().x, hit.emitted().toVec3().y, hit.emitted().toVec3().z);
+			}*/
+			Vec3 bouncedHit = bounce(hits, ray_index);
 			Ray newR = Ray(vecVecAdd(constVecMult(hit.t, r.d), r.o), bouncedHit);
 			newR.color = vecVecAdd(hit.emitted().toVec3(), vecVecMult(hit.albedo().toVec3(), r.color));
 
@@ -346,14 +358,102 @@ __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int n
 			printf("hit: %d \n", hit.t);
 			printf("color: %i %i %i \n", newR.color.x, newR.color.y, newR.color.z);*/
 			// set up for next bounce 
-			rays[ray_index] = newR;
+			r.d = newR.d;
+			r.o = newR.o;
+			r.color = newR.color;
 			Vec3 pos = vecVecAdd(constVecMult(hit.t, r.d), r.o);
 
-			//printf("rgb r: %d, g: %d, b: %d \n", newR.color.x, newR.color.y, newR.color.z);
+			/*if (ray_index == 200) {
+				printf("rgb r: %f, g: %f, b: %f \n", r.color.x, r.color.y, r.color.z);
+			}*/
+
 		}
 		
 
 	}
+}
+
+__device__ double stdmin(double a, double b) {
+	if (a > b) return b;
+	else return a;
+}
+
+__device__ double stdmax(double a, double b) {
+	if (a > b) return a;
+	else return b;
+}
+
+//__device__ bool bboxHit(Object& o, Ray& r, Hit& hit, int ray_index) {
+__device__ bool bboxHit(int obj_index, int ray_index, Ray* rays, Object* objs, Hit* hits) {
+	double tmin = -INFINITY, tmax = INFINITY;
+	BBox& b = objs[obj_index].bbox;
+	Ray& r = rays[ray_index];
+	Hit& hit = hits[ray_index];
+
+	/*if (ray_index == 200 && obj_index == 0) {
+		printf("bbox min x y z %f %f %f\n", b.min.x, b.min.y, b.min.z);
+		printf("bbox max x y z %f %f %f\n", b.max.x, b.max.y, b.max.z);
+		printf("ray x y z %f %f %f\n", r.d.x, r.d.y, r.d.z);
+	}*/
+
+	Vec3 invdir = vecVecDiv(Vec3(1.f), r.d);
+
+	// value of t in the parametric ray equation where ray intersects min coordinate with dimension i
+	double t1 = (b.min.x - r.o.x) * invdir.x;
+	// value of t in the parametric ray equation where ray intersects max coordinate with dimension i
+	double t2 = (b.max.x - r.o.x) * invdir.x;
+
+	tmin = stdmax(tmin, stdmin(t1, t2));
+	tmax = stdmin(tmax, stdmax(t1, t2));
+
+	t1 = (b.min.y - r.o.y) * invdir.y;
+	t2 = (b.max.y - r.o.y) * invdir.y;
+
+	tmin = stdmax(tmin, stdmin(t1, t2));
+	tmax = stdmin(tmax, stdmax(t1, t2));
+
+	t1 = (b.min.z - r.o.z) * invdir.z;
+	t2 = (b.max.z - r.o.z) * invdir.z;
+
+	tmin = stdmax(tmin, stdmin(t1, t2));
+	tmax = stdmin(tmax, stdmax(t1, t2));
+
+	// printf("hit: %f %f \n", r.maxt, tmin);
+
+	if (r.maxt >= tmin && tmin > EPSILON) {
+		hit.t = tmin;
+		Vec3 pos = vecVecDiv(vecVecAdd(b.max, b.min), Vec3(2.0f));
+		hit.uv = Vec2(0.f);
+		return true;
+	}
+	return false;
+}
+
+__device__ bool cubeHit(int obj_index, int ray_index, Ray* rays, Object* objs, Hit* hits) {
+	Object& o = objs[obj_index];
+	Ray& ray = rays[ray_index];
+	Hit& hit = hits[ray_index];
+	if (hit.t < ray.maxt) {
+		hit.Mat = o.Mat;
+		const Vec3 normVec = vecNormalize(vecVecAdd((vecVecAdd(ray.o, constVecMult(hit.t, ray.d))), constVecMult(-1.f, o.t.pos)));
+		if (abs(normVec.x) > abs(normVec.y) && abs(normVec.x) > abs(normVec.z)) {
+			if (normVec.x < 0) hit.normG = Vec3(-1.f, 0.f, 0.f);
+			else hit.normG = Vec3(1.f, 0.f, 0.f);
+		}
+		else if (abs(normVec.y) > abs(normVec.x) && abs(normVec.y) > abs(normVec.z)) {
+			if (normVec.y < 0) hit.normG = Vec3(0.f, -1.f, 0.f);
+			else hit.normG = Vec3(0.f, 1.f, 0.f);
+		}
+		else {
+			if (normVec.z < 0) hit.normG = Vec3(0.f, 0.f, -1.f);
+			else hit.normG = Vec3(0.f, 0.f, 1.f);
+		}
+		hit.normS = hit.normG;
+		hit.uv = Vec2(0.f);//Not doing right now
+		ray.maxt = hit.t;
+		return true;
+	}
+	return false;
 }
 
 __global__ void computeIntersections(
@@ -364,20 +464,25 @@ __global__ void computeIntersections(
 
 	if (ray_index < num_rays)
 	{
-		Ray ray = rays[ray_index];
+		Ray& ray = rays[ray_index];
 
 		float t_min = FLT_MAX;
 		int hit_obj_index = -1;
-		Hit h;
+		Hit& h = hits[ray_index];
 
 		for (int i = 0; i < objs_size; i++)
 		{
 			Object obj = objs[i];
 			Hit temp;
+
+			/*if (ray_index == 200 && i == 0) {
+				printf("bbox pref max x y z %f %f %f\n", obj.bbox.max.x, obj.bbox.max.y, obj.bbox.max.z);
+				printf("bbox pref min x y z %f %f %f\n", obj.bbox.min.x, obj.bbox.min.y, obj.bbox.min.z);
+			}*/
 			
-			if (bboxHit(obj.bbox, ray, temp)) {
+			if (bboxHit(i, ray_index, rays, objs, hits)) {
 				if (obj.type == gcube) {
-					if (cubeHit(obj, ray, h, temp)) {
+					if (cubeHit(i, ray_index, rays, objs, hits)) {
 						ray.maxt = h.t;
 						h.Mat = obj.Mat;
 					}
@@ -439,14 +544,14 @@ __global__ void fillIndices(int num_rays, int* hitIndices) {
 	}
 }
 
-__global__ void finalGather(int num_rays, Vec3* image, Ray* rays)
+__global__ void finalGather(int num_rays, Color3* image, Ray* rays)
 {
 	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
 
 	if (index < num_rays)
 	{
 		Ray ray = rays[index];
-		image[ray.pixelIndex] += ray.color;
+		image[ray.pixelIndex] = Color3(ray.color);
 	}
 }
 
@@ -493,7 +598,7 @@ void pathtrace(int iter) {
 			, dev_hitPeaks
 			, dev_hitIndices
 			);
-		
+
 		calculateColor CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (cam, dev_rays, dev_hits, depth, num_rays);
 		
 		
@@ -504,7 +609,7 @@ void pathtrace(int iter) {
 
 		//num_rays = concat_rays(num_rays, numblocksPathSegmentTracing, blockSize1d, dev_hitIndices);
 		
-		printf("num rays: %i , depth: %i, tracedepth: %i \n", num_rays, depth, traceDepth);
+		//printf("num rays: %i , depth: %i, tracedepth: %i \n", num_rays, depth, traceDepth);
 		if (num_rays == 0 || depth > traceDepth) {
 			iterationComplete = true; // TODO: should be based off stream compaction results.
 		}
@@ -524,7 +629,7 @@ void pathtrace(int iter) {
 	// sendImageToPBO << <blocksPerGrid2d, blockSize2d >> > (cam.resolution, iter, dev_image);
 
 	// Retrieve image from GPU
-	//cudaMemcpy(hst_scene->cam.image.data(), dev_image,
-	//	pixelcount * sizeof(Vec3), cudaMemcpyDeviceToHost);
+	cudaMemcpy(hst_scene->cam.img.data(), dev_image,
+		pixelcount * sizeof(Color3), cudaMemcpyDeviceToHost);
 
 }

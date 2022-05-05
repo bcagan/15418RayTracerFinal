@@ -171,14 +171,14 @@ int main() {
         for (int j = 0; j < h; j++) {
             unsigned char b = (int)((float)j / 720.f * 255.f);
             Color3 col(r, 0, b);
-            sc.cam.image[j][i] = col;
+            sc.cam.img[j * 1280 + i] = col;
         }
     }
 
     Color3* saveImage = (Color3*)malloc(sizeof(Color3)*1280*720);
     for (int j = 0; j < h; j++) {
         for (int i = 0; i < w; i++) {
-            saveImage[j * 1280 + i] = sc.cam.image[j][i];
+            saveImage[j * 1280 + i] = sc.cam.img[j * 1280 + i];
         }
     }
 
@@ -222,11 +222,11 @@ int main() {
     Sphere diffuseSphere = Sphere(Vec3(0.f, -3.f, -5.f), 3.f);
     diffuseSphere.Mat.albedo = Color3(255, 255, 255);
     diffuseSphere.Mat.emitted = Color3(0, 0, 0);
-    sc.addObj(&cufloor);
-    sc.addObj(&curoof);
-    sc.addObj(&culeft);
-    sc.addObj(&curight);
-    sc.addObj(&cuback);
+    sc.addObj(cufloor);
+    sc.addObj(curoof);
+    sc.addObj(culeft);
+    sc.addObj(curight);
+    sc.addObj(cuback);
     //sc.addObj(&diffuseSphere);
 
 
@@ -270,7 +270,7 @@ int main() {
         //Store image in saveImage
         for (int j = 0; j < h; j++) {
             for (int i = 0; i < w; i++) {
-                saveImage[j * 1280 + i] = sc.cam.image[j][i];
+                saveImage[j * 1280 + i] = sc.cam.img[j * 1280 + i];
             }
         }
 

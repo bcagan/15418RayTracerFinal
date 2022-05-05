@@ -6,52 +6,6 @@
 #include "glm/glm.hpp"
 #include <utility>
 
-__device__ double stdmin(double a, double b) {
-    if (a > b) return b;
-    else return a;
-}
-
-__device__ double stdmax(double a, double b) {
-    if (a > b) return a;
-    else return b;
-}
-
-__device__ bool bboxHit(BBox& b, Ray& r, Hit& hit) {
-    double tmin = -INFINITY, tmax = INFINITY;
-
-    Vec3 invdir = vecVecDiv(Vec3(1.f), r.d);
-
-    // value of t in the parametric ray equation where ray intersects min coordinate with dimension i
-    double t1 = (b.min.x - r.o.x) * invdir.x;
-    // value of t in the parametric ray equation where ray intersects max coordinate with dimension i
-    double t2 = (b.max.x - r.o.x) * invdir.x;
-
-    tmin = stdmax(tmin, stdmin(t1, t2));
-    tmax = stdmin(tmax, stdmax(t1, t2));
-
-    t1 = (b.min.y - r.o.y) * invdir.y;
-    t2 = (b.max.y - r.o.y) * invdir.y;
-
-    tmin = stdmax(tmin, stdmin(t1, t2));
-    tmax = stdmin(tmax, stdmax(t1, t2));
-
-    t1 = (b.min.z - r.o.z) * invdir.z;
-    t2 = (b.max.z - r.o.z) * invdir.z;
-
-    tmin = stdmax(tmin, stdmin(t1, t2));
-    tmax = stdmin(tmax, stdmax(t1, t2));
-
-    //printf("hit: %f %f \n", r.maxt, tmin);
-
-    if (r.maxt >= tmin && tmin > EPSILON) {
-        hit.t = tmin;
-        Vec3 pos = vecVecDiv(vecVecAdd(b.max, b.min), Vec3(2.0f));
-        hit.uv = Vec2(0.f);
-        return true;
-    }
-    return false;
-}
-
 
 __device__ void swap(float a, float b) {
     float c(a); a = b; b = c;
@@ -89,30 +43,4 @@ __device__ bool sphereHit(Object& o, Ray& r, Hit& h) {
         h.uv = Vec2(0.f);
     }
     return true;
-}
-
-__device__ bool cubeHit(Object& o, Ray& ray, Hit& hit, Hit& temp) {
-    if (temp.t < ray.maxt) {
-        hit.t = temp.t;
-        hit.uv = temp.uv;
-        hit.Mat = o.Mat;
-        const Vec3 normVec = vecNormalize(vecVecAdd((vecVecAdd(ray.o, constVecMult(hit.t, ray.d))), constVecMult(-1.f, o.t.pos)));
-        if (abs(normVec.x) > abs(normVec.y) && abs(normVec.x) > abs(normVec.z)) {
-            if (normVec.x < 0) hit.normG = Vec3(-1.f, 0.f, 0.f);
-            else hit.normG = Vec3(1.f, 0.f, 0.f);
-        }
-        else if (abs(normVec.y) > abs(normVec.x) && abs(normVec.y) > abs(normVec.z)) {
-            if (normVec.y < 0) hit.normG = Vec3(0.f, -1.f, 0.f);
-            else hit.normG = Vec3(0.f, 1.f, 0.f);
-        }
-        else {
-            if (normVec.z < 0) hit.normG = Vec3(0.f, 0.f, -1.f);
-            else hit.normG = Vec3(0.f, 0.f, 1.f);
-        }
-        hit.normS = hit.normG;
-        hit.uv = Vec2(0.f);//Not doing right now
-        ray.maxt = temp.t;
-        return true;
-    }
-    return false;
 }
