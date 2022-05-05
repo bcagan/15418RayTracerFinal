@@ -228,11 +228,12 @@ __global__ void generateRayFromCamera(Camera cam, int iter, int traceDepth, Ray*
 		curandState state;
 		curand_init(4321 + x, 0, 0, &state);
 
-		float rand = curand_uniform_double(&state);
+		float rand1 = curand_uniform_double(&state);
+		float rand2 = curand_uniform_double(&state);
 
 
-		float x = rand * (maxX - minX) + minX; 
-		float y = rand * (maxY - minY) + minY; 
+		float x = rand1 * (maxX - minX) + minX; 
+		float y = rand2 * (maxY - minY) + minY; 
 		float z = -cam.lensDistance; 
 		
 		Vec3 d = vecNormalize(Vec3(x, y, z));
