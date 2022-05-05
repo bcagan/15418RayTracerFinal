@@ -8,6 +8,8 @@ __device__ Ray Ray::transformRay(Transform transform) {
 	Ray retRay;
 	retRay.d = vecTransform.matVecMult(vecTransform.localToWorld(), d);
 	retRay.o = transform.matVecMult(transform.localToWorld(), o);
+	// printf("ray: %i %i %i \n", retRay.d.x, retRay.d.y, retRay.d.z);
+
 	return retRay;
 }
 

@@ -241,7 +241,7 @@ int main() {
         -1.f,1.f, 0.0f, 0.0f,0.0f,1.f, 0.f,0.f //top left
     }; //UV is x,y, [0,1] = [left, right], [0,1] = [top,bottom]
 
-
+    pathtraceInit(&sc);
 
 
     /*auto current_time = std::chrono::high_resolution_clock::now();
@@ -251,7 +251,7 @@ int main() {
 
     auto currentTime = std::chrono::high_resolution_clock::now();
 
-    pathtraceInit(&sc);
+    
 
     while (!glfwWindowShouldClose(window)) {//Loop unless user closes
 
@@ -273,6 +273,10 @@ int main() {
                 saveImage[j * 1280 + i] = sc.cam.image[j][i];
             }
         }
+
+        pathtraceFree();
+
+        std::cout << (float)sc.cam.image[100][100].r << " pix 100 100\n";
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, (void*)saveImage);
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -319,7 +323,7 @@ int main() {
         glDeleteBuffers(1, &VBO);
     } 
     
-    pathtraceFree();
+    
     glDeleteVertexArrays(1, &VAO);
     glDeleteProgram(shaderProgram);
     free(saveImage);

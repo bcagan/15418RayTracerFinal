@@ -168,11 +168,14 @@ int concat_rays(int num_rays, int numblocksPathSegmentTracing, int blockSize1d, 
 
     //Get number of elements
     int* device_num;
-    cudaCheckError(cudaMalloc(&device_num, sizeof(int) * (num_rays + 1)));
+	int rounded_length = nextPow2(num_rays);
+
+    cudaCheckError(cudaMalloc(&device_num, sizeof(int) * (rounded_length)));
+	
     cudaScan(dev_hitPeaks, dev_hitPeaks + (num_rays + 1), device_num);
     int numberRays = 0;
     cudaCheckError(cudaMemcpy(&numberRays, device_num + (num_rays), sizeof(int), cudaMemcpyDeviceToHost));
-
+	
     contractOut CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (num_rays, dev_hitPeaks, device_num, device_output);
 
     cudaCheckError(cudaDeviceSynchronize());
@@ -193,6 +196,7 @@ void pathtraceInit(Scene* scene) {
 	cudaMemset(dev_image, 0, pixelcount * sizeof(Vec3));
 
 	cudaMalloc(&dev_rays, pixelcount * sizeof(Ray));
+	cudaMemset(dev_rays, 0, pixelcount * sizeof(Ray));
 
 	cudaMalloc(&dev_objs, scene->sceneObjs.size() * sizeof(Object));
 	cudaMemcpy(dev_objs, scene->sceneObjs.data(), scene->sceneObjs.size() * sizeof(Object), cudaMemcpyHostToDevice);
@@ -206,7 +210,6 @@ void pathtraceInit(Scene* scene) {
 	cudaMalloc(&dev_hitIndices, (pixelcount) * sizeof(int));
 	cudaMemset(dev_hitIndices, 0, (pixelcount) * sizeof(int));
 
-
 }
 
 void pathtraceFree() {
@@ -218,57 +221,58 @@ void pathtraceFree() {
 	cudaFree(dev_hitIndices);
 }
 
-__device__ Mat4x4 tmakeTransform(Transform t) {
+__device__ Mat4x4 tmakeTransform(Transform* t) {
 	//Create rotation matrices
 	//Will do out just to make CUDA translation possible
 	//Mat3x3 defined by each column 
 
 	//Rotation
-	Mat3x3 Rx = Mat3x3(Vec3(1.f, 0.f, 0.f), Vec3(0.f, cos(t.rot.x), sin(t.rot.x)), Vec3(0.f, -sin(t.rot.x), cos(t.rot.x)));
-	Mat3x3 Ry = Mat3x3(Vec3(cos(t.rot.y), 0.f, -sin(t.rot.y)), Vec3(0.f, 1.f, 0.f), Vec3(sin(t.rot.y), 0.f, cos(t.rot.y)));
-	Mat3x3 Rz = Mat3x3(Vec3(cos(t.rot.z), sin(t.rot.z), 0.f), Vec3(-sin(t.rot.z), cos(t.rot.z), 0.f), Vec3(0.f, 0.f, 1.f));
-	Mat3x3 R = t.matMult(Rx, t.matMult(Ry, Rz));
+	Mat3x3 Rx = Mat3x3(Vec3(1.f, 0.f, 0.f), Vec3(0.f, cos(t->rot.x), sin(t->rot.x)), Vec3(0.f, -sin(t->rot.x), cos(t->rot.x)));
+	Mat3x3 Ry = Mat3x3(Vec3(cos(t->rot.y), 0.f, -sin(t->rot.y)), Vec3(0.f, 1.f, 0.f), Vec3(sin(t->rot.y), 0.f, cos(t->rot.y)));
+	Mat3x3 Rz = Mat3x3(Vec3(cos(t->rot.z), sin(t->rot.z), 0.f), Vec3(-sin(t->rot.z), cos(t->rot.z), 0.f), Vec3(0.f, 0.f, 1.f));
+	Mat3x3 R = t->matMult(Rx, t->matMult(Ry, Rz));
 
 	//Position
-	Mat4x3 P = Mat4x3(Vec3(1.f, 0.f, 0.f), Vec3(0.f, 1.f, 0.f), Vec3(0.f, 0.f, 1.f), t.pos);
+	Mat4x3 P = Mat4x3(Vec3(1.f, 0.f, 0.f), Vec3(0.f, 1.f, 0.f), Vec3(0.f, 0.f, 1.f), t->pos);
 
 	//Scaling
-	Mat3x3 S = Mat3x3(Vec3(t.scale.x, 0.f, 0.f), Vec3(0.f, t.scale.y, 0.f), Vec3(0.f, 0.f, t.scale.z));
+	Mat3x3 S = Mat3x3(Vec3(t->scale.x, 0.f, 0.f), Vec3(0.f, t->scale.y, 0.f), Vec3(0.f, 0.f, t->scale.z));
 
 	//Scale and rotate before position, scaling and rotation can be swapped 
-	Mat3x3 RS = t.matMult(R, S);
-	Mat4x4 preRes = Mat4x4(t.matMult(P, RS));
+	Mat3x3 RS = t->matMult(R, S);
+	Mat4x4 preRes = Mat4x4(t->matMult(P, RS));
 	preRes.set(3, 3, 1.f);
-	t.tempMatrix = preRes;
+	t->tempMatrix = preRes;
 }
 
 __device__ Mat4x4 localToWorld(Transform t) {
-	if (!t.tempMatrixFilled) tmakeTransform(t);
+	if (!t.tempMatrixFilled) tmakeTransform(&t);
 	Mat4x4 res = t.tempMatrix; //So, take the local spa
-	if (t.parent != nullptr) res = t.matMult((localToWorld(*t.parent)), (Mat4x4)res);
+	//printf("parent: %d", t->parent);
+	if (t.parent != 0) printf("lol");//res = t->matMult((localToWorld(t->parent)), (Mat4x4)res);
 	return res;
 }
 
-__global__ void generateRayFromCamera(Camera cam, int iter, int traceDepth, Ray* rays)
+__global__ void generateRayFromCamera(Camera cam, int traceDepth, Ray* rays)
 {
-	int x = (blockIdx.x * blockDim.x) + threadIdx.x;
-	int y = (blockIdx.y * blockDim.y) + threadIdx.y;
+	int ix = (blockIdx.x * blockDim.x) + threadIdx.x;
+	int iy = (blockIdx.y * blockDim.y) + threadIdx.y;
 
-	if (x < cam.resX && y < cam.resY) {
-		int index = x + (y * cam.resX);
+	if (ix < cam.resX && iy < cam.resY) {
+		int index = ix + (iy * cam.resX);
 
 		// printf("Hello from pixel %d\n", index);
 		Ray& ray = rays[index];
 
 		float sizeY = 2.f * cam.lensDistance * tan(cam.vFov);
 		float sizeX = (float)cam.resX / (float)cam.resY * sizeY;
-		float minX = (float)x / (float)cam.resX * sizeX - sizeX / 2.f;
-		float maxX = (float)(x + 1) / (float)cam.resX * sizeX - sizeX / 2.f;
-		float minY = (float)y / (float)cam.resY * sizeY - sizeY / 2.f;
-		float maxY = (float)(y + 1) / (float)cam.resY * sizeY - sizeY / 2.f;
+		float minX = (float)ix / (float)cam.resX * sizeX - sizeX / 2.f;
+		float maxX = (float)(ix + 1) / (float)cam.resX * sizeX - sizeX / 2.f;
+		float minY = (float)iy / (float)cam.resY * sizeY - sizeY / 2.f;
+		float maxY = (float)(iy + 1) / (float)cam.resY * sizeY - sizeY / 2.f;
 
 		curandState state;
-		curand_init(4321 + x, 0, 0, &state);
+		curand_init(12345 + index, 0, 0, &state);
 
 		float rand1 = curand_uniform_double(&state);
 		float rand2 = curand_uniform_double(&state);
@@ -277,16 +281,24 @@ __global__ void generateRayFromCamera(Camera cam, int iter, int traceDepth, Ray*
 		float x = rand1 * (maxX - minX) + minX; 
 		float y = rand2 * (maxY - minY) + minY; 
 		float z = -cam.lensDistance; 
+
 		
 		Vec3 d = vecNormalize(Vec3(x, y, z));
 		Vec3 o = Vec3(0.f);
 
 		Transform vecTransform = cam.transform;
 		vecTransform.pos = Vec3(0.f);
-		ray.d = vecTransform.matVecMult(localToWorld(vecTransform), d);
-		ray.o = cam.transform.matVecMult(localToWorld(cam.transform), o);
-		ray.pixelIndex = index;
-		ray.numBounces = iter;
+
+		rays[index].d = vecTransform.matVecMult(localToWorld(vecTransform), d);
+		rays[index].o = cam.transform.matVecMult(localToWorld(cam.transform), o);
+		rays[index].pixelIndex = index;
+		rays[index].maxt = INFINITY;
+		rays[index].mint = EPSILON;
+		rays[index].numBounces = traceDepth;
+
+
+		//printf("pixX %d pixY %d minX maxX miny maxY %f %f %f %f x y %f %f \n", ix, iy, minX, maxX, minY, maxY, x, y);
+		//if(index == 200) printf("x y z %f %f %f \n", rays[index].maxt, rays[index].mint, rays[index].d.z);
 
 	}
 }
@@ -321,7 +333,7 @@ __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int n
 		Ray& r = rays[ray_index];
 		Hit& hit = hits[ray_index];
 
-		Color3 rgb;
+		// printf("hit: %f \n", hit.t);
 
 		if (hit.t != -1.0f) {
 			// calculate bounce ray
@@ -329,57 +341,18 @@ __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int n
 			Ray newR = Ray(vecVecAdd(constVecMult(hit.t, r.d), r.o), bouncedHit);
 			newR.color = vecVecAdd(hit.emitted().toVec3(), vecVecMult(hit.albedo().toVec3(), r.color));
 
+			/*printf("ray: %i %i %i \n", r.o.x, r.o.y, r.o.z);
+			printf("hit: %d \n", hit.t);
+			printf("color: %i %i %i \n", newR.color.x, newR.color.y, newR.color.z);*/
 			// set up for next bounce 
 			rays[ray_index] = newR;
 			Vec3 pos = vecVecAdd(constVecMult(hit.t, r.d), r.o);
+
+			//printf("rgb r: %d, g: %d, b: %d \n", newR.color.x, newR.color.y, newR.color.z);
 		}
 		
 
 	}
-}
-
-__device__ double stdmin(double a, double b) {
-	if (a > b) return b;
-	else return a;
-}
-
-__device__ double stdmax(double a, double b) {
-	if (a > b) return a;
-	else return b;
-}
-
-__device__ bool bboxHit(BBox& b, Ray& r, Hit& hit) {
-	double tmin = -INFINITY, tmax = INFINITY;
-
-	Vec3 invdir = vecVecDiv(Vec3(1.f), r.d);
-
-	// value of t in the parametric ray equation where ray intersects min coordinate with dimension i
-	double t1 = (b.min.x - r.o.x) * invdir.x;
-	// value of t in the parametric ray equation where ray intersects max coordinate with dimension i
-	double t2 = (b.max.x - r.o.x) * invdir.x;
-
-	tmin = stdmax(tmin, stdmin(t1, t2));
-	tmax = stdmin(tmax, stdmax(t1, t2));
-
-	t1 = (b.min.y - r.o.y) * invdir.y;
-	t2 = (b.max.y - r.o.y) * invdir.y;
-
-	tmin = stdmax(tmin, stdmin(t1, t2));
-	tmax = stdmin(tmax, stdmax(t1, t2));
-
-	t1 = (b.min.z - r.o.z) * invdir.z;
-	t2 = (b.max.z - r.o.z) * invdir.z;
-
-	tmin = stdmax(tmin, stdmin(t1, t2));
-	tmax = stdmin(tmax, stdmax(t1, t2));
-
-	if (r.maxt >= tmin && tmin > EPSILON) {
-		hit.t = tmin;
-		Vec3 pos = vecVecDiv(vecVecAdd(b.max, b.min), Vec3(2.0f));
-		hit.uv = Vec2(0.f);
-		return true;
-	}
-	return false;
 }
 
 __global__ void computeIntersections(
@@ -392,24 +365,35 @@ __global__ void computeIntersections(
 	{
 		Ray ray = rays[ray_index];
 
-		float t;
-		Vec3 intersect_point;
-		Vec3 normal;
 		float t_min = FLT_MAX;
 		int hit_obj_index = -1;
 		Hit h;
 
 		for (int i = 0; i < objs_size; i++)
 		{
-			Object& obj = objs[i];
+			Object obj = objs[i];
 			Hit temp;
-
+			
 			if (bboxHit(obj.bbox, ray, temp)) {
 				if (obj.type == gcube) {
-					cubeHit(obj, ray, h, temp);
+					if (cubeHit(obj, ray, h, temp)) {
+						ray.maxt = h.t;
+						h.Mat = obj.Mat;
+					}
+					else {
+						t_min = -1.0f;
+						hit_obj_index = -1;
+					}
 				}
 				else if (obj.type == gsphere) {
-					sphereHit(obj, ray, h);
+					if (sphereHit(obj, ray, h)) {
+						ray.maxt = h.t;
+						h.Mat = obj.Mat;
+					}
+					else {
+						t_min = -1.0f;
+						hit_obj_index = -1;
+					}
 				}
 				else {
 					t_min = -1.0f;
@@ -419,13 +403,14 @@ __global__ void computeIntersections(
 			}
 			
 			
-			if (t > 0.0f && t_min > t)
+			if (h.t > 0.0f && t_min > h.t)
 			{
-				t_min = t;
+				t_min = h.t;
 				hit_obj_index = i;
 			}
 		}
-		
+		Hit reth;
+		hits[ray_index] = reth;
 		if (hit_obj_index == -1)
 		{
 			hits[ray_index].t = -1.0f;
@@ -433,6 +418,7 @@ __global__ void computeIntersections(
 		}
 		else
 		{
+			
 			//The ray hits something
 			hits[ray_index].t = t_min;
 			hits[ray_index].Mat = objs[hit_obj_index].Mat;
@@ -477,7 +463,7 @@ void pathtrace(int iter) {
 	// 1D block for path tracing
 	const int blockSize1d = 128;
 	// printf("camx camy %d %d \n", cam.resX, cam.resY);
-	generateRayFromCamera CUDA_KERNEL(blocksPerGrid2d, blockSize2d) (cam, iter, traceDepth, dev_rays);
+	generateRayFromCamera CUDA_KERNEL(blocksPerGrid2d, blockSize2d) (cam, traceDepth, dev_rays);
 
 	int depth = 0;
 	Ray* dev_ray_end = dev_rays + pixelcount;
@@ -495,7 +481,7 @@ void pathtrace(int iter) {
 		int numblocksPathSegmentTracing = (num_rays + blockSize1d - 1) / blockSize1d;
 
 		fillIndices CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (num_rays, dev_hitIndices); //Fill init indices to 1...num_rays
-
+		
 		computeIntersections CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (
 			depth
 			, num_rays
@@ -506,36 +492,38 @@ void pathtrace(int iter) {
 			, dev_hitPeaks
 			, dev_hitIndices
 			);
-
+		
 		calculateColor CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (cam, dev_rays, dev_hits, depth, num_rays);
-
+		
 		
 		cudaDeviceSynchronize();
 		depth++;
-
+		
 		//Use find rays to contract rays into those that have ended and those that havent
 
-		num_rays = concat_rays(num_rays, numblocksPathSegmentTracing, blockSize1d, dev_hitIndices);
-
-		//printf("num paths: %i , depth: %i \n", num_paths, depth);
+		//num_rays = concat_rays(num_rays, numblocksPathSegmentTracing, blockSize1d, dev_hitIndices);
+		
+		printf("num rays: %i , depth: %i, tracedepth: %i \n", num_rays, depth, traceDepth);
 		if (num_rays == 0 || depth > traceDepth) {
 			iterationComplete = true; // TODO: should be based off stream compaction results.
 		}
 	}
 	num_rays = dev_ray_end - dev_rays;
+	//printf("gathered %d\n", dev_rays[2000].color);
 	printf("Iteration Done\n");
 	
 	// Assemble this iteration and apply it to the image
 	dim3 numBlocksPixels = (pixelcount + blockSize1d - 1) / blockSize1d;
 	finalGather CUDA_KERNEL(numBlocksPixels, blockSize1d) (num_rays, dev_image, dev_rays);
 
+	
 	///////////////////////////////////////////////////////////////////////////
 
 	// Send results to OpenGL buffer for rendering
 	// sendImageToPBO << <blocksPerGrid2d, blockSize2d >> > (cam.resolution, iter, dev_image);
 
 	// Retrieve image from GPU
-	cudaMemcpy(hst_scene->cam.image.data(), dev_image,
-		pixelcount * sizeof(Vec3), cudaMemcpyDeviceToHost);
+	//cudaMemcpy(hst_scene->cam.image.data(), dev_image,
+	//	pixelcount * sizeof(Vec3), cudaMemcpyDeviceToHost);
 
 }
