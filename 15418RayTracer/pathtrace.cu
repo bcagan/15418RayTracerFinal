@@ -302,7 +302,7 @@ __global__ void generateRayFromCamera(Camera cam, int traceDepth, Ray* rays)
 		ray.mint = EPSILON;
 		ray.numBounces = traceDepth;
 		ray.color = Color3().toVec3();
-
+		ray.storeColor = Vec3(1.f);
 
 		//printf("pixX %d pixY %d minX maxX miny maxY %f %f %f %f x y %f %f \n", ix, iy, minX, maxX, minY, maxY, x, y);
 		// if(index == 200) printf("xx y z %f %f %f \n", rays[index].maxt, rays[index].mint, rays[index].d.z);
@@ -352,16 +352,19 @@ __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int n
 			}*/
 			Vec3 bouncedHit = bounce(hits, ray_index);
 			Ray newR = Ray(vecVecAdd(constVecMult(hit.t, r.d), r.o), bouncedHit);
-			newR.color = vecVecAdd(hit.emitted().toVec3(), vecVecMult(hit.albedo().toVec3(), r.color));
+			newR.color += hit.emitted().toVec3() * r.storeColor;
+			newR.storeColor = r.storeColor * hit.albedo().toVec3();
+			//printf("original store color %f  %f %f current color %f %f %f \n", r.storeColor.x, r.storeColor.y, r.storeColor.z, r.color.x, r.color.y, r.color.z);
 
-			/*printf("ray: %i %i %i \n", r.o.x, r.o.y, r.o.z);
-			printf("hit: %d \n", hit.t);
-			printf("color: %i %i %i \n", newR.color.x, newR.color.y, newR.color.z);*/
+
+			//printf("ray: %f %f %f hit %f color %f %f %f \n", r.d.x, r.d.y, r.d.z, hit.t, newR.color.x, newR.color.y, newR.color.z);
 			// set up for next bounce 
 			r.d = newR.d;
 			r.o = newR.o;
 			r.color = newR.color;
-			Vec3 pos = vecVecAdd(constVecMult(hit.t, r.d), r.o);
+			r.storeColor = newR.storeColor;
+			if(r.numBounces > 2) printf("store color %f  %f %f current color %f %f %f \n", r.storeColor.x, r.storeColor.y, r.storeColor.z, r.color.x, r.color.y, r.color.z);
+			
 
 			/*if (ray_index == 200) {
 				printf("rgb r: %f, g: %f, b: %f \n", r.color.x, r.color.y, r.color.z);
@@ -388,7 +391,7 @@ __device__ bool bboxHit(int obj_index, int ray_index, Ray* rays, Object* objs, H
 	double tmin = -INFINITY, tmax = INFINITY;
 	BBox& b = objs[obj_index].bbox;
 	Ray& r = rays[ray_index];
-	Hit& hit = hits[ray_index];
+	//Hit& hit = hits[ray_index];
 
 	/*if (ray_index == 200 && obj_index == 0) {
 		printf("bbox min x y z %f %f %f\n", b.min.x, b.min.y, b.min.z);
@@ -421,9 +424,9 @@ __device__ bool bboxHit(int obj_index, int ray_index, Ray* rays, Object* objs, H
 	// printf("hit: %f %f \n", r.maxt, tmin);
 
 	if (r.maxt >= tmin && tmin > EPSILON) {
-		hit.t = tmin;
+		hits[ray_index].t = tmin;
 		Vec3 pos = vecVecDiv(vecVecAdd(b.max, b.min), Vec3(2.0f));
-		hit.uv = Vec2(0.f);
+		hits[ray_index].uv = Vec2(0.f);
 		return true;
 	}
 	return false;
@@ -434,23 +437,23 @@ __device__ bool cubeHit(int obj_index, int ray_index, Ray* rays, Object* objs, H
 	Ray& ray = rays[ray_index];
 	Hit& hit = hits[ray_index];
 	if (hit.t < ray.maxt) {
-		hit.Mat = o.Mat;
+		hits[ray_index].Mat = o.Mat;
 		const Vec3 normVec = vecNormalize(vecVecAdd((vecVecAdd(ray.o, constVecMult(hit.t, ray.d))), constVecMult(-1.f, o.t.pos)));
 		if (abs(normVec.x) > abs(normVec.y) && abs(normVec.x) > abs(normVec.z)) {
-			if (normVec.x < 0) hit.normG = Vec3(-1.f, 0.f, 0.f);
-			else hit.normG = Vec3(1.f, 0.f, 0.f);
+			if (normVec.x < 0) hits[ray_index].normG = Vec3(-1.f, 0.f, 0.f);
+			else hits[ray_index].normG = Vec3(1.f, 0.f, 0.f);
 		}
 		else if (abs(normVec.y) > abs(normVec.x) && abs(normVec.y) > abs(normVec.z)) {
-			if (normVec.y < 0) hit.normG = Vec3(0.f, -1.f, 0.f);
-			else hit.normG = Vec3(0.f, 1.f, 0.f);
+			if (normVec.y < 0) hits[ray_index].normG = Vec3(0.f, -1.f, 0.f);
+			else hits[ray_index].normG = Vec3(0.f, 1.f, 0.f);
 		}
 		else {
-			if (normVec.z < 0) hit.normG = Vec3(0.f, 0.f, -1.f);
-			else hit.normG = Vec3(0.f, 0.f, 1.f);
+			if (normVec.z < 0) hits[ray_index].normG = Vec3(0.f, 0.f, -1.f);
+			else hits[ray_index].normG = Vec3(0.f, 0.f, 1.f);
 		}
-		hit.normS = hit.normG;
+		hits[ray_index].normS = hit.normG;
 		hit.uv = Vec2(0.f);//Not doing right now
-		ray.maxt = hit.t;
+		ray.maxt = hits[ray_index].t;
 		return true;
 	}
 	return false;
