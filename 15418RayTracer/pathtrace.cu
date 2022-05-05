@@ -322,10 +322,12 @@ __device__ inline Vec3 rrandomOnUnitSphere(float cosphi, float theta) {
 __device__ Vec3 bounce(Hit* hits, int ray_index) {
 	Hit& h = hits[ray_index];
 	curandState state;
-	curand_init(4321, 0, 0, &state);
+	curand_init(4321+ray_index, 0, 0, &state);
+	curandState state2;
+	curand_init(1235 + 2 * ray_index, 0, 0, &state);
 
 	float rand1 = curand_uniform_double(&state);
-	float rand2 = curand_uniform_double(&state);
+	float rand2 = curand_uniform_double(&state2);
 
 	float theta = 2.f * rand1 * PI;
 	float cosphi = 2.f * rand2 - 1.f;
@@ -363,7 +365,7 @@ __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int n
 			r.o = newR.o;
 			r.color = newR.color;
 			r.storeColor = newR.storeColor;
-			if(r.numBounces > 2) printf("store color %f  %f %f current color %f %f %f \n", r.storeColor.x, r.storeColor.y, r.storeColor.z, r.color.x, r.color.y, r.color.z);
+			//if(r.numBounces > 2) printf("store color %f  %f %f current color %f %f %f \n", r.storeColor.x, r.storeColor.y, r.storeColor.z, r.color.x, r.color.y, r.color.z);
 			
 
 			/*if (ray_index == 200) {
@@ -518,8 +520,7 @@ __global__ void computeIntersections(
 				hit_obj_index = i;
 			}
 		}
-		Hit reth;
-		hits[ray_index] = reth;
+
 		if (hit_obj_index == -1)
 		{
 			hits[ray_index].t = -1.0f;
@@ -528,10 +529,6 @@ __global__ void computeIntersections(
 		else
 		{
 			
-			//The ray hits something
-			hits[ray_index].t = t_min;
-			hits[ray_index].Mat = objs[hit_obj_index].Mat;
-			hits[ray_index].normS = h.normS;
 			hitPeaks[ray_index + 1] = 1;
 			
 		}
@@ -612,7 +609,7 @@ void pathtrace(int iter) {
 
 		//num_rays = concat_rays(num_rays, numblocksPathSegmentTracing, blockSize1d, dev_hitIndices);
 		
-		//printf("num rays: %i , depth: %i, tracedepth: %i \n", num_rays, depth, traceDepth);
+		printf("num rays: %i , depth: %i, tracedepth: %i \n", num_rays, depth, traceDepth);
 		if (num_rays == 0 || depth > traceDepth) {
 			iterationComplete = true; // TODO: should be based off stream compaction results.
 		}

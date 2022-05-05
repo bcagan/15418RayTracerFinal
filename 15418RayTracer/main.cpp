@@ -249,7 +249,7 @@ int main() {
         -1.f,1.f, 0.0f, 0.0f,0.0f,1.f, 0.f,0.f //top left
     }; //UV is x,y, [0,1] = [left, right], [0,1] = [top,bottom]
 
-    //pathtraceInit(&sc);
+    
 
 
     /*auto current_time = std::chrono::high_resolution_clock::now();
@@ -270,10 +270,10 @@ int main() {
         processInput(window);//Run all input checking code
 
         std::cout << delta << " is the delta\n";
-
+        pathtraceInit(&sc);
         //Ray trace image
-        //pathtrace(15);
-        sc.render();
+        pathtrace(15);
+        //sc.render();
         
         //Store image in saveImage
         for (int j = 0; j < h; j++) {
@@ -283,7 +283,7 @@ int main() {
             }
         }
 
-        //pathtraceFree();
+        pathtraceFree();
 
         std::cout << (float)sc.cam.img[100 * 1280 + 100].r << " pix 100 100\n";
 
