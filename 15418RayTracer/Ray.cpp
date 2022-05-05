@@ -2,7 +2,7 @@
 #include "Defined.h"
 #include "Transform.h"
 
-Ray Ray::transformRay(Transform transform) {
+__device__ Ray Ray::transformRay(Transform transform) {
 	Transform vecTransform = transform;
 	vecTransform.pos = Vec3(0.f);
 	Ray retRay;
@@ -13,7 +13,7 @@ Ray Ray::transformRay(Transform transform) {
 
 
 //Derived for 15-468's DIRT path tracer base code
-inline Vec3 randomOnUnitSphere(float cosphi, float theta){
+__device__ inline Vec3 randomOnUnitSphere(float cosphi, float theta){
 
 	float sinphi = sqrt(1.f - cosphi * cosphi);
 	float x = cos(theta) * sinphi;
@@ -24,7 +24,7 @@ inline Vec3 randomOnUnitSphere(float cosphi, float theta){
 
 
 
-Vec3 Hit::bounce(Ray out) {
+__device__ Vec3 Hit::bounce(Ray out) {
 	float theta = 2.f* randf()*PI;
 	float cosphi = 2.f * randf() - 1.f;
 	return vecNormalize(vecVecAdd(normS ,randomOnUnitSphere(cosphi, theta)));

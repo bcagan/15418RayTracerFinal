@@ -7,6 +7,10 @@
 #include <utility>
 
 
+__device__ void swap(float a, float b) {
+    float c(a); a = b; b = c;
+}
+
 __device__ bool sphereHit(Object& o, Ray& r, Hit& h) {
     float t0, t1;
     const Vec3 L = vecVecAdd(vecVecSub(o.t.pos, r.o), constVecMult(r.mint, r.d));
@@ -20,7 +24,7 @@ __device__ bool sphereHit(Object& o, Ray& r, Hit& h) {
     t0 = tca - thc;
     t1 = tca + thc;
 
-    if (t0 > t1) std::swap(t0, t1);
+    if (t0 > t1) swap(t0, t1);
 
     if (t0 < 0) {
         t0 = t1; // if t0 is negative, let's use t1 instead 

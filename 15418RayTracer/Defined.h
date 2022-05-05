@@ -7,26 +7,28 @@
 #include "glm/glm.hpp"
 #include <iostream>
 #include <io.h>
+#include <crt/host_defines.h>
+
 
 //All vec operators based on equivalent implementations in Scotty3D
 
 
 struct Vec3 {
-	Vec3() {
+	__device__ Vec3() {
 		x = 0.f;
 		y = 0.f;
 		z = 0.f;
 	}
-	Vec3(float a, float b, float c) {
+	__device__ Vec3(float a, float b, float c) {
 		x = a; y = b; z = c;
 	}
-	Vec3(float a) {
+	__device__ Vec3(float a) {
 		x = a; y = a; z = a;
 	}
 	float x;
 	float y;
 	float z;
-	float get(int ind) {
+	__device__ float get(int ind) {
 		switch (ind)
 		{
 		case (0):
@@ -37,7 +39,7 @@ struct Vec3 {
 			return z;
 		}
 	}
-	void set(int ind, float a) {
+	__device__ void set(int ind, float a) {
 		switch (ind) {
 		case(0):
 			x = a;
@@ -50,7 +52,7 @@ struct Vec3 {
 
 
 
-	float& operator[](int idx) {
+	__device__ float& operator[](int idx) {
 		assert(idx >= 0 && idx <= 2);
 		switch (idx)
 		{
@@ -62,7 +64,7 @@ struct Vec3 {
 			return z;
 		};
 	}
-	float operator[](int idx) const {
+	__device__ float operator[](int idx) const {
 		assert(idx >= 0 && idx <= 2);
 		switch (idx)
 		{
@@ -76,86 +78,86 @@ struct Vec3 {
 	}
 
 
-	Vec3 operator+=(Vec3 v) {
+	__device__ Vec3 operator+=(Vec3 v) {
 		x += v.x;
 		y += v.y;
 		z += v.z;
 		return *this;
 	}
-	Vec3 operator-=(Vec3 v) {
+	__device__ Vec3 operator-=(Vec3 v) {
 		x -= v.x;
 		y -= v.y;
 		z -= v.z;
 		return *this;
 	}
-	Vec3 operator*=(Vec3 v) {
+	__device__ Vec3 operator*=(Vec3 v) {
 		x *= v.x;
 		y *= v.y;
 		z *= v.z;
 		return *this;
 	}
-	Vec3 operator/=(Vec3 v) {
+	__device__ Vec3 operator/=(Vec3 v) {
 		x /= v.x;
 		y /= v.y;
 		z /= v.z;
 		return *this;
 	}
 
-	Vec3 operator+=(float s) {
+	__device__ Vec3 operator+=(float s) {
 		x += s;
 		y += s;
 		z += s;
 		return *this;
 	}
-	Vec3 operator-=(float s) {
+	__device__ Vec3 operator-=(float s) {
 		x -= s;
 		y -= s;
 		z -= s;
 		return *this;
 	}
-	Vec3 operator*=(float s) {
+	__device__ Vec3 operator*=(float s) {
 		x *= s;
 		y *= s;
 		z *= s;
 		return *this;
 	}
-	Vec3 operator/=(float s) {
+	__device__ Vec3 operator/=(float s) {
 		x /= s;
 		y /= s;
 		z /= s;
 		return *this;
 	}
 
-	Vec3 operator+(Vec3 v) const {
+	__device__ Vec3 operator+(Vec3 v) const {
 		return Vec3(x + v.x, y + v.y, z + v.z);
 	}
-	Vec3 operator-(Vec3 v) const {
+	__device__ Vec3 operator-(Vec3 v) const {
 		return Vec3(x - v.x, y - v.y, z - v.z);
 	}
-	Vec3 operator*(Vec3 v) const {
+	__device__ Vec3 operator*(Vec3 v) const {
 		return Vec3(x * v.x, y * v.y, z * v.z);
 	}
-	Vec3 operator/(Vec3 v) const {
+	__device__ Vec3 operator/(Vec3 v) const {
 		return Vec3(x / v.x, y / v.y, z / v.z);
 	}
 
-	Vec3 operator+(float s) const {
+	__device__ Vec3 operator+(float s) const {
 		return Vec3(x + s, y + s, z + s);
 	}
-	Vec3 operator-(float s) const {
+	__device__ Vec3 operator-(float s) const {
 		return Vec3(x - s, y - s, z - s);
 	}
-	Vec3 operator*(float s) const {
+	__device__ Vec3 operator*(float s) const {
 		return Vec3(x * s, y * s, z * s);
 	}
-	Vec3 operator/(float s) const {
+	__device__ Vec3 operator/(float s) const {
 		return Vec3(x / s, y / s, z / s);
 	}
 
-	bool operator==(Vec3 v) const {
+	__device__ bool operator==(Vec3 v) const {
 		return x == v.x && y == v.y && z == v.z;
 	}
-	bool operator!=(Vec3 v) const {
+	__device__ bool operator!=(Vec3 v) const {
 		return x != v.x || y != v.y || z != v.z;
 	}
 
@@ -163,28 +165,28 @@ struct Vec3 {
 };
 
 struct Vec4 {
-	Vec4() {
+	__device__ Vec4() {
 		x = 0.f;
 		y = 0.f;
 		z = 0.f;
 		w = 0.f;
 	}
-	Vec4(float a, float b, float c, float d) {
+	__device__ Vec4(float a, float b, float c, float d) {
 		x = a; y = b; z = c, w = d;
 	}
-	Vec4(float a) {
+	__device__ Vec4(float a) {
 		w = a;  x = a; y = a; z = a;
 	}
-	Vec4(Vec3 v, float a) {
+	__device__ Vec4(Vec3 v, float a) {
 		x = v.x; y = v.y; z = v.z;
 		w = a;
 	}
 	float x;
 	float y;
 	float z;
-	float w; 
-	
-	float& operator[](int idx) {
+	float w;
+
+	__device__ float& operator[](int idx) {
 		assert(idx >= 0 && idx <= 3);
 		switch (idx)
 		{
@@ -198,7 +200,7 @@ struct Vec4 {
 			return w;
 		};
 	}
-	float operator[](int idx) const {
+	__device__ float operator[](int idx) const {
 		assert(idx >= 0 && idx <= 3);
 		switch (idx)
 		{
@@ -213,28 +215,28 @@ struct Vec4 {
 		};
 	}
 
-	Vec4 operator+=(Vec4 v) {
+	__device__ Vec4 operator+=(Vec4 v) {
 		x += v.x;
 		y += v.y;
 		z += v.z;
 		w += v.w;
 		return *this;
 	}
-	Vec4 operator-=(Vec4 v) {
+	__device__ Vec4 operator-=(Vec4 v) {
 		x -= v.x;
 		y -= v.y;
 		z -= v.z;
 		w -= v.w;
 		return *this;
 	}
-	Vec4 operator*=(Vec4 v) {
+	__device__ Vec4 operator*=(Vec4 v) {
 		x *= v.x;
 		y *= v.y;
 		z *= v.z;
 		w *= v.w;
 		return *this;
 	}
-	Vec4 operator/=(Vec4 v) {
+	__device__ Vec4 operator/=(Vec4 v) {
 		x /= v.x;
 		y /= v.y;
 		z /= v.z;
@@ -242,28 +244,28 @@ struct Vec4 {
 		return *this;
 	}
 
-	Vec4 operator+=(float s) {
+	__device__ Vec4 operator+=(float s) {
 		x += s;
 		y += s;
 		z += s;
 		w += s;
 		return *this;
 	}
-	Vec4 operator-=(float s) {
+	__device__ Vec4 operator-=(float s) {
 		x -= s;
 		y -= s;
 		z -= s;
 		w -= s;
 		return *this;
 	}
-	Vec4 operator*=(float s) {
+	__device__ Vec4 operator*=(float s) {
 		x *= s;
 		y *= s;
 		z *= s;
 		w *= s;
 		return *this;
 	}
-	Vec4 operator/=(float s) {
+	__device__ Vec4 operator/=(float s) {
 		x /= s;
 		y /= s;
 		z /= s;
@@ -271,41 +273,41 @@ struct Vec4 {
 		return *this;
 	}
 
-	Vec4 operator+(Vec4 v) const {
+	__device__ Vec4 operator+(Vec4 v) const {
 		return Vec4(x + v.x, y + v.y, z + v.z, w + v.w);
 	}
-	Vec4 operator-(Vec4 v) const {
+	__device__ Vec4 operator-(Vec4 v) const {
 		return Vec4(x - v.x, y - v.y, z - v.z, w - v.w);
 	}
-	Vec4 operator*(Vec4 v) const {
+	__device__ Vec4 operator*(Vec4 v) const {
 		return Vec4(x * v.x, y * v.y, z * v.z, w * v.w);
 	}
-	Vec4 operator/(Vec4 v) const {
+	__device__ Vec4 operator/(Vec4 v) const {
 		return Vec4(x / v.x, y / v.y, z / v.z, w / v.w);
 	}
 
-	Vec4 operator+(float s) const {
+	__device__ Vec4 operator+(float s) const {
 		return Vec4(x + s, y + s, z + s, w + s);
 	}
-	Vec4 operator-(float s) const {
+	__device__ Vec4 operator-(float s) const {
 		return Vec4(x - s, y - s, z - s, w - s);
 	}
-	Vec4 operator*(float s) const {
+	__device__ Vec4 operator*(float s) const {
 		return Vec4(x * s, y * s, z * s, w * s);
 	}
-	Vec4 operator/(float s) const {
+	__device__ Vec4 operator/(float s) const {
 		return Vec4(x / s, y / s, z / s, w / s);
 	}
 
-	bool operator==(Vec4 v) const {
+	__device__ bool operator==(Vec4 v) const {
 		return x == v.x && y == v.y && z == v.z && w == v.w;
 	}
-	bool operator!=(Vec4 v) const {
+	__device__ bool operator!=(Vec4 v) const {
 		return x != v.x || y != v.y || z != v.z || w != v.w;
 	}
 
 
-	float get(int ind) {
+	__device__ float get(int ind) {
 		switch (ind)
 		{
 		case (0):
@@ -318,11 +320,11 @@ struct Vec4 {
 			return w;
 		}
 	}
-	void set(int ind, float a) {
+	__device__ void set(int ind, float a) {
 		switch (ind)
 		{
 		case (0):
-			 x = a;
+			x = a;
 		case(1):
 			y = a;
 		case(2):
@@ -335,7 +337,7 @@ struct Vec4 {
 
 struct Vec2 {
 
-	float& operator[](int idx) {
+	__device__ float& operator[](int idx) {
 		assert(idx >= 0 && idx <= 1);
 		switch (idx)
 		{
@@ -345,7 +347,7 @@ struct Vec2 {
 			return y;
 		};
 	}
-	float operator[](int idx) const {
+	__device__ float operator[](int idx) const {
 		assert(idx >= 0 && idx <= 1);
 		switch (idx)
 		{
@@ -355,19 +357,19 @@ struct Vec2 {
 			return y;
 		};
 	}
-	Vec2() {
+	__device__ Vec2() {
 		x = 0.f;
 		y = 0.f;
 	}
-	Vec2(float a) {
+	__device__ Vec2(float a) {
 		x = a; y = a;
 	}
-	Vec2(float a, float b) {
+	__device__ Vec2(float a, float b) {
 		x = a; y = b;
 	}
 	float x;
 	float y;
-	float get(int ind) {
+	__device__ float get(int ind) {
 		switch (ind)
 		{
 		case (0):
@@ -376,7 +378,7 @@ struct Vec2 {
 			return y;
 		}
 	}
-	void set(int ind, float a) {
+	__device__ void set(int ind, float a) {
 		switch (ind)
 		{
 		case (0):
@@ -388,88 +390,88 @@ struct Vec2 {
 
 
 
-	Vec2 operator+=(Vec2 v) {
+	__device__ Vec2 operator+=(Vec2 v) {
 		x += v.x;
 		y += v.y;
 		return *this;
 	}
-	Vec2 operator-=(Vec2 v) {
+	__device__ Vec2 operator-=(Vec2 v) {
 		x -= v.x;
 		y -= v.y;
 		return *this;
 	}
-	Vec2 operator*=(Vec2 v) {
+	__device__ Vec2 operator*=(Vec2 v) {
 		x *= v.x;
 		y *= v.y;
 		return *this;
 	}
-	Vec2 operator/=(Vec2 v) {
+	__device__ Vec2 operator/=(Vec2 v) {
 		x /= v.x;
 		y /= v.y;
 		return *this;
 	}
 
-	Vec2 operator+=(float s) {
+	__device__ Vec2 operator+=(float s) {
 		x += s;
 		y += s;
 		return *this;
 	}
-	Vec2 operator-=(float s) {
+	__device__ Vec2 operator-=(float s) {
 		x -= s;
 		y -= s;
 		return *this;
 	}
-	Vec2 operator*=(float s) {
+	__device__ Vec2 operator*=(float s) {
 		x *= s;
 		y *= s;
 		return *this;
 	}
-	Vec2 operator/=(float s) {
+	__device__ Vec2 operator/=(float s) {
 		x /= s;
 		y /= s;
 		return *this;
 	}
 
-	Vec2 operator+(Vec2 v) const {
+	__device__ Vec2 operator+(Vec2 v) const {
 		return Vec2(x + v.x, y + v.y);
 	}
-	Vec2 operator-(Vec2 v) const {
+	__device__ Vec2 operator-(Vec2 v) const {
 		return Vec2(x - v.x, y - v.y);
 	}
-	Vec2 operator*(Vec2 v) const {
+	__device__ Vec2 operator*(Vec2 v) const {
 		return Vec2(x * v.x, y * v.y);
 	}
-	Vec2 operator/(Vec2 v) const {
+	__device__ Vec2 operator/(Vec2 v) const {
 		return Vec2(x / v.x, y / v.y);
 	}
 
-	Vec2 operator+(float s) const {
+	__device__ Vec2 operator+(float s) const {
 		return Vec2(x + s, y + s);
 	}
-	Vec2 operator-(float s) const {
+	__device__ Vec2 operator-(float s) const {
 		return Vec2(x - s, y - s);
 	}
-	Vec2 operator*(float s) const {
+	__device__ Vec2 operator*(float s) const {
 		return Vec2(x * s, y * s);
 	}
-	Vec2 operator/(float s) const {
+	__device__ Vec2 operator/(float s) const {
 		return Vec2(x / s, y / s);
 	}
 
-	bool operator==(Vec2 v) const {
+	__device__ bool operator==(Vec2 v) const {
 		return x == v.x && y == v.y;
 	}
-	bool operator!=(Vec2 v) const {
+	__device__ bool operator!=(Vec2 v) const {
 		return x != v.x || y != v.y;
 	}
 };
-inline float vecNorm(Vec2 v) {
+__device__ inline float vecNorm(Vec2 v) {
 	return sqrt(v.x * v.x + v.y * v.y);
 }
-inline float vecNorm(Vec3 v) {
+__device__ inline float vecNorm(Vec3 v) {
 	return sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 }
-inline float vecNorm(Vec4 v) {
+__device__ inline float vecNorm(Vec4 v) {
 	return sqrt(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w);
 }
 
@@ -627,7 +629,7 @@ struct Mat3x3 {
 	Vec3 a;
 	Vec3 b;
 	Vec3 c;
-	float get(int x, int y) {
+	__device__ float get(int x, int y) {
 		switch (x) {
 		case(0):
 			return a.get(y);
@@ -637,7 +639,7 @@ struct Mat3x3 {
 			return c.get(y);
 		}
 	}
-	void set(int x, int y, float z) {
+	__device__ void set(int x, int y, float z) {
 		switch (x) {
 		case(0):
 			a.set(y, z);
@@ -807,7 +809,7 @@ struct Mat4x3 {
 	Vec3 b;
 	Vec3 c;
 	Vec3 d;
-	float get(int x, int y) {
+	__device__ float get(int x, int y) {
 		switch (x) {
 		case(0):
 			return a.get(y);
@@ -819,7 +821,7 @@ struct Mat4x3 {
 			return d.get(y);
 		}
 	}
-	void set(int x, int y, float z) {
+	__device__ void set(int x, int y, float z) {
 		switch (x) {
 		case(0):
 			a.set(y, z);
@@ -851,7 +853,7 @@ struct Mat4x4 {
 		ret.c[2] = (*this)[2][2];
 		return ret;
 	}
-	
+
 	Vec4& operator[](int idx) {
 		assert(idx >= 0 && idx <= 3);
 		switch (idx) {
@@ -905,7 +907,7 @@ struct Mat4x4 {
 		a -= s;
 		b -= s;
 		c -= s;
-		d -= s; 
+		d -= s;
 		return *this;
 	}
 	Mat4x4 operator*=(float s) {
@@ -992,7 +994,7 @@ struct Mat4x4 {
 	}
 
 	Vec4 operator*(Vec4 v) const {
-		return a*v[0]  + b*v[1] + c*v[2] + d*v[3];
+		return a * v[0] + b * v[1] + c * v[2] + d * v[3];
 	}
 
 
@@ -1024,14 +1026,14 @@ struct Mat4x4 {
 		a = Vec4(M.a, 0.f);
 		b = Vec4(M.b, 0.f);
 		c = Vec4(M.c, 0.f);
-		d = Vec4(0.f,0.f,0.f, 1.f);
+		d = Vec4(0.f, 0.f, 0.f, 1.f);
 	}
 
 	Vec4 a;
 	Vec4 b;
 	Vec4 c;
 	Vec4 d;
-	float get(int x, int y) {
+	__device__ float get(int x, int y) {
 		switch (x) {
 		case(0):
 			return a.get(y);
@@ -1043,7 +1045,7 @@ struct Mat4x4 {
 			return d.get(y);
 		}
 	}
-	void set(int x, int y, float z) {
+	__device__ void set(int x, int y, float z) {
 		switch (x) {
 		case(0):
 			a.set(y, z);
@@ -1066,17 +1068,17 @@ struct Mat4x4 {
 #define randf()  static_cast <float> (rand()) / static_cast <float> (RAND_MAX)
 struct Color3
 {
-	Color3(unsigned char c) {
+	__device__ Color3(unsigned char c) {
 		r = c;
 		g = c;
 		b = c;
 	};
-	Color3(unsigned char a, unsigned char d, unsigned char c) {
+	__device__ Color3(unsigned char a, unsigned char d, unsigned char c) {
 		r = a;
 		g = d;
 		b = c;
 	};
-	Color3(Vec3 v) { //Assume float in [0.f,1.f]
+	__device__ Color3(Vec3 v) { //Assume float in [0.f,1.f]
 		auto round = [](float f) {
 			return floor(f + 0.5f);
 		};
@@ -1084,11 +1086,11 @@ struct Color3
 		g = round(v.y * 255.f);
 		b = round(v.z * 255.f);
 	};
-	Color3() {
+	__device__ Color3() {
 		r = 255; g = 255; b = 255;
 	};
-	Vec3 toVec3() {
-		return Vec3((float)r/255.f,(float)g/255.f,(float)b/255.f);
+	__device__ Vec3 toVec3() {
+		return Vec3((float)r / 255.f, (float)g / 255.f, (float)b / 255.f);
 	};
 	unsigned char r;
 	unsigned char g;
@@ -1120,69 +1122,69 @@ inline Color3 normToColor(Vec3 n) {
 
 
 
-inline Vec4 constVecMult(float a, Vec4 v) {
+__device__ inline Vec4 constVecMult(float a, Vec4 v) {
 	return v * a;
 }
-inline Vec3 constVecMult(float a, Vec3 v) {
+__device__ inline Vec3 constVecMult(float a, Vec3 v) {
 	return v * a;
 }
-inline Vec2 constVecMult(float a, Vec2 v) {
+__device__ inline Vec2 constVecMult(float a, Vec2 v) {
 	return v * a;
 }
-inline Vec4 vecVecMult(Vec4 a, Vec4 v) {
+__device__ inline Vec4 vecVecMult(Vec4 a, Vec4 v) {
 	return a * v;
 }
-inline Vec3 vecVecMult(Vec3 a, Vec3 v) {
+__device__ inline Vec3 vecVecMult(Vec3 a, Vec3 v) {
 	return a * v;
 }
-inline Vec2 vecVecMult(Vec2 a, Vec2 v) {
+__device__ inline Vec2 vecVecMult(Vec2 a, Vec2 v) {
 	return a * v;
 }
-inline Vec4 vecVecAdd(Vec4 a, Vec4 v) {
+__device__ Vec4 vecVecAdd(Vec4 a, Vec4 v) {
 	return a + v;
 }
-inline Vec3 vecVecAdd(Vec3 a, Vec3 v) {
+__device__ Vec3 vecVecAdd(Vec3 a, Vec3 v) {
 	return a + v;
 }
-inline Vec2 vecVecAdd(Vec2 a, Vec2 v) {
+__device__ inline Vec2 vecVecAdd(Vec2 a, Vec2 v) {
 	return a + v;
 }
-inline Vec4 vecVecSub(Vec4 a, Vec4 v) {
+__device__ inline Vec4 vecVecSub(Vec4 a, Vec4 v) {
 	return a - v;
 }
-inline Vec3 vecVecSub(Vec3 a, Vec3 v) {
+__device__ inline Vec3 vecVecSub(Vec3 a, Vec3 v) {
 	return a - v;
 }
-inline Vec2 vecVecSub(Vec2 a, Vec2 v) {
+__device__ inline Vec2 vecVecSub(Vec2 a, Vec2 v) {
 	return a - v;
 }
-inline Vec4 vecVecDiv(Vec4 a, Vec4 v) {
+__device__ inline Vec4 vecVecDiv(Vec4 a, Vec4 v) {
 	return a / v;
 }
-inline Vec3 vecVecDiv(Vec3 a, Vec3 v) {
+__device__ inline Vec3 vecVecDiv(Vec3 a, Vec3 v) {
 	return a / v;
 }
-inline Vec2 vecVecDiv(Vec2 a, Vec2 v) {
+__device__ inline Vec2 vecVecDiv(Vec2 a, Vec2 v) {
 	return a / v;
 }
-inline float dot(Vec2 a, Vec2 b) {
+__device__ inline float dot(Vec2 a, Vec2 b) {
 	return a.x * b.x + a.y * b.y;
 }
-inline float dot(Vec3 a, Vec3 b) {
+__device__ inline float dot(Vec3 a, Vec3 b) {
 	return a.x * b.x + a.y * b.y + a.z * b.z;
 }
-inline float dot(Vec4 a, Vec4 b) {
+__device__ inline float dot(Vec4 a, Vec4 b) {
 	return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 }
-inline Vec3 vecNormalize(Vec3 v) {
+__device__ inline Vec3 vecNormalize(Vec3 v) {
 	return vecVecDiv(v, Vec3(vecNorm(v)));
 }
 
-inline Vec4 vecNormalize(Vec4 v) {
+__device__ inline Vec4 vecNormalize(Vec4 v) {
 	return vecVecDiv(v, Vec4(vecNorm(v)));
 }
 
-inline Vec2 vecNormalize(Vec2 v) {
+__device__ inline Vec2 vecNormalize(Vec2 v) {
 	return vecVecDiv(v, Vec2(vecNorm(v)));;
 }
 

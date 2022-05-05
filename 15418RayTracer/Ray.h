@@ -18,14 +18,14 @@ public:
 	int pixelIndex;
 	Ray transformRay(Transform transform);
 
-	Ray(Vec3 origin, Vec3 dir) {
+	__device__ Ray(Vec3 origin, Vec3 dir) {
 		mint = EPSILON;
 		maxt = INFINITY;
 		o = origin;
 		d = dir;
 	};
 
-	Ray() {
+	__device__ Ray() {
 		Vec3 origin(0.f);
 		Vec3 dir(1.f);
 		mint = EPSILON;
@@ -50,15 +50,15 @@ public:
 	Vec3 normG; //Geometric normal
 	Vec2 uv; //uv for texture if we decide to go that route, I dont think we will
 
-	Hit() {
+	__device__ Hit() {
 
 	};
 
-	Color3 emitted() {
+	__device__ Color3 emitted() {
 		return Mat.emitted;
 	};
-	Color3 albedo() {
+	__device__ Color3 albedo() {
 		return Mat.albedo;
 	};
-	Vec3 bounce(Ray out); //Return ray bouncing (in opposite direction) into material that will result in out
+	__device__ Vec3 bounce(Ray out); //Return ray bouncing (in opposite direction) into material that will result in out
 };

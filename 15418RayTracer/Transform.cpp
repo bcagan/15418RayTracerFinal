@@ -5,7 +5,7 @@
 //Be using them over quaternions because quaternions are black magic
 
 //Create transformation matrix from Transform
-Mat4x4 Transform::makeTransform() {
+__device__ Mat4x4 Transform::makeTransform() {
 	//Create rotation matrices
 	//Will do out just to make CUDA translation possible
 	//Mat3x3 defined by each column 
@@ -34,24 +34,24 @@ Mat4x4 Transform::makeTransform() {
 
 //Parent space transformations
 //Transformation defines transform from parent to local space
-Mat4x4 Transform::localToParent() {
+__device__ Mat4x4 Transform::localToParent() {
 	if (!tempMatrixFilled) makeAndSaveTransform();
 	return tempMatrix; //So, take the local space, and apply the parent to local transform to get the parent space equivalent
 }
-Mat4x4 Transform::parentToLocal() {
+__device__ Mat4x4 Transform::parentToLocal() {
 	if (!tempMatrixFilled) makeAndSaveTransform();
 	return matInverse(tempMatrix);
 }
 
 //World space transformations
-Mat4x4 Transform::localToWorld() {
+__device__ Mat4x4 Transform::localToWorld() {
 	if (!tempMatrixFilled) makeAndSaveTransform();
 	Mat4x4 res = tempMatrix; //So, take the local spa
 	if (parent != nullptr) res = matMult((parent->localToWorld()),  (Mat4x4)res);
 	return res;
 }
 
-Mat4x4 Transform::worldToLocal() {
+__device__ Mat4x4 Transform::worldToLocal() {
 	if (!tempMatrixFilled) makeAndSaveTransform();
 	Mat4x4 res = tempMatrix; //So, take the local spa
 	if (parent != nullptr) res = matMult((parent->localToWorld()) , (Mat4x4)res);

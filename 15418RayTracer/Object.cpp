@@ -4,7 +4,7 @@
 #include "glm/glm.hpp"
 #include <utility>
 
-bool BBox::hit( Ray &r, Hit& hit) {
+__device__ bool BBox::hit( Ray &r, Hit& hit) {
     double tmin = -INFINITY, tmax = INFINITY;
 
     Vec3 invdir = vecVecDiv(Vec3(1.f), r.d); 

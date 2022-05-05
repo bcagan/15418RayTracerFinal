@@ -6,11 +6,11 @@
 class Material
 {
 public:
-	Material(Color3 a, Color3 e) {
+	__device__ Material(Color3 a, Color3 e) {
 		albedo = a;
 		emitted = e;
 	}
-	Material() {
+	__device__ Material() {
 	}
 	Color3 albedo;
 	Color3 emitted;

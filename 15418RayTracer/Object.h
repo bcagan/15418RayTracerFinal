@@ -15,7 +15,7 @@ public:
 	BBox() : min(Vec3(0.f)), max(Vec3(1.f)) {}
 	Vec3 min;
 	Vec3 max;
-	bool hit( Ray& ray, Hit& hit);
+	__device__ bool hit( Ray& ray, Hit& hit);
 };
 
 class Object
