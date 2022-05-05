@@ -2,6 +2,7 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <driver_functions.h>
+#include <curand_kernel.h>
 #include <cmath>
 
 #include "Scene.h"
@@ -216,8 +217,15 @@ __global__ void generateRayFromCamera(Camera cam, int iter, int traceDepth, Ray*
 		float maxX = (float)(x + 1) / (float)cam.resX * sizeX - sizeX / 2.f;
 		float minY = (float)y / (float)cam.resY * sizeY - sizeY / 2.f;
 		float maxY = (float)(y + 1) / (float)cam.resY * sizeY - sizeY / 2.f;
-		float x = randf() * (maxX - minX) + minX; 
-		float y = randf() * (maxY - minY) + minY; 
+
+		curandState state;
+		curand_init(4321 + x, 0, 0, &state);
+
+		float rand = curand_uniform_double(&state);
+
+
+		float x = rand * (maxX - minX) + minX; 
+		float y = rand * (maxY - minY) + minY; 
 		float z = -cam.lensDistance; 
 		
 		Vec3 d = vecNormalize(Vec3(x, y, z));
