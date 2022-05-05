@@ -14,6 +14,7 @@
 #include "Scene.cpp"
 #include "glm/glm.hpp"
 #include "glm/gtx/norm.hpp"
+#include "Ray.cpp"
 
 //https://stackoverflow.com/questions/6061565/setting-up-visual-studio-intellisense-for-cuda-kernel-calls
 #ifdef __INTELLISENSE__
@@ -32,6 +33,7 @@ inline void cudaAssert(cudaError_t code, const char* file, int line, bool abort 
 		if (abort) exit(code);
 	}
 }
+
 
 static Scene* hst_scene = NULL;
 static Vec3* dev_image = NULL;
@@ -97,6 +99,7 @@ void exclusive_scan(int* device_data, int length) {
         blocks = (N / twod1 + 1 + threadsPerBlock - 1) / threadsPerBlock;
 
         upsweepKernel CUDA_KERNEL(blocks, threadsPerBlock) (N, device_data, twod1, twod);
+		//upsweepKernel<<<blocks,threadsPerBlock>>>(N, device_data, twod1, twod);
     }
     blocks = (N + threadsPerBlock - 1) / threadsPerBlock;
     set0 CUDA_KERNEL(blocks, threadsPerBlock) (N, device_data);
@@ -250,6 +253,18 @@ __global__ void generateRayFromCamera(Camera cam, int iter, int traceDepth, Ray*
 		ray.numBounces = iter;
 
 	}
+}
+
+__device__ Vec3 bounce(Hit h) {
+	curandState state;
+	curand_init(4321, 0, 0, &state);
+
+	float rand1 = curand_uniform_double(&state);
+	float rand2 = curand_uniform_double(&state);
+
+	float theta = 2.f * rand1 * PI;
+	float cosphi = 2.f * rand2 - 1.f;
+	return vecNormalize(vecVecAdd(h.normS, randomOnUnitSphere(cosphi, theta)));
 }
 
 __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int num_rays)

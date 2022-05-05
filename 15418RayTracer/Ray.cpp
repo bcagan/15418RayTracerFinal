@@ -24,7 +24,7 @@ __device__ inline Vec3 randomOnUnitSphere(float cosphi, float theta){
 
 
 
-__device__ Vec3 Hit::bounce(Ray out) {
+Vec3 Hit::bounce(Ray out) {
 	float theta = 2.f* randf()*PI;
 	float cosphi = 2.f * randf() - 1.f;
 	return vecNormalize(vecVecAdd(normS ,randomOnUnitSphere(cosphi, theta)));
