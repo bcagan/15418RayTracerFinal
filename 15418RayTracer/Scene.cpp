@@ -104,6 +104,7 @@ __device__ void Scene::render() {
             if (per > lastPerc) {
                 lastPerc = per;
                 // std::cout << "Render: " << per << "%\n";
+                printf("Render: %d percent \n", per);
             }
         }
     }

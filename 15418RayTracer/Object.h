@@ -26,7 +26,7 @@ public:
 	Transform t;
 	// added since hit is a host function and cannot be called from global functions in pathtrace.cu
 	GeomType type;
-	virtual bool hit( Ray& ray, Hit& hit) {
+	__device__ virtual bool hit( Ray& ray, Hit& hit) {
 		printf("generic\n");
 		return false;
 	}//I assumne info of the material will be populated in scene intersection func
@@ -57,34 +57,34 @@ public:
 
 	float size;
 
-	//bool hit(Ray &ray, Hit& hit) override {
-	//	Hit temp;
-	//	if (bbox.hit(ray, temp)) {
-	//		if (temp.t < ray.maxt) {
-	//			hit.t = temp.t;
-	//			hit.uv = temp.uv;
-	//			hit.Mat = Mat;
-	//			Vec3 normVec = vecNormalize(vecVecAdd((vecVecAdd(ray.o , constVecMult(hit.t , ray.d))), constVecMult(-1.f, t.pos))); 
-	//			if (abs(normVec.x) > abs(normVec.y) && abs(normVec.x) > abs(normVec.z)){
-	//				if (normVec.x < 0) hit.normG = Vec3(-1.f, 0.f, 0.f);
-	//				else hit.normG = Vec3(1.f, 0.f, 0.f);
-	//			}
-	//			else if (abs(normVec.y) > abs(normVec.x) && abs(normVec.y) > abs(normVec.z)){
-	//				if (normVec.y < 0) hit.normG = Vec3(0.f, -1.f, 0.f);
-	//				else hit.normG = Vec3(0.f, 1.f, 0.f);
-	//			}
-	//			else {
-	//				if (normVec.z < 0) hit.normG = Vec3(0.f, 0.f, -1.f);
-	//				else hit.normG = Vec3(0.f, 0.f, 1.f);
-	//			}
-	//			hit.normS = hit.normG;
-	//			hit.uv = Vec2(0.f);//Not doing right now
-	//			ray.maxt = temp.t;
-	//			return true;
-	//		}
-	//	}
-	//	return false;
-	//};
+	__device__ bool hit(Ray &ray, Hit& hit) override {
+		Hit temp;
+		if (bbox.hit(ray, temp)) {
+			if (temp.t < ray.maxt) {
+				hit.t = temp.t;
+				hit.uv = temp.uv;
+				hit.Mat = Mat;
+				Vec3 normVec = vecNormalize(vecVecAdd((vecVecAdd(ray.o , constVecMult(hit.t , ray.d))), constVecMult(-1.f, t.pos))); 
+				if (abs(normVec.x) > abs(normVec.y) && abs(normVec.x) > abs(normVec.z)){
+					if (normVec.x < 0) hit.normG = Vec3(-1.f, 0.f, 0.f);
+					else hit.normG = Vec3(1.f, 0.f, 0.f);
+				}
+				else if (abs(normVec.y) > abs(normVec.x) && abs(normVec.y) > abs(normVec.z)){
+					if (normVec.y < 0) hit.normG = Vec3(0.f, -1.f, 0.f);
+					else hit.normG = Vec3(0.f, 1.f, 0.f);
+				}
+				else {
+					if (normVec.z < 0) hit.normG = Vec3(0.f, 0.f, -1.f);
+					else hit.normG = Vec3(0.f, 0.f, 1.f);
+				}
+				hit.normS = hit.normG;
+				hit.uv = Vec2(0.f);//Not doing right now
+				ray.maxt = temp.t;
+				return true;
+			}
+		}
+		return false;
+	};
 };
 
 class Sphere : public Object {
@@ -104,5 +104,5 @@ public:
 
 	float radius = 1.f;
 
-	bool hit( Ray& ray, Hit& hit) override;
+	__device__ bool hit( Ray& ray, Hit& hit) override;
 };

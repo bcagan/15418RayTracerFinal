@@ -13,6 +13,10 @@
 #include "Object.h"
 #include <chrono>
 
+void pathtraceInit(Scene* scene);
+void pathtrace(int iter); 
+void pathtraceFree();
+
 void processInput(GLFWwindow* window) { //Function for all input code
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) { //If escape is pressed
         glfwSetWindowShouldClose(window, true); //Tell the window it should next close
@@ -315,6 +319,7 @@ int main() {
         glDeleteBuffers(1, &VBO);
     } 
     
+    // pathtraceFree();
     glDeleteVertexArrays(1, &VAO);
     glDeleteProgram(shaderProgram);
     free(saveImage);
