@@ -8,6 +8,9 @@
 #include "Scene.h"
 #include "device_launch_parameters.h"
 #include "Intersections.h"
+#include "Ray.h"
+#include "Transform.h"
+#include "Object.h"
 #include "Scene.cpp"
 #include "glm/glm.hpp"
 #include "glm/gtx/norm.hpp"
@@ -244,6 +247,7 @@ __global__ void generateRayFromCamera(Camera cam, int iter, int traceDepth, Ray*
 		ray.d = vecTransform.matVecMult(vecTransform.localToWorld(), d);
 		ray.o = cam.transform.matVecMult(cam.transform.localToWorld(), o);
 		ray.pixelIndex = index;
+		ray.numBounces = iter;
 
 	}
 }
@@ -356,9 +360,9 @@ __global__ void finalGather(int num_rays, Vec3* image, Ray* rays)
 	}
 }
 
-void pathtrace(int frame, int iter) {
+void pathtrace(int iter) {
 	// it might make more sense to define number of ray bounces in the scene rather than the ray
-	const int traceDepth = 15;
+	const int traceDepth = iter;
 	const Camera& cam = hst_scene->cam;
 	const int pixelcount = cam.resX * cam.resY;
 	// 2D block for generating ray from camera

@@ -11,6 +11,7 @@
 #include <malloc.h>
 #include "Scene.h"
 #include "Object.h"
+#include "Pathtrace.cu"
 #include <chrono>
 
 void processInput(GLFWwindow* window) { //Function for all input code
@@ -247,6 +248,8 @@ int main() {
 
     auto currentTime = std::chrono::high_resolution_clock::now();
 
+    // pathtraceInit(&sc);
+
     while (!glfwWindowShouldClose(window)) {//Loop unless user closes
 
         auto previousTime = currentTime;
@@ -258,7 +261,9 @@ int main() {
         std::cout << delta << " is the delta\n";
 
         //Ray trace image
+        // pathtrace(15);
         sc.render();
+        
         //Store image in saveImage
         for (int j = 0; j < h; j++) {
             for (int i = 0; i < w; i++) {
