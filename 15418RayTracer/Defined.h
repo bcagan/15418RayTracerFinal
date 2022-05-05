@@ -1140,10 +1140,10 @@ __device__ inline Vec3 vecVecMult(Vec3 a, Vec3 v) {
 __device__ inline Vec2 vecVecMult(Vec2 a, Vec2 v) {
 	return a * v;
 }
-__device__ Vec4 vecVecAdd(Vec4 a, Vec4 v) {
+__device__ inline Vec4 vecVecAdd(Vec4 a, Vec4 v) {
 	return a + v;
 }
-__device__ Vec3 vecVecAdd(Vec3 a, Vec3 v) {
+__device__ inline Vec3 vecVecAdd(Vec3 a, Vec3 v) {
 	return a + v;
 }
 __device__ inline Vec2 vecVecAdd(Vec2 a, Vec2 v) {

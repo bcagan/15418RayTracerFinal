@@ -4,6 +4,16 @@
 #include "glm/glm.hpp"
 #include <utility>
 
+__device__ double sstdmin(double a, double b) {
+    if (a > b) return b;
+    else return a;
+}
+
+__device__ double sstdmax(double a, double b) {
+    if (a > b) return a;
+    else return b;
+}
+
 __device__ bool BBox::hit( Ray &r, Hit& hit) {
     double tmin = -INFINITY, tmax = INFINITY;
 
@@ -14,20 +24,20 @@ __device__ bool BBox::hit( Ray &r, Hit& hit) {
     // value of t in the parametric ray equation where ray intersects max coordinate with dimension i
     double t2 = (max.x - r.o.x) * invdir.x;
 
-    tmin = std::max(tmin, std::min(t1, t2));
-    tmax = std::min(tmax, std::max(t1, t2));
+    tmin = sstdmax(tmin, sstdmin(t1, t2));
+    tmax = sstdmin(tmax, sstdmax(t1, t2));
 
     t1 = (min.y - r.o.y) * invdir.y;
     t2 = (max.y - r.o.y) * invdir.y;
 
-    tmin = std::max(tmin, std::min(t1, t2));
-    tmax = std::min(tmax, std::max(t1, t2));
+    tmin = sstdmax(tmin, sstdmin(t1, t2));
+    tmax = sstdmin(tmax, sstdmax(t1, t2));
 
     t1 = (min.z - r.o.z) * invdir.z;
     t2 = (max.z - r.o.z) * invdir.z;
 
-    tmin = std::max(tmin, std::min(t1, t2));
-    tmax = std::min(tmax, std::max(t1, t2));
+    tmin = sstdmax(tmin, sstdmin(t1, t2));
+    tmax = sstdmin(tmax, sstdmax(t1, t2));
 
     if(r.maxt >= tmin && tmin > EPSILON){
         hit.t = tmin;
@@ -38,7 +48,7 @@ __device__ bool BBox::hit( Ray &r, Hit& hit) {
     return false;
 }
 
-bool Sphere::hit( Ray& r, Hit& h) {
+__device__ bool Sphere::hit( Ray& r, Hit& h) {
    
     double t0, t1;
     Vec3 L = vecVecAdd(vecVecSub(t.pos , r.o) , constVecMult(r.mint,r.d));
@@ -52,7 +62,7 @@ bool Sphere::hit( Ray& r, Hit& h) {
     t0 = tca - thc;
     t1 = tca + thc;
 
-    if (t0 > t1) std::swap(t0, t1);
+    // if (t0 > t1) std::swap(t0, t1);
 
     if (t0 < 0) {
         t0 = t1; // if t0 is negative, let's use t1 instead 

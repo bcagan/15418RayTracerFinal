@@ -11,7 +11,6 @@
 #include <malloc.h>
 #include "Scene.h"
 #include "Object.h"
-#include "Pathtrace.cu"
 #include <chrono>
 
 void processInput(GLFWwindow* window) { //Function for all input code

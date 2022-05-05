@@ -9,12 +9,15 @@
 #include "device_launch_parameters.h"
 #include "Intersections.h"
 #include "Ray.h"
+//#include "Ray.cpp"
 #include "Transform.h"
+//#include "Transform.cpp"
 #include "Object.h"
-#include "Scene.cpp"
+//#include "Object.cpp"
+//#include "Scene.cpp"
 #include "glm/glm.hpp"
 #include "glm/gtx/norm.hpp"
-#include "Ray.cpp"
+
 
 //https://stackoverflow.com/questions/6061565/setting-up-visual-studio-intellisense-for-cuda-kernel-calls
 #ifdef __INTELLISENSE__
@@ -215,6 +218,37 @@ void pathtraceFree() {
 	cudaFree(dev_hitIndices);
 }
 
+__device__ Mat4x4 tmakeTransform(Transform t) {
+	//Create rotation matrices
+	//Will do out just to make CUDA translation possible
+	//Mat3x3 defined by each column 
+
+	//Rotation
+	Mat3x3 Rx = Mat3x3(Vec3(1.f, 0.f, 0.f), Vec3(0.f, cos(t.rot.x), sin(t.rot.x)), Vec3(0.f, -sin(t.rot.x), cos(t.rot.x)));
+	Mat3x3 Ry = Mat3x3(Vec3(cos(t.rot.y), 0.f, -sin(t.rot.y)), Vec3(0.f, 1.f, 0.f), Vec3(sin(t.rot.y), 0.f, cos(t.rot.y)));
+	Mat3x3 Rz = Mat3x3(Vec3(cos(t.rot.z), sin(t.rot.z), 0.f), Vec3(-sin(t.rot.z), cos(t.rot.z), 0.f), Vec3(0.f, 0.f, 1.f));
+	Mat3x3 R = t.matMult(Rx, t.matMult(Ry, Rz));
+
+	//Position
+	Mat4x3 P = Mat4x3(Vec3(1.f, 0.f, 0.f), Vec3(0.f, 1.f, 0.f), Vec3(0.f, 0.f, 1.f), t.pos);
+
+	//Scaling
+	Mat3x3 S = Mat3x3(Vec3(t.scale.x, 0.f, 0.f), Vec3(0.f, t.scale.y, 0.f), Vec3(0.f, 0.f, t.scale.z));
+
+	//Scale and rotate before position, scaling and rotation can be swapped 
+	Mat3x3 RS = t.matMult(R, S);
+	Mat4x4 preRes = Mat4x4(t.matMult(P, RS));
+	preRes.set(3, 3, 1.f);
+	t.tempMatrix = preRes;
+}
+
+__device__ Mat4x4 localToWorld(Transform t) {
+	if (!t.tempMatrixFilled) tmakeTransform(t);
+	Mat4x4 res = t.tempMatrix; //So, take the local spa
+	if (t.parent != nullptr) res = t.matMult((localToWorld(*t.parent)), (Mat4x4)res);
+	return res;
+}
+
 __global__ void generateRayFromCamera(Camera cam, int iter, int traceDepth, Ray* rays)
 {
 	int x = (blockIdx.x * blockDim.x) + threadIdx.x;
@@ -247,12 +281,21 @@ __global__ void generateRayFromCamera(Camera cam, int iter, int traceDepth, Ray*
 
 		Transform vecTransform = cam.transform;
 		vecTransform.pos = Vec3(0.f);
-		ray.d = vecTransform.matVecMult(vecTransform.localToWorld(), d);
-		ray.o = cam.transform.matVecMult(cam.transform.localToWorld(), o);
+		//ray.d = vecTransform.matVecMult(localToWorld(vecTransform), d);
+		//ray.o = cam.transform.matVecMult(localToWorld(cam.transform), o);
 		ray.pixelIndex = index;
 		ray.numBounces = iter;
 
 	}
+}
+
+__device__ inline Vec3 rrandomOnUnitSphere(float cosphi, float theta) {
+
+	float sinphi = sqrt(1.f - cosphi * cosphi);
+	float x = cos(theta) * sinphi;
+	float z = sin(theta) * sinphi;
+	float y = cosphi;
+	return Vec3(x, y, z);
 }
 
 __device__ Vec3 bounce(Hit h) {
@@ -264,7 +307,7 @@ __device__ Vec3 bounce(Hit h) {
 
 	float theta = 2.f * rand1 * PI;
 	float cosphi = 2.f * rand2 - 1.f;
-	return vecNormalize(vecVecAdd(h.normS, randomOnUnitSphere(cosphi, theta)));
+	return vecNormalize(vecVecAdd(h.normS, rrandomOnUnitSphere(cosphi, theta)));
 }
 
 __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int num_rays)
@@ -280,7 +323,7 @@ __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int n
 
 		if (hit.t != -1.0f) {
 			// calculate bounce ray
-			Vec3 bouncedHit = hit.bounce(r);
+			Vec3 bouncedHit = bounce(hit);
 			Ray newR = Ray(vecVecAdd(constVecMult(hit.t, r.d), r.o), bouncedHit);
 			newR.color = vecVecAdd(hit.emitted().toVec3(), vecVecMult(hit.albedo().toVec3(), r.color));
 
@@ -293,6 +336,49 @@ __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int n
 	}
 }
 
+__device__ double stdmin(double a, double b) {
+	if (a > b) return b;
+	else return a;
+}
+
+__device__ double stdmax(double a, double b) {
+	if (a > b) return a;
+	else return b;
+}
+
+__device__ bool bboxHit(BBox& b, Ray& r, Hit& hit) {
+	double tmin = -INFINITY, tmax = INFINITY;
+
+	Vec3 invdir = vecVecDiv(Vec3(1.f), r.d);
+
+	// value of t in the parametric ray equation where ray intersects min coordinate with dimension i
+	double t1 = (b.min.x - r.o.x) * invdir.x;
+	// value of t in the parametric ray equation where ray intersects max coordinate with dimension i
+	double t2 = (b.max.x - r.o.x) * invdir.x;
+
+	tmin = stdmax(tmin, stdmin(t1, t2));
+	tmax = stdmin(tmax, stdmax(t1, t2));
+
+	t1 = (b.min.y - r.o.y) * invdir.y;
+	t2 = (b.max.y - r.o.y) * invdir.y;
+
+	tmin = stdmax(tmin, stdmin(t1, t2));
+	tmax = stdmin(tmax, stdmax(t1, t2));
+
+	t1 = (b.min.z - r.o.z) * invdir.z;
+	t2 = (b.max.z - r.o.z) * invdir.z;
+
+	tmin = stdmax(tmin, stdmin(t1, t2));
+	tmax = stdmin(tmax, stdmax(t1, t2));
+
+	if (r.maxt >= tmin && tmin > EPSILON) {
+		hit.t = tmin;
+		Vec3 pos = vecVecDiv(vecVecAdd(b.max, b.min), Vec3(2.0f));
+		hit.uv = Vec2(0.f);
+		return true;
+	}
+	return false;
+}
 
 __global__ void computeIntersections(
 	int depth, int num_rays, Ray* rays, int objs_size, Object* objs, Hit* hits, int* hitPeaks, int* hitIndices
@@ -316,7 +402,7 @@ __global__ void computeIntersections(
 			Object& obj = objs[i];
 			Hit temp;
 
-			if (obj.bbox.hit(ray, temp)) {
+			if (bboxHit(obj.bbox, ray, temp)) {
 				if (obj.type == gcube) {
 					cubeHit(obj, ray, h, temp);
 				}

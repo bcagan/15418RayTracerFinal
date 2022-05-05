@@ -223,7 +223,7 @@ public:
 	float radius = 1.0f;
 
 	//Take above structures and create transformation matrix
-	Mat4x4 makeTransform();//Of note, 4 columns, 3 rows, homogenous coordinate row not accounted for. GLM has a weird naming format
+	__device__ Mat4x4 makeTransform();//Of note, 4 columns, 3 rows, homogenous coordinate row not accounted for. GLM has a weird naming format
 	__device__ Mat4x4 makeAndSaveTransform(){
 		tempMatrix = makeTransform();
 		return tempMatrix;
