@@ -108,7 +108,7 @@ void exclusive_scan(int* device_data, int length) {
 
 
 
-double cudaScan(int* inarray, int* end, int* resultarray) {
+void cudaScan(int* inarray, int* end, int* resultarray) {
     int* device_data;
     // We round the array size up to a power of 2, but elements after
     // the end of the original input are left uninitialized and not checked
