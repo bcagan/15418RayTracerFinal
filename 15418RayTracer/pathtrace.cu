@@ -256,6 +256,8 @@ __global__ void generateRayFromCamera(Camera cam, int iter, int traceDepth, Ray*
 
 	if (x < cam.resX && y < cam.resY) {
 		int index = x + (y * cam.resX);
+
+		// printf("Hello from pixel %d\n", index);
 		Ray& ray = rays[index];
 
 		float sizeY = 2.f * cam.lensDistance * tan(cam.vFov);
@@ -281,8 +283,8 @@ __global__ void generateRayFromCamera(Camera cam, int iter, int traceDepth, Ray*
 
 		Transform vecTransform = cam.transform;
 		vecTransform.pos = Vec3(0.f);
-		//ray.d = vecTransform.matVecMult(localToWorld(vecTransform), d);
-		//ray.o = cam.transform.matVecMult(localToWorld(cam.transform), o);
+		ray.d = vecTransform.matVecMult(localToWorld(vecTransform), d);
+		ray.o = cam.transform.matVecMult(localToWorld(cam.transform), o);
 		ray.pixelIndex = index;
 		ray.numBounces = iter;
 
@@ -474,7 +476,7 @@ void pathtrace(int iter) {
 
 	// 1D block for path tracing
 	const int blockSize1d = 128;
-
+	// printf("camx camy %d %d \n", cam.resX, cam.resY);
 	generateRayFromCamera CUDA_KERNEL(blocksPerGrid2d, blockSize2d) (cam, iter, traceDepth, dev_rays);
 
 	int depth = 0;

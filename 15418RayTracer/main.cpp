@@ -251,7 +251,7 @@ int main() {
 
     auto currentTime = std::chrono::high_resolution_clock::now();
 
-    // pathtraceInit(&sc);
+    pathtraceInit(&sc);
 
     while (!glfwWindowShouldClose(window)) {//Loop unless user closes
 
@@ -264,8 +264,8 @@ int main() {
         std::cout << delta << " is the delta\n";
 
         //Ray trace image
-        // pathtrace(15);
-        sc.render();
+        pathtrace(15);
+        // sc.render();
         
         //Store image in saveImage
         for (int j = 0; j < h; j++) {
@@ -319,7 +319,7 @@ int main() {
         glDeleteBuffers(1, &VBO);
     } 
     
-    // pathtraceFree();
+    pathtraceFree();
     glDeleteVertexArrays(1, &VAO);
     glDeleteProgram(shaderProgram);
     free(saveImage);
