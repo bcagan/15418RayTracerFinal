@@ -172,6 +172,7 @@ int main() {
             unsigned char b = (int)((float)j / 720.f * 255.f);
             Color3 col(r, 0, b);
             sc.cam.img[j * 1280 + i] = col;
+            //sc.cam.image[j][i] = col;
         }
     }
 
@@ -179,6 +180,7 @@ int main() {
     for (int j = 0; j < h; j++) {
         for (int i = 0; i < w; i++) {
             saveImage[j * 1280 + i] = sc.cam.img[j * 1280 + i];
+            //saveImage[j * 1280 + i] = sc.cam.image[j][i];
         }
     }
 
@@ -229,6 +231,12 @@ int main() {
     sc.addObj(cuback);
     //sc.addObj(&diffuseSphere);
 
+    sc.addObjseq(&cufloor);
+    sc.addObjseq(&curoof);
+    sc.addObjseq(&culeft);
+    sc.addObjseq(&curight);
+    sc.addObjseq(&cuback);
+
 
     int val = 255;
     float vertices[] = {
@@ -241,7 +249,7 @@ int main() {
         -1.f,1.f, 0.0f, 0.0f,0.0f,1.f, 0.f,0.f //top left
     }; //UV is x,y, [0,1] = [left, right], [0,1] = [top,bottom]
 
-    pathtraceInit(&sc);
+    //pathtraceInit(&sc);
 
 
     /*auto current_time = std::chrono::high_resolution_clock::now();
@@ -264,19 +272,20 @@ int main() {
         std::cout << delta << " is the delta\n";
 
         //Ray trace image
-        pathtrace(15);
-        // sc.render();
+        //pathtrace(15);
+        sc.render();
         
         //Store image in saveImage
         for (int j = 0; j < h; j++) {
             for (int i = 0; i < w; i++) {
                 saveImage[j * 1280 + i] = sc.cam.img[j * 1280 + i];
+                //saveImage[j * 1280 + i] = sc.cam.image[j][i];
             }
         }
 
-        pathtraceFree();
+        //pathtraceFree();
 
-        std::cout << (float)sc.cam.image[100][100].r << " pix 100 100\n";
+        std::cout << (float)sc.cam.img[100 * 1280 + 100].r << " pix 100 100\n";
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, (void*)saveImage);
         glGenerateMipmap(GL_TEXTURE_2D);

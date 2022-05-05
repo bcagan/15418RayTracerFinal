@@ -14,21 +14,25 @@
 void Scene::addObj(Object o) {
     sceneObjs.push_back(o);
 }
+void Scene::addObjseq(Object* o) {
+    sceneObjss.push_back(o);
+}
 
 __device__ bool Scene::intersect(Ray ray, Hit& hit) {
     //Presume transform is just position, not rotation or scaling, so transform defines objects world space pos
     bool hitBool = false;
     for (int o = 0; o < sceneObjs.size(); o++) {
-        auto obj = sceneObjs[o];
+        auto obj = sceneObjss[o];
         Hit temp;
-        if (obj.bbox.hit(ray,temp)) {
-            if (obj.hit(ray, hit)) {
+        if (obj->bbox.hit(ray,temp)) {
+            if (obj->hit(ray, hit)) {
                 if (hit.t < ray.maxt) {
                     ray.maxt = hit.t;
-                    hit.Mat = obj.Mat;
+                    hit.Mat = obj->Mat;
                 }
                 hitBool = true;
             }
+            
         }
     }
     return hitBool;
