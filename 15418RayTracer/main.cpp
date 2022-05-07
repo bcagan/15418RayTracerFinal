@@ -224,10 +224,12 @@ int main() {
     Sphere diffuseSphere = Sphere(Vec3(0.f, -3.f, -5.f), 3.f);
     diffuseSphere.Mat.albedo = Color3(255, 255, 255);
     diffuseSphere.Mat.emitted = Color3(0, 0, 0);
-    sc.addObj(cufloor);
-    sc.addObj(curoof);
+    
+    
     sc.addObj(culeft);
     sc.addObj(curight);
+    sc.addObj(curoof);
+    sc.addObj(cufloor);
     sc.addObj(cuback);
     //sc.addObj(&diffuseSphere);
 

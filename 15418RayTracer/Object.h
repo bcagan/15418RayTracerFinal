@@ -24,6 +24,7 @@ public:
 	Material Mat;
 	BBox bbox;
 	Transform t;
+	Vec3 pos;
 	// added since hit is a host function and cannot be called from global functions in pathtrace.cu
 	GeomType type;
 	__device__ virtual bool hit( Ray& ray, Hit& hit) {
@@ -45,6 +46,7 @@ public:
 		t.pos = p;
 		size = s;
 		type = gcube;
+		pos = p;
 		bbox = BBox(vecVecAdd(p, Vec3(s / -2.f)), vecVecAdd(p , Vec3(s / 2.f)));
 		//Set bbox
 	}

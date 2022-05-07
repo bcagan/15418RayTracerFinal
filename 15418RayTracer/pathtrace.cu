@@ -329,6 +329,7 @@ __device__ Vec3 bounce(Hit* hits, int ray_index) {
 
 	float theta = 2.f * rand1 * PI;
 	float cosphi = 2.f * rand2 - 1.f;
+
 	return vecNormalize(vecVecAdd(h.normS, rrandomOnUnitSphere(cosphi, theta)));
 }
 
@@ -341,23 +342,18 @@ __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int n
 		Ray& r = rays[ray_index];
 		Hit& hit = hits[ray_index];
 
-		// printf("hit: %f \n", hit.t);
-		// if(ray_index == 200) printf("x y z %f %f %f \n", rays[ray_index].maxt, rays[ray_index].mint, rays[ray_index].d.z);
-
 		if (hit.t != -1.0f) {
 			// calculate bounce ray
-			/*if (ray_index == 200) {
-				printf("pre rgb r: %f, g: %f, b: %f asdf %f %f %f \n", r.color.x, r.color.y, r.color.z, hit.albedo().toVec3().x, hit.albedo().toVec3().y, hit.albedo().toVec3().z);
-				printf("emitasdf %f %f %f ", hit.emitted().toVec3().x, hit.emitted().toVec3().y, hit.emitted().toVec3().z);
-			}*/
+			if (ray_index == 500) printf("oldr origin x: %f y: %f z: %f  \n", r.o.x, r.o.y, r.o.z);
+			if (ray_index == 500) printf("oldr direction x: %f y: %f z: %f  \n", r.d.x, r.d.y, r.d.z);
 			Vec3 bouncedHit = bounce(hits, ray_index);
+			
 			Ray newR = Ray(vecVecAdd(constVecMult(hit.t, r.d), r.o), bouncedHit);
+			if (ray_index == 500) printf("newrr origin x: %f y: %f z: %f  \n", newR.o.x, newR.o.y, newR.o.z);
+			if (ray_index == 500) printf("newr direction x: %f y: %f z: %f  \n", newR.d.x, newR.d.y, newR.d.z);
 			newR.color += hit.emitted().toVec3() * r.storeColor;
 			newR.storeColor = r.storeColor * hit.albedo().toVec3();
-			//printf("original store color %f  %f %f current color %f %f %f \n", r.storeColor.x, r.storeColor.y, r.storeColor.z, r.color.x, r.color.y, r.color.z);
 
-
-			//printf("ray: %f %f %f hit %f color %f %f %f \n", r.d.x, r.d.y, r.d.z, hit.t, newR.color.x, newR.color.y, newR.color.z);
 			// set up for next bounce 
 			r.d = newR.d;
 			r.o = newR.o;
@@ -366,11 +362,10 @@ __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int n
 			r.color = newR.color;
 			r.storeColor = newR.storeColor;
 			r.numBounces--;
-			//if(r.numBounces > 2) printf("store color %f  %f %f current color %f %f %f \n", r.storeColor.x, r.storeColor.y, r.storeColor.z, r.color.x, r.color.y, r.color.z);
 			
 
-			if (ray_index == 23523) {
-				printf("rgb r: %f, g: %f, b: %f \n", r.numBounces, r.color.y, r.color.z);
+			if (ray_index == 500) {
+				printf("rgb r: %f, g: %f, b: %f bounce: %f\n", r.color.x, r.color.y, r.color.z, r.numBounces);
 			}
 
 		}
@@ -391,45 +386,49 @@ __device__ double stdmax(double a, double b) {
 
 //__device__ bool bboxHit(Object& o, Ray& r, Hit& hit, int ray_index) {
 __device__ bool bboxHit(int obj_index, int ray_index, Ray* rays, Object* objs, Hit* hits) {
-	double tmin = -INFINITY, tmax = INFINITY;
+	
 	BBox& b = objs[obj_index].bbox;
+	Vec3 min = b.min;
+	Vec3 max = b.max;
+	
 	Ray& r = rays[ray_index];
-	//Hit& hit = hits[ray_index];
+	Hit& hit = hits[ray_index];
+	
 
-	/*if (ray_index == 200 && obj_index == 0) {
-		printf("bbox min x y z %f %f %f\n", b.min.x, b.min.y, b.min.z);
-		printf("bbox max x y z %f %f %f\n", b.max.x, b.max.y, b.max.z);
-		printf("ray x y z %f %f %f\n", r.d.x, r.d.y, r.d.z);
-	}*/
+	double tmin = -INFINITY, tmax = INFINITY;
 
 	Vec3 invdir = vecVecDiv(Vec3(1.f), r.d);
 
 	// value of t in the parametric ray equation where ray intersects min coordinate with dimension i
-	double t1 = (b.min.x - r.o.x) * invdir.x;
+	double t1 = (min.x - r.o.x) * invdir.x;
 	// value of t in the parametric ray equation where ray intersects max coordinate with dimension i
-	double t2 = (b.max.x - r.o.x) * invdir.x;
+	double t2 = (max.x - r.o.x) * invdir.x;
 
 	tmin = stdmax(tmin, stdmin(t1, t2));
 	tmax = stdmin(tmax, stdmax(t1, t2));
 
-	t1 = (b.min.y - r.o.y) * invdir.y;
-	t2 = (b.max.y - r.o.y) * invdir.y;
+	t1 = (min.y - r.o.y) * invdir.y;
+	t2 = (max.y - r.o.y) * invdir.y;
 
 	tmin = stdmax(tmin, stdmin(t1, t2));
 	tmax = stdmin(tmax, stdmax(t1, t2));
 
-	t1 = (b.min.z - r.o.z) * invdir.z;
-	t2 = (b.max.z - r.o.z) * invdir.z;
+	t1 = (min.z - r.o.z) * invdir.z;
+	t2 = (max.z - r.o.z) * invdir.z;
 
 	tmin = stdmax(tmin, stdmin(t1, t2));
 	tmax = stdmin(tmax, stdmax(t1, t2));
 
-	// printf("hit: %f %f \n", r.maxt, tmin);
+	if (ray_index == 500) printf("DIR rx: %f ry: %f rz: %f bboxx: %f bboxy: %f bboxz: %f\n", r.d.x, r.d.y, r.d.z, min.x, min.y, min.z);
+	if (ray_index == 500) printf("OUTSIDE tmin: %f tmax: %f hit.t: %f r.maxt: %f \n", tmin, tmax, hit.t, r.maxt);
 
-	if (r.maxt >= tmin && tmin > EPSILON) {
-		hits[ray_index].t = tmin;
+	if (r.maxt >= tmin && tmax >= tmin && tmin > EPSILON) {
+		
+		hit.t = tmin;
+		
 		Vec3 pos = vecVecDiv(vecVecAdd(b.max, b.min), Vec3(2.0f));
-		hits[ray_index].uv = Vec2(0.f);
+		hit.uv = Vec2(0.f);
+		if (ray_index == 500) printf("tmin: %f tmax: %f hit.t: %f r.maxt: %f \n", tmin, tmax, hit.t, r.maxt);
 		return true;
 	}
 	return false;
@@ -439,26 +438,30 @@ __device__ bool cubeHit(int obj_index, int ray_index, Ray* rays, Object* objs, H
 	Object& o = objs[obj_index];
 	Ray& ray = rays[ray_index];
 	Hit& hit = hits[ray_index];
+	//Hit temp;
 	if (hit.t < ray.maxt) {
-		hits[ray_index].Mat = o.Mat;
-		const Vec3 normVec = vecNormalize(vecVecAdd((vecVecAdd(ray.o, constVecMult(hit.t, ray.d))), constVecMult(-1.f, o.t.pos)));
+		hit.Mat = o.Mat;
+		
+		Vec3 normVec = vecNormalize(vecVecAdd((vecVecAdd(ray.o, constVecMult(hit.t, ray.d))), constVecMult(-1.f, o.pos)));
+		if (ray_index == 500) printf("NORMVEC: %f %f %f \n", normVec.x, normVec.y, normVec.z);
 		if (abs(normVec.x) > abs(normVec.y) && abs(normVec.x) > abs(normVec.z)) {
-			if (normVec.x < 0) hits[ray_index].normG = Vec3(-1.f, 0.f, 0.f);
-			else hits[ray_index].normG = Vec3(1.f, 0.f, 0.f);
+			if (normVec.x < 0) hit.normG = Vec3(-1.f, 0.f, 0.f);
+			else hit.normG = Vec3(1.f, 0.f, 0.f);
 		}
 		else if (abs(normVec.y) > abs(normVec.x) && abs(normVec.y) > abs(normVec.z)) {
-			if (normVec.y < 0) hits[ray_index].normG = Vec3(0.f, -1.f, 0.f);
-			else hits[ray_index].normG = Vec3(0.f, 1.f, 0.f);
+			if (normVec.y < 0) hit.normG = Vec3(0.f, -1.f, 0.f);
+			else hit.normG = Vec3(0.f, 1.f, 0.f);
 		}
 		else {
-			if (normVec.z < 0) hits[ray_index].normG = Vec3(0.f, 0.f, -1.f);
-			else hits[ray_index].normG = Vec3(0.f, 0.f, 1.f);
+			if (normVec.z < 0) hit.normG = Vec3(0.f, 0.f, -1.f);
+			else hit.normG = Vec3(0.f, 0.f, 1.f);
 		}
-		hits[ray_index].normS = hit.normG;
+		hit.normS = hit.normG;
 		hit.uv = Vec2(0.f);//Not doing right now
-		ray.maxt = hits[ray_index].t;
+		ray.maxt = hit.t;
 		return true;
 	}
+
 	return false;
 }
 
@@ -470,61 +473,41 @@ __global__ void computeIntersections(
 
 	if (ray_index < num_rays)
 	{
+		bool hitbool = false;
 		Ray& ray = rays[ray_index];
-
-		float t_min = FLT_MAX;
 		int hit_obj_index = -1;
 		Hit& h = hits[ray_index];
 
 		for (int i = 0; i < objs_size; i++)
 		{
-			Object obj = objs[i];
-			Hit temp;
+			Object& obj = objs[i];
 
-			/*if (ray_index == 200 && i == 0) {
-				printf("bbox pref max x y z %f %f %f\n", obj.bbox.max.x, obj.bbox.max.y, obj.bbox.max.z);
-				printf("bbox pref min x y z %f %f %f\n", obj.bbox.min.x, obj.bbox.min.y, obj.bbox.min.z);
-			}*/
+			
 			
 			if (bboxHit(i, ray_index, rays, objs, hits)) {
+				
 				if (obj.type == gcube) {
 					if (cubeHit(i, ray_index, rays, objs, hits)) {
-						ray.maxt = h.t;
-						h.Mat = obj.Mat;
-					}
-					else {
-						t_min = -1.0f;
-						hit_obj_index = -1;
+						if (h.t < ray.maxt) {
+							ray.maxt = h.t;
+							h.Mat = obj.Mat;
+						}
+						
+						hitbool = true;
 					}
 				}
 				else if (obj.type == gsphere) {
 					if (sphereHit(obj, ray, h)) {
-						ray.maxt = h.t;
 						h.Mat = obj.Mat;
 					}
-					else {
-						t_min = -1.0f;
-						hit_obj_index = -1;
-					}
-				}
-				else {
-					t_min = -1.0f;
-					hit_obj_index = -1;
-				}
-				
+				}		
 			}
 			
-			
-			if (h.t > 0.0f && t_min > h.t)
-			{
-				t_min = h.t;
-				hit_obj_index = i;
-			}
 		}
 
-		if (hit_obj_index == -1)
+		if (!hitbool)
 		{
-			hits[ray_index].t = -1.0f;
+			h.t = -1.0f;
 			hitPeaks[ray_index + 1] = 0;
 		}
 		else
@@ -599,6 +582,7 @@ void pathtrace(int iter) {
 			, dev_hitPeaks
 			, dev_hitIndices
 			);
+
 
 		calculateColor CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (cam, dev_rays, dev_hits, depth, num_rays);
 		
