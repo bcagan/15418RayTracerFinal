@@ -304,8 +304,8 @@ __global__ void generateRayFromCamera(Camera cam, int traceDepth, Ray* rays, int
 		ray.maxt = INFINITY;
 		ray.mint = EPSILON;
 		ray.numBounces = traceDepth;
-		ray.color = Color3(0).toVec3();
-		ray.storeColor = Vec3(1.f);
+		ray.color = Color3(0);
+		ray.storeColor = Color3();
 
 		//printf("pixX %d pixY %d minX maxX miny maxY %f %f %f %f x y %f %f \n", ix, iy, minX, maxX, minY, maxY, x, y);
 		// if(index == 200) printf("xx y z %f %f %f \n", rays[index].maxt, rays[index].mint, rays[index].d.z);
@@ -354,12 +354,12 @@ __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int n
 			Ray newR = Ray(vecVecAdd(constVecMult(hit.t, r.d), r.o), bouncedHit);
 			/*if (ray_index == 500) printf("newrr origin x: %f y: %f z: %f  \n", newR.o.x, newR.o.y, newR.o.z);
 			if (ray_index == 500) printf("newr direction x: %f y: %f z: %f  \n", newR.d.x, newR.d.y, newR.d.z);*/
-			newR.color = hit.emitted().toVec3() * r.storeColor + r.color;
-			newR.storeColor = r.storeColor * hit.albedo().toVec3();
+			newR.color = Color3(hit.emitted().toVec3() * r.storeColor.toVec3() + r.color.toVec3());
+			newR.storeColor = Color3(r.storeColor.toVec3() * hit.albedo().toVec3());
 
 			if (ray_index == 500) {
-				printf("old vs newRGB r: %f, g: %f, b: %f  r: %f, g: %f, b: %f \n", r.color.x, r.color.y, r.color.z, newR.color.x, newR.color.y, newR.color.z);
-				printf("newR.storeColor r: %f %f %f alb: %f %f %f \n ", newR.storeColor.x, newR.storeColor.y, newR.storeColor.z, hit.albedo().toVec3().x, hit.albedo().toVec3().y, hit.albedo().toVec3().z);
+				printf("old vs newRGB r: %f, g: %f, b: %f  r: %f, g: %f, b: %f \n", r.color.r, r.color.g, r.color.b, newR.color.r, newR.color.g, newR.color.b);
+				printf("newR.storeColor r: %f %f %f alb: %f %f %f\n ", newR.storeColor.r, newR.storeColor.g, newR.storeColor.b, hit.albedo().toVec3().x, hit.albedo().toVec3().y, hit.albedo().toVec3().z);
 			}
 
 			// set up for next bounce 
@@ -373,7 +373,7 @@ __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int n
 			
 
 			if (ray_index == 500) {
-				printf("rgb r: %f, g: %f, b: %f bounce: %f\n", r.color.x, r.color.y, r.color.z, r.numBounces);
+				printf("rgb r: %f, g: %f, b: %f bounce: %f\n", r.color.r, r.color.g, r.color.b, r.numBounces);
 			}
 
 		}
@@ -543,7 +543,7 @@ __global__ void finalGather(int num_rays, Vec3* image, Ray* rays, int num_sample
 	if (index < num_rays)
 	{
 		Ray ray = rays[index];
-		image[ray.pixelIndex] += (ray.color /= (float)num_samples);
+		image[ray.pixelIndex] += (ray.color.toVec3() /= (float)num_samples);
 	}
 }
 

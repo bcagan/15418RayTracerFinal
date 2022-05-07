@@ -14,8 +14,8 @@ public:
 	float mint, maxt; //min distance of ray intersection, max distance of ray intersection
 	//Example: mint may have a use I dont remember but we might not use it however when navigating the bvh tree, if we know we intersect at t = 10,
 	//then any other intersection at t >= 10 can be ruled out
-	Vec3 color;
-	Vec3 storeColor = Vec3(1.f);
+	Color3 color;
+	Color3 storeColor = Color3();
 	int pixelIndex;
 	Ray transformRay(Transform transform);
 
