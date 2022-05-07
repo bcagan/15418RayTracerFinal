@@ -37,7 +37,6 @@ inline void cudaAssert(cudaError_t code, const char* file, int line, bool abort 
 	}
 }
 
-
 static Scene* hst_scene = NULL;
 static Vec3* dev_image = NULL;
 static Color3* dev_finalImage = NULL;
@@ -263,7 +262,7 @@ __device__ Mat4x4 localToWorld(Transform t) {
 	return res;
 }
 
-__global__ void generateRayFromCamera(Camera cam, int traceDepth, Ray* rays)
+__global__ void generateRayFromCamera(Camera cam, int traceDepth, Ray* rays, int seed)
 {
 	int ix = (blockIdx.x * blockDim.x) + threadIdx.x;
 	int iy = (blockIdx.y * blockDim.y) + threadIdx.y;
@@ -282,7 +281,7 @@ __global__ void generateRayFromCamera(Camera cam, int traceDepth, Ray* rays)
 		float maxY = (float)(iy + 1) / (float)cam.resY * sizeY - sizeY / 2.f;
 
 		curandState state;
-		curand_init(12345 + index, 0, 0, &state);
+		curand_init(12345 + seed * index, 0, 0, &state);
 
 		float rand1 = curand_uniform_double(&state);
 		float rand2 = curand_uniform_double(&state);
@@ -323,10 +322,10 @@ __device__ inline Vec3 rrandomOnUnitSphere(float cosphi, float theta) {
 	return Vec3(x, y, z);
 }
 
-__device__ Vec3 bounce(Hit* hits, int ray_index) {
+__device__ Vec3 bounce(Hit* hits, int ray_index, int seed) {
 	Hit& h = hits[ray_index];
 	curandState state;
-	curand_init(4321 + ray_index, 0, 0, &state);
+	curand_init(4321 + seed * ray_index, 0, 0, &state);
 
 	float rand1 = curand_uniform_double(&state);
 	float rand2 = curand_uniform_double(&state);
@@ -337,7 +336,7 @@ __device__ Vec3 bounce(Hit* hits, int ray_index) {
 	return vecNormalize(vecVecAdd(h.normS, rrandomOnUnitSphere(cosphi, theta)));
 }
 
-__global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int num_rays)
+__global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int num_rays, int seed)
 {
 	int ray_index = (blockIdx.x * blockDim.x) + threadIdx.x;
 
@@ -348,15 +347,19 @@ __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int n
 
 		if (hit.t != -1.0f) {
 			// calculate bounce ray
-			if (ray_index == 500) printf("oldr origin x: %f y: %f z: %f  \n", r.o.x, r.o.y, r.o.z);
-			if (ray_index == 500) printf("oldr direction x: %f y: %f z: %f  \n", r.d.x, r.d.y, r.d.z);
-			Vec3 bouncedHit = bounce(hits, ray_index);
+			/*if (ray_index == 500) printf("oldr origin x: %f y: %f z: %f  \n", r.o.x, r.o.y, r.o.z);
+			if (ray_index == 500) printf("oldr direction x: %f y: %f z: %f  \n", r.d.x, r.d.y, r.d.z);*/
+			Vec3 bouncedHit = bounce(hits, ray_index, seed);
 			
 			Ray newR = Ray(vecVecAdd(constVecMult(hit.t, r.d), r.o), bouncedHit);
-			if (ray_index == 500) printf("newrr origin x: %f y: %f z: %f  \n", newR.o.x, newR.o.y, newR.o.z);
-			if (ray_index == 500) printf("newr direction x: %f y: %f z: %f  \n", newR.d.x, newR.d.y, newR.d.z);
-			newR.color += hit.emitted().toVec3() * r.storeColor;
+			/*if (ray_index == 500) printf("newrr origin x: %f y: %f z: %f  \n", newR.o.x, newR.o.y, newR.o.z);
+			if (ray_index == 500) printf("newr direction x: %f y: %f z: %f  \n", newR.d.x, newR.d.y, newR.d.z);*/
+			newR.color = hit.emitted().toVec3() * r.storeColor + r.color;
 			newR.storeColor = r.storeColor * hit.albedo().toVec3();
+
+			if (ray_index == 500) {
+				printf("old vs newRGB r: %f, g: %f, b: %f  r: %f, g: %f, b: %f \n", r.color.x, r.color.y, r.color.z, newR.color.x, newR.color.y, newR.color.z);
+			}
 
 			// set up for next bounce 
 			r.d = newR.d;
@@ -423,8 +426,8 @@ __device__ bool bboxHit(int obj_index, int ray_index, Ray* rays, Object* objs, H
 	tmin = stdmax(tmin, stdmin(t1, t2));
 	tmax = stdmin(tmax, stdmax(t1, t2));
 
-	if (ray_index == 500) printf("DIR rx: %f ry: %f rz: %f bboxx: %f bboxy: %f bboxz: %f\n", r.d.x, r.d.y, r.d.z, min.x, min.y, min.z);
-	if (ray_index == 500) printf("OUTSIDE tmin: %f tmax: %f hit.t: %f r.maxt: %f \n", tmin, tmax, hit.t, r.maxt);
+	/*if (ray_index == 500) printf("DIR rx: %f ry: %f rz: %f bboxx: %f bboxy: %f bboxz: %f\n", r.d.x, r.d.y, r.d.z, min.x, min.y, min.z);
+	if (ray_index == 500) printf("OUTSIDE tmin: %f tmax: %f hit.t: %f r.maxt: %f \n", tmin, tmax, hit.t, r.maxt);*/
 
 	if (r.maxt >= tmin && tmax >= tmin && tmin > EPSILON) {
 		
@@ -432,7 +435,7 @@ __device__ bool bboxHit(int obj_index, int ray_index, Ray* rays, Object* objs, H
 		
 		Vec3 pos = vecVecDiv(vecVecAdd(b.max, b.min), Vec3(2.0f));
 		hit.uv = Vec2(0.f);
-		if (ray_index == 500) printf("tmin: %f tmax: %f hit.t: %f r.maxt: %f \n", tmin, tmax, hit.t, r.maxt);
+		/*if (ray_index == 500) printf("tmin: %f tmax: %f hit.t: %f r.maxt: %f \n", tmin, tmax, hit.t, r.maxt);*/
 		return true;
 	}
 	return false;
@@ -571,11 +574,14 @@ void pathtrace(int iter) {
 	//Pre define final block size for image storage
 	dim3 numBlocksPixels;
 	
+
+	//
 	
 	for (int s = 0; s < hst_scene->sampleNum(); s++) {
 
-		// printf("camx camy %d %d \n", cam.resX, cam.resY);
-		generateRayFromCamera CUDA_KERNEL(blocksPerGrid2d, blockSize2d) (cam, traceDepth, dev_rays);
+		int seed = (int)(rand() * 100);
+		printf("seed %d \n", seed);
+		generateRayFromCamera CUDA_KERNEL(blocksPerGrid2d, blockSize2d) (cam, traceDepth, dev_rays, seed);
 
 		int depth = 0;
 		Ray* dev_ray_end = dev_rays + pixelcount;
@@ -585,7 +591,7 @@ void pathtrace(int iter) {
 		// Shoot ray into scene, bounce between objects, push shading chunks
 		bool iterationComplete = false;
 		while (!iterationComplete) {
-
+			
 			// clean shading chunks
 			cudaMemset(dev_hits, 0, pixelcount * sizeof(Hit));
 
@@ -606,7 +612,7 @@ void pathtrace(int iter) {
 				);
 
 
-			calculateColor CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (cam, dev_rays, dev_hits, depth, num_rays);
+			calculateColor CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (cam, dev_rays, dev_hits, depth, num_rays, seed);
 
 			cudaDeviceSynchronize();
 			depth++;
@@ -626,7 +632,7 @@ void pathtrace(int iter) {
 
 		// Assemble this iteration and apply it to the image
 		numBlocksPixels = (pixelcount + blockSize1d - 1) / blockSize1d;
-		finalGather CUDA_KERNEL(numBlocksPixels, blockSize1d) (num_rays, dev_image, dev_rays,hst_scene->sampleNum());
+		finalGather CUDA_KERNEL(numBlocksPixels, blockSize1d) (num_rays, dev_image, dev_rays, hst_scene->sampleNum());
 
 	}
 
