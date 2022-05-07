@@ -304,7 +304,7 @@ __global__ void generateRayFromCamera(Camera cam, int traceDepth, Ray* rays, int
 		ray.maxt = INFINITY;
 		ray.mint = EPSILON;
 		ray.numBounces = traceDepth;
-		ray.color = Color3().toVec3();
+		ray.color = Color3(0).toVec3();
 		ray.storeColor = Vec3(1.f);
 
 		//printf("pixX %d pixY %d minX maxX miny maxY %f %f %f %f x y %f %f \n", ix, iy, minX, maxX, minY, maxY, x, y);
@@ -359,6 +359,7 @@ __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int n
 
 			if (ray_index == 500) {
 				printf("old vs newRGB r: %f, g: %f, b: %f  r: %f, g: %f, b: %f \n", r.color.x, r.color.y, r.color.z, newR.color.x, newR.color.y, newR.color.z);
+				printf("newR.storeColor r: %f %f %f alb: %f %f %f \n ", newR.storeColor.x, newR.storeColor.y, newR.storeColor.z, hit.albedo().toVec3().x, hit.albedo().toVec3().y, hit.albedo().toVec3().z);
 			}
 
 			// set up for next bounce 
