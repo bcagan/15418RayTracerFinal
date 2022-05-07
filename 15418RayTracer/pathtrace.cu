@@ -39,7 +39,8 @@ inline void cudaAssert(cudaError_t code, const char* file, int line, bool abort 
 
 
 static Scene* hst_scene = NULL;
-static Color3* dev_image = NULL;
+static Vec3* dev_image = NULL;
+static Color3* dev_finalImage = NULL;
 static Object* dev_objs = NULL;
 static Material* dev_materials = NULL;
 static Ray* dev_rays = NULL;
@@ -192,8 +193,11 @@ void pathtraceInit(Scene* scene) {
 	const Camera& cam = hst_scene->cam;
 	const int pixelcount = cam.resX * cam.resY;
 
-	cudaMalloc(&dev_image, pixelcount * sizeof(Color3));
-	cudaMemset(dev_image, 0, pixelcount * sizeof(Color3));
+	cudaMalloc(&dev_image, pixelcount * sizeof(Vec3));
+	cudaMemset(dev_image, 0, pixelcount * sizeof(Vec3));
+
+	cudaMalloc(&dev_finalImage, pixelcount * sizeof(Color3));
+	cudaMemset(dev_finalImage, 0, pixelcount * sizeof(Color3));
 
 	cudaMalloc(&dev_rays, pixelcount * sizeof(Ray));
 	cudaMemset(dev_rays, 0, pixelcount * sizeof(Ray));
@@ -528,14 +532,24 @@ __global__ void fillIndices(int num_rays, int* hitIndices) {
 	}
 }
 
-__global__ void finalGather(int num_rays, Color3* image, Ray* rays)
+__global__ void finalGather(int num_rays, Vec3* image, Ray* rays, int num_samples)
 {
 	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
 
 	if (index < num_rays)
 	{
 		Ray ray = rays[index];
-		image[ray.pixelIndex] = Color3(ray.color);
+		image[ray.pixelIndex] += (ray.color /= (float)num_samples);
+	}
+}
+
+__global__ void color3Gather(int num_rays, Vec3* image, Color3* newImage)
+{
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+
+	if (index < num_rays)
+	{
+		newImage[index] = Color3(image[index]);
 	}
 }
 
@@ -552,69 +566,79 @@ void pathtrace(int iter) {
 
 	// 1D block for path tracing
 	const int blockSize1d = 128;
-	// printf("camx camy %d %d \n", cam.resX, cam.resY);
-	generateRayFromCamera CUDA_KERNEL(blocksPerGrid2d, blockSize2d) (cam, traceDepth, dev_rays);
+	int numblocksPathSegmentTracing;
+	
+	//Pre define final block size for image storage
+	dim3 numBlocksPixels;
+	
+	
+	for (int s = 0; s < hst_scene->sampleNum(); s++) {
 
-	int depth = 0;
-	Ray* dev_ray_end = dev_rays + pixelcount;
-	int num_rays = dev_ray_end - dev_rays;
+		// printf("camx camy %d %d \n", cam.resX, cam.resY);
+		generateRayFromCamera CUDA_KERNEL(blocksPerGrid2d, blockSize2d) (cam, traceDepth, dev_rays);
 
-	// --- PathSegment Tracing Stage ---
-	// Shoot ray into scene, bounce between objects, push shading chunks
-	bool iterationComplete = false;
-	while (!iterationComplete) {
+		int depth = 0;
+		Ray* dev_ray_end = dev_rays + pixelcount;
+		int num_rays = dev_ray_end - dev_rays;
 
-		// clean shading chunks
-		cudaMemset(dev_hits, 0, pixelcount * sizeof(Hit));
+		// --- PathSegment Tracing Stage ---
+		// Shoot ray into scene, bounce between objects, push shading chunks
+		bool iterationComplete = false;
+		while (!iterationComplete) {
 
-		// tracing
-		int numblocksPathSegmentTracing = (num_rays + blockSize1d - 1) / blockSize1d;
+			// clean shading chunks
+			cudaMemset(dev_hits, 0, pixelcount * sizeof(Hit));
 
-		fillIndices CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (num_rays, dev_hitIndices); //Fill init indices to 1...num_rays
-		
-		computeIntersections CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (
-			depth
-			, num_rays
-			, dev_rays
-			, hst_scene->sceneObjs.size()
-			, dev_objs
-			, dev_hits
-			, dev_hitPeaks
-			, dev_hitIndices
-			);
+			// tracing
+			numblocksPathSegmentTracing = (num_rays + blockSize1d - 1) / blockSize1d;
+
+			fillIndices CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (num_rays, dev_hitIndices); //Fill init indices to 1...num_rays
+
+			computeIntersections CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (
+				depth
+				, num_rays
+				, dev_rays
+				, hst_scene->sceneObjs.size()
+				, dev_objs
+				, dev_hits
+				, dev_hitPeaks
+				, dev_hitIndices
+				);
 
 
-		calculateColor CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (cam, dev_rays, dev_hits, depth, num_rays);
-		
-		
-		cudaDeviceSynchronize();
-		depth++;
-		
-		//Use find rays to contract rays into those that have ended and those that havent
+			calculateColor CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (cam, dev_rays, dev_hits, depth, num_rays);
 
-		//num_rays = concat_rays(num_rays, numblocksPathSegmentTracing, blockSize1d, dev_hitIndices);
-		
-		printf("num rays: %i , depth: %i, tracedepth: %i \n", num_rays, depth, traceDepth);
-		if (num_rays == 0 || depth > traceDepth) {
-			iterationComplete = true; // TODO: should be based off stream compaction results.
+			cudaDeviceSynchronize();
+			depth++;
+
+			//Use find rays to contract rays into those that have ended and those that havent
+
+			//num_rays = concat_rays(num_rays, numblocksPathSegmentTracing, blockSize1d, dev_hitIndices);
+
+			printf("num rays: %i , depth: %i, tracedepth: %i \n", num_rays, depth, traceDepth);
+			if (num_rays == 0 || depth > traceDepth) {
+				iterationComplete = true; // TODO: should be based off stream compaction results.
+			}
 		}
-	}
-	num_rays = dev_ray_end - dev_rays;
-	//printf("gathered %d\n", dev_rays[2000].color);
-	printf("Iteration Done\n");
-	
-	// Assemble this iteration and apply it to the image
-	dim3 numBlocksPixels = (pixelcount + blockSize1d - 1) / blockSize1d;
-	finalGather CUDA_KERNEL(numBlocksPixels, blockSize1d) (num_rays, dev_image, dev_rays);
+		num_rays = dev_ray_end - dev_rays;
+		//printf("gathered %d\n", dev_rays[2000].color);
+		printf("Iteration Done\n");
 
-	
+		// Assemble this iteration and apply it to the image
+		numBlocksPixels = (pixelcount + blockSize1d - 1) / blockSize1d;
+		finalGather CUDA_KERNEL(numBlocksPixels, blockSize1d) (num_rays, dev_image, dev_rays,hst_scene->sampleNum());
+
+	}
+
+	color3Gather CUDA_KERNEL(numBlocksPixels,blockSize1d)(pixelcount,dev_image,dev_finalImage);
+
 	///////////////////////////////////////////////////////////////////////////
 
 	// Send results to OpenGL buffer for rendering
 	// sendImageToPBO << <blocksPerGrid2d, blockSize2d >> > (cam.resolution, iter, dev_image);
 
 	// Retrieve image from GPU
-	cudaMemcpy(hst_scene->cam.img.data(), dev_image,
+	cudaMemcpy(hst_scene->cam.img.data(), dev_finalImage,
 		pixelcount * sizeof(Color3), cudaMemcpyDeviceToHost);
 
 }

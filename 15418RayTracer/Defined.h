@@ -1062,12 +1062,33 @@ struct Mat4x4 {
 
 
 
-#define EPSILON 0.00001f
+#define EPSILON 0.0001f
 #define PI 3.1415926f
 //https://stackoverflow.com/questions/686353/random-float-number-generation
 #define randf()  static_cast <float> (rand()) / static_cast <float> (RAND_MAX)
 struct Color3
 {
+
+	__device__ Color3 operator/(Color3 c) {
+		Color3 ret;
+		ret.r = r / c.r;
+		ret.g = g / c.b;
+		ret.b = b / c.b;
+		return ret;
+	};
+
+	__device__ void operator+=(Color3 c) {
+		r = r + c.r;
+		b = g + c.b;
+		b = b + c.b;
+	};
+
+	__device__ void operator/=(Color3 c) {
+		r /= r + c.r;
+		b /= g + c.b;
+		b /= b + c.b;
+	};
+
 	__device__ Color3(unsigned char c) {
 		r = c;
 		g = c;

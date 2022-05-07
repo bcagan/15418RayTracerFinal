@@ -15,6 +15,7 @@ public:
 	Color3 renderC(Ray r, int numBounces);
 	bool intersect(Ray ray, Hit& hit);
 	Color3 background = Color3(0);
+	float sampleNum() { return numSamples; }
 
 	Camera cam;
 	std::vector<Object> sceneObjs;
