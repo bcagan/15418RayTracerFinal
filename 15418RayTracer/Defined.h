@@ -1103,6 +1103,9 @@ struct Color3
 		auto round = [](float f) {
 			return floor(f + 0.5f);
 		};
+		if (v.x > 1.0f) v.x = 1.0f;
+		if (v.y > 1.0f) v.y = 1.0f;
+		if (v.z > 1.0f) v.z = 1.0f;
 		r = round(v.x * 255.f);
 		g = round(v.y * 255.f);
 		b = round(v.z * 255.f);
