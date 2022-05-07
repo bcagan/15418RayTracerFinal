@@ -354,12 +354,13 @@ __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int n
 			Ray newR = Ray(vecVecAdd(constVecMult(hit.t, r.d), r.o), bouncedHit);
 			/*if (ray_index == 500) printf("newrr origin x: %f y: %f z: %f  \n", newR.o.x, newR.o.y, newR.o.z);
 			if (ray_index == 500) printf("newr direction x: %f y: %f z: %f  \n", newR.d.x, newR.d.y, newR.d.z);*/
-			newR.color = hit.emitted().toVec3() * r.storeColor + r.color;
-			newR.storeColor = r.storeColor * hit.albedo().toVec3();
+		
+			newR.color = Color3(hit.emitted().toVec3() * r.storeColor + r.color).toVec3();
+			newR.storeColor = Color3(r.storeColor * hit.albedo().toVec3()).toVec3();
 
-			if (ray_index == 500) {
+			if (ray_index == 5000) {
 				/*printf("old vs newRGB r: %f, g: %f, b: %f  r: %f, g: %f, b: %f \n", r.color.r, r.color.g, r.color.b, newR.color.r, newR.color.g, newR.color.b);
-				printf("newR.storeColor r: %f %f %f alb: %f %f %f\n ", newR.storeColor.r, newR.storeColor.g, newR.storeColor.b, hit.albedo().toVec3().x, hit.albedo().toVec3().y, hit.albedo().toVec3().z);*/
+				printf("newR.storeColor r: %u %u %u alb: %f %f %f\n ", newR.storeColor.r, newR.storeColor.g, newR.storeColor.b, hit.albedo().toVec3().x, hit.albedo().toVec3().y, hit.albedo().toVec3().z);*/
 			}
 
 			// set up for next bounce 
@@ -372,8 +373,8 @@ __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int n
 			r.numBounces--;
 			
 
-			if (ray_index == 500) {
-				/*printf("rgb r: %f, g: %f, b: %f bounce: %f\n", r.color.r, r.color.g, r.color.b, r.numBounces);*/
+			if (ray_index == 5000) {
+				//printf("rgb r: %f, g: %f, b: %f bounce: %f\n", r.color.r, r.color.g, r.color.b, r.numBounces);
 			}
 
 		}
@@ -451,7 +452,7 @@ __device__ bool cubeHit(int obj_index, int ray_index, Ray* rays, Object* objs, H
 		hit.Mat = o.Mat;
 		
 		Vec3 normVec = vecNormalize(vecVecAdd((vecVecAdd(ray.o, constVecMult(hit.t, ray.d))), constVecMult(-1.f, o.pos)));
-		if (ray_index == 500) printf("NORMVEC: %f %f %f \n", normVec.x, normVec.y, normVec.z);
+		/*if (ray_index == 500) printf("NORMVEC: %f %f %f \n", normVec.x, normVec.y, normVec.z);*/
 		if (abs(normVec.x) > abs(normVec.y) && abs(normVec.x) > abs(normVec.z)) {
 			if (normVec.x < 0) hit.normG = Vec3(-1.f, 0.f, 0.f);
 			else hit.normG = Vec3(1.f, 0.f, 0.f);
