@@ -164,6 +164,8 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
+    // CHANGE HERE TO SWAP BETWEEN NAIVE AND CUDA OUTPUT (1)
+
     int w = 1280; int h = 720;
     Scene sc;
     for (int i = 0; i < w; i++) {
@@ -271,9 +273,13 @@ int main() {
 
         processInput(window);//Run all input checking code
 
+        // CHANGE HERE TO SWAP BETWEEN NAIVE AND CUDA OUTPUT (2)
+
         std::cout << delta << " is the delta\n";
+       
         pathtraceInit(&sc);
         //Ray trace image
+
         pathtrace(15);
         //sc.render();
         

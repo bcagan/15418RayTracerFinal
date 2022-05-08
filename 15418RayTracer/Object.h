@@ -25,6 +25,7 @@ public:
 	BBox bbox;
 	Transform t;
 	Vec3 pos;
+	float sz;
 	// added since hit is a host function and cannot be called from global functions in pathtrace.cu
 	GeomType type;
 	__device__ virtual bool hit( Ray& ray, Hit& hit) {
@@ -96,6 +97,7 @@ public:
 		pos = c;
 		type = gsphere;
 		t.radius = r;
+		sz = r;
 		bbox = BBox(vecVecAdd(c,Vec3( - r)), vecVecAdd(c ,Vec3( r)));
 	}
 
@@ -103,6 +105,7 @@ public:
 		t.pos = Vec3(0.f);
 		t.radius = 1.f;
 		pos = Vec3(0.f);
+		sz = 1.f;
 		bbox = BBox(Vec3(-1.f), Vec3(1.f));
 	}
 

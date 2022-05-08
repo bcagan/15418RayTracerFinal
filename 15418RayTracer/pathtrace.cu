@@ -489,7 +489,7 @@ __device__ bool sphereHit(int obj_index, int ray_index, Ray* rays, Object* objs,
 	// ignore if vector is facing the opposite way in any direction
 	if (tca < 0) return false;
 	const double d2 = dot(L, L) - tca * tca;
-	const double radius2 = o.t.radius * o.t.radius;
+	const double radius2 = o.sz * o.sz;
 	if (d2 > radius2) return false;
 	const double thc = sqrt(radius2 - d2);
 	t0 = tca - thc;
