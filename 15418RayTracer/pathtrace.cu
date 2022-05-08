@@ -463,16 +463,17 @@ __device__ bool sphereHit(int obj_index, int ray_index, Ray* rays, Object* objs,
 	Object& o = objs[obj_index];
 	Ray& r = rays[ray_index];
 	Hit& h = hits[ray_index];
-
+	
 	float t0, t1;
-	const Vec3 L = vecVecAdd(vecVecSub(o.pos, r.o), constVecMult(r.mint, r.d));
-	const double tca = dot(L, r.d);
+	
+	Vec3 L = vecVecSub(o.pos, r.o);
+	double tca = dot(L, r.d);
 	// ignore if vector is facing the opposite way in any direction
 	if (tca < 0) return false;
-	const double d2 = dot(L, L) - tca * tca;
-	const double radius2 = o.sz * o.sz;
+	float d2 = dot(L, L) - tca * tca;
+	float radius2 = o.sz * o.sz;
 	if (d2 > radius2) return false;
-	const double thc = sqrt(radius2 - d2);
+	float thc = sqrt(radius2 - d2);
 	t0 = tca - thc;
 	t1 = tca + thc;
 
@@ -483,17 +484,15 @@ __device__ bool sphereHit(int obj_index, int ray_index, Ray* rays, Object* objs,
 		if (t0 < 0) return false; // both t0 and t1 are negative 
 	}
 
-	if (h.t >= t0 && t0 > r.mint) {
-		if (t0 > r.mint) {
-			h.t = t0;
-		}
-		else {
-			h.t = r.mint;
-		}
+	if (t0 < r.maxt) {
+		h.t = t0;
+		h.Mat = o.Mat;
 		h.normG = vecNormalize(vecVecSub(vecVecAdd(r.o, constVecMult(h.t, r.d)), o.pos));
 		h.normS = h.normG;
 		h.uv = Vec2(0.f);
+		r.maxt = h.t;
 	}
+	
 	return true;
 }
 
@@ -514,7 +513,7 @@ __global__ void computeIntersections(
 		{
 			Object& obj = objs[i];
 
-			
+			float hitpre = h.t;
 			
 			if (bboxHit(i, ray_index, rays, objs, hits)) {
 				
@@ -529,8 +528,17 @@ __global__ void computeIntersections(
 					}
 				}
 				else if (obj.type == gsphere) {
+					
 					if (sphereHit(i, ray_index, rays, objs, hits)) {
-						h.Mat = obj.Mat;
+						if (h.t < ray.maxt) {
+							ray.maxt = h.t;
+							h.Mat = obj.Mat;
+						}
+
+						hitbool = true;
+					}
+					else {
+						h.t = hitpre;
 					}
 				}		
 			}

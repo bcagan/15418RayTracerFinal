@@ -103,6 +103,7 @@ public:
 
 	__device__ Sphere(){
 		t.pos = Vec3(0.f);
+		type = gsphere;
 		t.radius = 1.f;
 		pos = Vec3(0.f);
 		sz = 1.f;
