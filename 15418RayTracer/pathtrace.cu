@@ -251,14 +251,13 @@ __device__ Mat4x4 tmakeTransform(Transform* t) {
 __device__ Mat4x4 localToWorld(Transform t) {
 	if (!t.tempMatrixFilled) tmakeTransform(&t);
 	Mat4x4 res = t.tempMatrix; //So, take the local spa
-	//printf("parent: %lu\n", (unsigned long) t.parent);
+
 	Transform* tp = t.parent;
 	while (tp != nullptr) {
 		res = (t.parent)->tempMatrix * res;
 		tp = t.parent;
 	}
-	/*if (t.parent != nullptr) 
-	res = localToWorld(*(t.parent)) * res;*/
+
 	return res;
 }
 
@@ -307,9 +306,6 @@ __global__ void generateRayFromCamera(Camera cam, int traceDepth, Ray* rays, int
 		ray.color = Vec3(0);
 		ray.storeColor = Vec3(1.f);
 
-		//printf("pixX %d pixY %d minX maxX miny maxY %f %f %f %f x y %f %f \n", ix, iy, minX, maxX, minY, maxY, x, y);
-		// if(index == 200) printf("xx y z %f %f %f \n", rays[index].maxt, rays[index].mint, rays[index].d.z);
-
 	}
 }
 
@@ -347,21 +343,12 @@ __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int n
 
 		if (hit.t != -1.0f) {
 			// calculate bounce ray
-			/*if (ray_index == 500) printf("oldr origin x: %f y: %f z: %f  \n", r.o.x, r.o.y, r.o.z);
-			if (ray_index == 500) printf("oldr direction x: %f y: %f z: %f  \n", r.d.x, r.d.y, r.d.z);*/
 			Vec3 bouncedHit = bounce(hits, ray_index, seed);
 			
 			Ray newR = Ray(vecVecAdd(constVecMult(hit.t, r.d), r.o), bouncedHit);
-			/*if (ray_index == 500) printf("newrr origin x: %f y: %f z: %f  \n", newR.o.x, newR.o.y, newR.o.z);
-			if (ray_index == 500) printf("newr direction x: %f y: %f z: %f  \n", newR.d.x, newR.d.y, newR.d.z);*/
 		
 			newR.color = Color3(hit.emitted().toVec3() * r.storeColor + r.color).toVec3();
 			newR.storeColor = Color3(r.storeColor * hit.albedo().toVec3()).toVec3();
-
-			if (ray_index == 5000) {
-				/*printf("old vs newRGB r: %f, g: %f, b: %f  r: %f, g: %f, b: %f \n", r.color.r, r.color.g, r.color.b, newR.color.r, newR.color.g, newR.color.b);
-				printf("newR.storeColor r: %u %u %u alb: %f %f %f\n ", newR.storeColor.r, newR.storeColor.g, newR.storeColor.b, hit.albedo().toVec3().x, hit.albedo().toVec3().y, hit.albedo().toVec3().z);*/
-			}
 
 			// set up for next bounce 
 			r.d = newR.d;
@@ -372,10 +359,6 @@ __global__ void calculateColor(Camera cam, Ray* rays, Hit* hits, int iter, int n
 			r.storeColor = newR.storeColor;
 			r.numBounces--;
 			
-
-			if (ray_index == 5000) {
-				//printf("rgb r: %f, g: %f, b: %f bounce: %f\n", r.color.r, r.color.g, r.color.b, r.numBounces);
-			}
 
 		}
 		
@@ -428,8 +411,6 @@ __device__ bool bboxHit(int obj_index, int ray_index, Ray* rays, Object* objs, H
 	tmin = stdmax(tmin, stdmin(t1, t2));
 	tmax = stdmin(tmax, stdmax(t1, t2));
 
-	/*if (ray_index == 500) printf("DIR rx: %f ry: %f rz: %f bboxx: %f bboxy: %f bboxz: %f\n", r.d.x, r.d.y, r.d.z, min.x, min.y, min.z);
-	if (ray_index == 500) printf("OUTSIDE tmin: %f tmax: %f hit.t: %f r.maxt: %f \n", tmin, tmax, hit.t, r.maxt);*/
 
 	if (r.maxt >= tmin && tmax >= tmin && tmin > EPSILON) {
 		
@@ -437,7 +418,7 @@ __device__ bool bboxHit(int obj_index, int ray_index, Ray* rays, Object* objs, H
 		
 		Vec3 pos = vecVecDiv(vecVecAdd(b.max, b.min), Vec3(2.0f));
 		hit.uv = Vec2(0.f);
-		/*if (ray_index == 500) printf("tmin: %f tmax: %f hit.t: %f r.maxt: %f \n", tmin, tmax, hit.t, r.maxt);*/
+		
 		return true;
 	}
 	return false;
@@ -452,7 +433,7 @@ __device__ bool cubeHit(int obj_index, int ray_index, Ray* rays, Object* objs, H
 		hit.Mat = o.Mat;
 		
 		Vec3 normVec = vecNormalize(vecVecAdd((vecVecAdd(ray.o, constVecMult(hit.t, ray.d))), constVecMult(-1.f, o.pos)));
-		/*if (ray_index == 500) printf("NORMVEC: %f %f %f \n", normVec.x, normVec.y, normVec.z);*/
+		
 		if (abs(normVec.x) > abs(normVec.y) && abs(normVec.x) > abs(normVec.z)) {
 			if (normVec.x < 0) hit.normG = Vec3(-1.f, 0.f, 0.f);
 			else hit.normG = Vec3(1.f, 0.f, 0.f);
@@ -601,7 +582,7 @@ __global__ void color3Gather(int num_rays, Vec3* image, Color3* newImage)
 }
 
 void pathtrace(int iter) {
-	// it might make more sense to define number of ray bounces in the scene rather than the ray
+	// bounce depth
 	const int traceDepth = iter;
 	const Camera& cam = hst_scene->cam;
 	const int pixelcount = cam.resX * cam.resY;
@@ -618,13 +599,10 @@ void pathtrace(int iter) {
 	//Pre define final block size for image storage
 	dim3 numBlocksPixels;
 	
-
-	//
-	
 	for (int s = 0; s < hst_scene->sampleNum(); s++) {
 
 		int seed = (int)(rand() * 100);
-		printf("seed %d \n", seed);
+
 		generateRayFromCamera CUDA_KERNEL(blocksPerGrid2d, blockSize2d) (cam, traceDepth, dev_rays, seed);
 
 		int depth = 0;
@@ -632,11 +610,11 @@ void pathtrace(int iter) {
 		int num_rays = dev_ray_end - dev_rays;
 
 		// --- PathSegment Tracing Stage ---
-		// Shoot ray into scene, bounce between objects, push shading chunks
+		// Shoot ray into scene, bounce between objects, calculate color value of ray
 		bool iterationComplete = false;
 		while (!iterationComplete) {
 			
-			// clean shading chunks
+			// clean hit objects
 			cudaMemset(dev_hits, 0, pixelcount * sizeof(Hit));
 
 			// tracing
@@ -663,8 +641,7 @@ void pathtrace(int iter) {
 			cudaDeviceSynchronize();
 			depth++;
 
-			//Use find rays to contract rays into those that have ended and those that havent
-
+			//Use concat rays to contract rays into those that have ended and those that havent
 			//num_rays = concat_rays(num_rays, numblocksPathSegmentTracing, blockSize1d, dev_hitIndices);
 
 			printf("num rays: %i , depth: %i, tracedepth: %i \n", num_rays, depth, traceDepth);
@@ -685,9 +662,6 @@ void pathtrace(int iter) {
 	color3Gather CUDA_KERNEL(numBlocksPixels,blockSize1d)(pixelcount,dev_image,dev_finalImage);
 
 	///////////////////////////////////////////////////////////////////////////
-
-	// Send results to OpenGL buffer for rendering
-	// sendImageToPBO << <blocksPerGrid2d, blockSize2d >> > (cam.resolution, iter, dev_image);
 
 	// Retrieve image from GPU
 	cudaMemcpy(hst_scene->cam.img.data(), dev_finalImage,
