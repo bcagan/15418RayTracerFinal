@@ -93,6 +93,7 @@ class Sphere : public Object {
 public:
 	__device__ Sphere(Vec3 c, float r) : radius(r) {
 		t.pos = c; 
+		pos = c;
 		type = gsphere;
 		t.radius = r;
 		bbox = BBox(vecVecAdd(c,Vec3( - r)), vecVecAdd(c ,Vec3( r)));
@@ -101,6 +102,7 @@ public:
 	__device__ Sphere(){
 		t.pos = Vec3(0.f);
 		t.radius = 1.f;
+		pos = Vec3(0.f);
 		bbox = BBox(Vec3(-1.f), Vec3(1.f));
 	}
 

@@ -474,6 +474,48 @@ __device__ bool cubeHit(int obj_index, int ray_index, Ray* rays, Object* objs, H
 	return false;
 }
 
+__device__ void swap(float a, float b) {
+	float c(a); a = b; b = c;
+}
+
+__device__ bool sphereHit(int obj_index, int ray_index, Ray* rays, Object* objs, Hit* hits) {
+	Object& o = objs[obj_index];
+	Ray& r = rays[ray_index];
+	Hit& h = hits[ray_index];
+
+	float t0, t1;
+	const Vec3 L = vecVecAdd(vecVecSub(o.pos, r.o), constVecMult(r.mint, r.d));
+	const double tca = dot(L, r.d);
+	// ignore if vector is facing the opposite way in any direction
+	if (tca < 0) return false;
+	const double d2 = dot(L, L) - tca * tca;
+	const double radius2 = o.t.radius * o.t.radius;
+	if (d2 > radius2) return false;
+	const double thc = sqrt(radius2 - d2);
+	t0 = tca - thc;
+	t1 = tca + thc;
+
+	if (t0 > t1) swap(t0, t1);
+
+	if (t0 < 0) {
+		t0 = t1; // if t0 is negative, let's use t1 instead 
+		if (t0 < 0) return false; // both t0 and t1 are negative 
+	}
+
+	if (h.t >= t0 && t0 > r.mint) {
+		if (t0 > r.mint) {
+			h.t = t0;
+		}
+		else {
+			h.t = r.mint;
+		}
+		h.normG = vecNormalize(vecVecSub(vecVecAdd(r.o, constVecMult(h.t, r.d)), o.pos));
+		h.normS = h.normG;
+		h.uv = Vec2(0.f);
+	}
+	return true;
+}
+
 __global__ void computeIntersections(
 	int depth, int num_rays, Ray* rays, int objs_size, Object* objs, Hit* hits, int* hitPeaks, int* hitIndices
 )
@@ -506,7 +548,7 @@ __global__ void computeIntersections(
 					}
 				}
 				else if (obj.type == gsphere) {
-					if (sphereHit(obj, ray, h)) {
+					if (sphereHit(i, ray_index, rays, objs, hits)) {
 						h.Mat = obj.Mat;
 					}
 				}		
@@ -612,6 +654,8 @@ void pathtrace(int iter) {
 				, dev_hitPeaks
 				, dev_hitIndices
 				);
+
+			seed = (int)(rand() * 100);
 
 
 			calculateColor CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (cam, dev_rays, dev_hits, depth, num_rays, seed);
