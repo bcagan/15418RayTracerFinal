@@ -262,7 +262,7 @@ int main() {
     cornellSphere.addObjseq(&culeft);
     cornellSphere.addObjseq(&curight);
     cornellSphere.addObjseq(&cuback);
-    //cornellSphere.addObj(&diffuseSphere);
+    cornellSphere.addObjseq(&diffuseSphere);
 
 
     //Many boxes
@@ -275,6 +275,38 @@ int main() {
             cubetemp.Mat.emitted = Color3(emittedTemp);
             manyBoxes.addObj(cubetemp);
             manyBoxes.addObjseq(&cubetemp);
+        }
+    }
+
+
+    //Many spheres
+    Cube minSpheres[13 * 13];
+    for (float x = -30.f; x <= 30.f; x += 5.f) {
+        for (float y = -30.f; y <= 30.f; y += 5.f) {
+            Sphere sphereTemp = Sphere(Vec3(x, y, -20.f), 2.f);
+            Color3 emittedTemp = Color3(Vec3((x + 30.f) / 60.f, (y + 30.f) / 60.f, 1.f));
+            sphereTemp.Mat.albedo = Color3(255);
+            sphereTemp.Mat.emitted = Color3(emittedTemp);
+            manySpheres.addObj(sphereTemp);
+            manySpheres.addObjseq(&sphereTemp);
+        }
+    }
+
+    for (int i = 0; i < 50; i++) {
+        if (randf() < 0.5) {
+            Sphere newSphere = Sphere(Vec3(randf() * 20.f - 10.f, randf() * 20.f - 10.f, -10.f * randf()),randf()*4.f);
+            newSphere.Mat.albedo = Color3(Vec3(randf() / 2.f + 0.5f, randf() / 2.f + 0.5f, randf() / 2.f + 0.5f));
+            newSphere.Mat.emitted = Color3(Vec3(randf()/2.f+0.5f, randf() / 2.f + 0.5f, randf() / 2.f + 0.5f));
+            random.addObj(newSphere);
+            random.addObjseq(&newSphere);
+        }
+        else {
+
+            Cube newCube = Cube(Vec3(randf() * 20.f - 10.f, randf() * 20.f - 10.f, -10.f * randf()), randf() * 4.f);
+            newCube.Mat.albedo = Color3(Vec3(randf() / 2.f + 0.5f, randf() / 2.f + 0.5f, randf() / 2.f + 0.5f));
+            newCube.Mat.emitted = Color3(Vec3(randf() / 2.f + 0.5f, randf() / 2.f + 0.5f, randf() / 2.f + 0.5f));
+            random.addObj(newCube);
+            random.addObjseq(&newCube);
         }
     }
 
@@ -307,7 +339,7 @@ int main() {
 
         std::cout << delta << " is the delta\n";
        
-        pathtraceInit(&manyBoxes);
+        pathtraceInit(&random);
         //Ray trace image
 
         pathtrace(15);
@@ -316,15 +348,14 @@ int main() {
         //Store image in saveImage
         for (int j = 0; j < h; j++) {
             for (int i = 0; i < w; i++) {
-                saveImage[j * 1280 + i] = manyBoxes.cam.img[j * 1280 + i];
+                saveImage[j * 1280 + i] = random.cam.img[j * 1280 + i];
                 //saveImage[j * 1280 + i] = sc.cam.image[j][i];
             }
         }
 
         pathtraceFree();
 
-        std::cout << (float)manyBoxes.cam.img[100 * 1280 + 100].r << " pix 100 100\n";
-
+        
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, (void*)saveImage);
         glGenerateMipmap(GL_TEXTURE_2D);
 

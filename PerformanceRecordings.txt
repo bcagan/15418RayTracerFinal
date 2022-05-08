@@ -1,0 +1,40 @@
+Performance:
+15 max bounces
+	Serial:
+		Cornell
+		CornellSphere
+		ManyBoxes
+		ManySpheres
+		Random
+	Parallel:
+		Cornell
+		CornellSphere
+		ManyBoxes
+		ManySpheres
+		Random
+10 max bounces
+	Serial:
+		Cornell
+		CornellSphere
+		ManyBoxes
+		ManySpheres
+		Random
+	Parallel:
+		Cornell
+		CornellSphere
+		ManyBoxes
+		ManySpheres
+		Random
+5 max bounces
+	Serial:
+		Cornell
+		CornellSphere
+		ManyBoxes
+		ManySpheres
+		Random
+	Parallel:
+		Cornell
+		CornellSphere
+		ManyBoxes
+		ManySpheres
+		Random
