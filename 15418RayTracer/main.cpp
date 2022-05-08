@@ -152,7 +152,48 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    
+
+    //Create scene and camera
+
+    int w = 1280; int h = 720;
+    Scene sc;
+    Scene cornellPlain;
+    Scene cornellSphere;
+    Scene manyBoxes;
+    Scene manySpheres;
+    Scene random;
+    sc.background = Color3(0.f);
+    cornellPlain.background = Color3(0.f);
+    cornellSphere.background = Color3(0.f);
+    manyBoxes.background = Color3(0.f);
+    manySpheres.background = Color3(0.f);
+    random.background = Color3(0.f);
+
+    for (int i = 0; i < w; i++) {
+        unsigned char r = (int)((float)i / 1280.f * 255.f);
+        for (int j = 0; j < h; j++) {
+            unsigned char b = (int)((float)j / 720.f * 255.f);
+            Color3 col(r, 0, b);
+            sc.cam.img[j * 1280 + i] = col;
+            cornellPlain.cam.img[j * 1280 + i] = col;
+            cornellSphere.cam.img[j * 1280 + i] = col;
+            random.cam.img[j * 1280 + i] = col;
+            manyBoxes.cam.img[j * 1280 + i] = col;
+            manySpheres.cam.img[j * 1280 + i] = col;
+        }
+    }
+
+    Color3* saveImage = (Color3*)malloc(sizeof(Color3) * 1280 * 720);
+    for (int j = 0; j < h; j++) {
+        for (int i = 0; i < w; i++) {
+            saveImage[j * 1280 + i] = sc.cam.img[j * 1280 + i];
+        }
+    }
+
     //Creating tex
+
+    
 
     unsigned int tex;
     glGenTextures(1, &tex);
@@ -166,26 +207,6 @@ int main() {
     
     // CHANGE HERE TO SWAP BETWEEN NAIVE AND CUDA OUTPUT (1/2)
 
-    int w = 1280; int h = 720;
-    Scene sc;
-    for (int i = 0; i < w; i++) {
-        unsigned char r = (int)((float)i / 1280.f * 255.f);
-        for (int j = 0; j < h; j++) {
-            unsigned char b = (int)((float)j / 720.f * 255.f);
-            Color3 col(r, 0, b);
-            sc.cam.img[j * 1280 + i] = col;
-            //sc.cam.image[j][i] = col;
-        }
-    }
-
-    Color3* saveImage = (Color3*)malloc(sizeof(Color3)*1280*720);
-    for (int j = 0; j < h; j++) {
-        for (int i = 0; i < w; i++) {
-            saveImage[j * 1280 + i] = sc.cam.img[j * 1280 + i];
-            //saveImage[j * 1280 + i] = sc.cam.image[j][i];
-        }
-    }
-
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, (void*)saveImage);
     glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -195,22 +216,11 @@ int main() {
     glUseProgram(shaderProgram);
     glUniform1i(glGetUniformLocation(shaderProgram, "inTex"), 0);
 
-    //Create scene and camera
-    sc.background = Color3(0.f);
-    //Assume camera is facing -z with up as +y as default
-    /*Sphere sph = Sphere(Vec3(12.f, 0.f, -10.f), 10.f);
-    sph.Mat.albedo = Color3(255, 255, 255);
-    sph.Mat.emitted = Color3(255, 255, 255);
-    Sphere sph2 = Sphere(Vec3(-12.f, 0.f, -10.f), 10.f);
-    sph2.Mat.albedo = Color3(255, 255, 255);
-    sph2.Mat.emitted = Color3(0, 0, 0);
-    sc.addObj(&sph);
-    sc.addObj(&sph2);
-    */
 
+    //Cornellboxes
     Cube cufloor = Cube(Vec3(0.f, -10.f, -5.f), 10.f);
-    cufloor.Mat.albedo = Color3(255,255,255);
-    cufloor.Mat.emitted = Color3(0,0,0);
+    cufloor.Mat.albedo = Color3(255, 255, 255);
+    cufloor.Mat.emitted = Color3(0, 0, 0);
     Cube culeft = Cube(Vec3(10.f, 0.f, -5.f), 10.f);
     culeft.Mat.albedo = Color3(255, 0, 0);
     culeft.Mat.emitted = Color3(0, 0, 0);
@@ -226,20 +236,79 @@ int main() {
     Sphere diffuseSphere = Sphere(Vec3(0.f, -3.f, -5.f), 3.f);
     diffuseSphere.Mat.albedo = Color3(255, 255, 255);
     diffuseSphere.Mat.emitted = Color3(0, 0, 0);
-    
-    
-    sc.addObj(culeft);
-    sc.addObj(curight);
-    sc.addObj(curoof);
-    sc.addObj(cufloor);
-    sc.addObj(cuback);
-    //sc.addObj(&diffuseSphere);
 
-    sc.addObjseq(&cufloor);
-    sc.addObjseq(&curoof);
-    sc.addObjseq(&culeft);
-    sc.addObjseq(&curight);
-    sc.addObjseq(&cuback);
+    cornellPlain.addObj(culeft);
+    cornellPlain.addObj(curight);
+    cornellPlain.addObj(curoof);
+    cornellPlain.addObj(cufloor);
+    cornellPlain.addObj(cuback);
+
+    cornellPlain.addObjseq(&cufloor);
+    cornellPlain.addObjseq(&curoof);
+    cornellPlain.addObjseq(&culeft);
+    cornellPlain.addObjseq(&curight);
+    cornellPlain.addObjseq(&cuback);
+    
+
+    cornellSphere.addObj(culeft);
+    cornellSphere.addObj(curight);
+    cornellSphere.addObj(curoof);
+    cornellSphere.addObj(cufloor);
+    cornellSphere.addObj(cuback);
+    cornellSphere.addObj(diffuseSphere);
+
+    cornellSphere.addObjseq(&cufloor);
+    cornellSphere.addObjseq(&curoof);
+    cornellSphere.addObjseq(&culeft);
+    cornellSphere.addObjseq(&curight);
+    cornellSphere.addObjseq(&cuback);
+    cornellSphere.addObjseq(&diffuseSphere);
+
+
+    //Many boxes
+    Cube miniCubes[13 * 13];
+    for (float x = -30.f; x <= 30.f; x += 5.f) {
+        for (float y = -30.f; y <= 30.f; y += 5.f) {
+            Cube cubetemp = Cube(Vec3(x, y, -20.f), 2.f);
+            Color3 emittedTemp = Color3(Vec3((x + 30.f) / 60.f, (y + 30.f) / 60.f, 1.f));
+            cubetemp.Mat.albedo = Color3(255);
+            cubetemp.Mat.emitted = Color3(emittedTemp);
+            manyBoxes.addObj(cubetemp);
+            manyBoxes.addObjseq(&cubetemp);
+        }
+    }
+
+
+    //Many spheres
+    Cube minSpheres[13 * 13];
+    for (float x = -30.f; x <= 30.f; x += 5.f) {
+        for (float y = -30.f; y <= 30.f; y += 5.f) {
+            Sphere sphereTemp = Sphere(Vec3(x, y, -20.f), 2.f);
+            Color3 emittedTemp = Color3(Vec3((x + 30.f) / 60.f, (y + 30.f) / 60.f, 1.f));
+            sphereTemp.Mat.albedo = Color3(255);
+            sphereTemp.Mat.emitted = Color3(emittedTemp);
+            manySpheres.addObj(sphereTemp);
+            manySpheres.addObjseq(&sphereTemp);
+        }
+    }
+
+    for (int i = 0; i < 50; i++) {
+        if (randf() < 0.5) {
+            Sphere newSphere = Sphere(Vec3(randf() * 20.f - 10.f, randf() * 20.f - 10.f, -10.f * randf()),randf()*4.f);
+            newSphere.Mat.albedo = Color3(Vec3(randf() / 2.f + 0.5f, randf() / 2.f + 0.5f, randf() / 2.f + 0.5f));
+            newSphere.Mat.emitted = Color3(Vec3(randf()/2.f+0.5f, randf() / 2.f + 0.5f, randf() / 2.f + 0.5f));
+            random.addObj(newSphere);
+            random.addObjseq(&newSphere);
+        }
+        else {
+
+            Cube newCube = Cube(Vec3(randf() * 20.f - 10.f, randf() * 20.f - 10.f, -10.f * randf()), randf() * 4.f);
+            newCube.Mat.albedo = Color3(Vec3(randf() / 2.f + 0.5f, randf() / 2.f + 0.5f, randf() / 2.f + 0.5f));
+            newCube.Mat.emitted = Color3(Vec3(randf() / 2.f + 0.5f, randf() / 2.f + 0.5f, randf() / 2.f + 0.5f));
+            random.addObj(newCube);
+            random.addObjseq(&newCube);
+        }
+    }
 
 
     int val = 255;
@@ -253,13 +322,6 @@ int main() {
         -1.f,1.f, 0.0f, 0.0f,0.0f,1.f, 0.f,0.f //top left
     }; //UV is x,y, [0,1] = [left, right], [0,1] = [top,bottom]
 
-    
-
-
-    /*auto current_time = std::chrono::high_resolution_clock::now();
-			static auto previous_time = current_time;
-			float elapsed = std::chrono::duration< float >(current_time - previous_time).count();
-			previous_time = current_time;*/
 
     auto currentTime = std::chrono::high_resolution_clock::now();
 
@@ -277,7 +339,7 @@ int main() {
 
         std::cout << delta << " is the delta\n";
        
-        pathtraceInit(&sc);
+        pathtraceInit(&random);
         //Ray trace image
 
         pathtrace(15);
@@ -286,15 +348,14 @@ int main() {
         //Store image in saveImage
         for (int j = 0; j < h; j++) {
             for (int i = 0; i < w; i++) {
-                saveImage[j * 1280 + i] = sc.cam.img[j * 1280 + i];
+                saveImage[j * 1280 + i] = random.cam.img[j * 1280 + i];
                 //saveImage[j * 1280 + i] = sc.cam.image[j][i];
             }
         }
 
         pathtraceFree();
 
-        std::cout << (float)sc.cam.img[100 * 1280 + 100].r << " pix 100 100\n";
-
+        
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, (void*)saveImage);
         glGenerateMipmap(GL_TEXTURE_2D);
 
