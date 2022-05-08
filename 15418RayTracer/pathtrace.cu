@@ -17,6 +17,7 @@
 //#include "Scene.cpp"
 #include "glm/glm.hpp"
 #include "glm/gtx/norm.hpp"
+#include <chrono>
 
 
 //https://stackoverflow.com/questions/6061565/setting-up-visual-studio-intellisense-for-cuda-kernel-calls
@@ -598,12 +599,25 @@ void pathtrace(int iter) {
 	
 	//Pre define final block size for image storage
 	dim3 numBlocksPixels;
+
+	float generateDelta = 0.f;
+	float intersectionDelta = 0.f;
+	//float refactorDelta = 0.f;
+	float colorDelta = 0.f;
+	float syncDelta = 0.f;
+	float loadDelta = 0.f;
 	
 	for (int s = 0; s < hst_scene->sampleNum(); s++) {
 
 		int seed = (int)(rand() * 100);
 
+		auto generateStart  = std::chrono::high_resolution_clock::now();
+
 		generateRayFromCamera CUDA_KERNEL(blocksPerGrid2d, blockSize2d) (cam, traceDepth, dev_rays, seed);
+
+		auto generateEnd = std::chrono::high_resolution_clock::now();
+		generateDelta += std::chrono::duration< float >(generateEnd - generateStart).count();
+
 
 		int depth = 0;
 		Ray* dev_ray_end = dev_rays + pixelcount;
@@ -612,13 +626,18 @@ void pathtrace(int iter) {
 		// --- PathSegment Tracing Stage ---
 		// Shoot ray into scene, bounce between objects, calculate color value of ray
 		bool iterationComplete = false;
+
+		float iterationCounter = 0.f;
+
 		while (!iterationComplete) {
-			
+			iterationCounter++;
 			// clean hit objects
 			cudaMemset(dev_hits, 0, pixelcount * sizeof(Hit));
 
 			// tracing
 			numblocksPathSegmentTracing = (num_rays + blockSize1d - 1) / blockSize1d;
+
+			auto intersectionStart = std::chrono::high_resolution_clock::now();
 
 			fillIndices CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (num_rays, dev_hitIndices); //Fill init indices to 1...num_rays
 
@@ -633,38 +652,61 @@ void pathtrace(int iter) {
 				, dev_hitIndices
 				);
 
+			auto intersectionEnd = std::chrono::high_resolution_clock::now();
+			intersectionDelta += std::chrono::duration< float >(intersectionEnd - intersectionStart).count();
+
 			seed = (int)(rand() * 100);
 
+			auto colorStart = std::chrono::high_resolution_clock::now();
 
 			calculateColor CUDA_KERNEL(numblocksPathSegmentTracing, blockSize1d) (cam, dev_rays, dev_hits, depth, num_rays, seed);
 
+
+			auto colorEnd = std::chrono::high_resolution_clock::now();
+
+			auto syncStart = std::chrono::high_resolution_clock::now();
 			cudaDeviceSynchronize();
+			auto syncEnd = std::chrono::high_resolution_clock::now();
+			colorDelta += std::chrono::duration< float >(colorEnd - colorStart).count();
+			syncDelta += std::chrono::duration<float>(syncEnd - syncStart).count();
 			depth++;
 
 			//Use concat rays to contract rays into those that have ended and those that havent
 			//num_rays = concat_rays(num_rays, numblocksPathSegmentTracing, blockSize1d, dev_hitIndices);
+			//Unable to figure out bug that broke this so unused, however, this would have helped improve parallelized speedup
+			//By only allocating threads for still active rays
 
-			printf("num rays: %i , depth: %i, tracedepth: %i \n", num_rays, depth, traceDepth);
+			//printf("num rays: %i , depth: %i, tracedepth: %i \n", num_rays, depth, traceDepth);
 			if (num_rays == 0 || depth > traceDepth) {
 				iterationComplete = true; // TODO: should be based off stream compaction results.
 			}
 		}
 		num_rays = dev_ray_end - dev_rays;
 		//printf("gathered %d\n", dev_rays[2000].color);
-		printf("Iteration Done\n");
+		//printf("Iteration Done\n");
 
 		// Assemble this iteration and apply it to the image
 		numBlocksPixels = (pixelcount + blockSize1d - 1) / blockSize1d;
 		finalGather CUDA_KERNEL(numBlocksPixels, blockSize1d) (num_rays, dev_image, dev_rays, hst_scene->sampleNum());
 
+		
 	}
+
 
 	color3Gather CUDA_KERNEL(numBlocksPixels,blockSize1d)(pixelcount,dev_image,dev_finalImage);
 
 	///////////////////////////////////////////////////////////////////////////
 
+
+	auto loadStart = std::chrono::high_resolution_clock::now();
+	
 	// Retrieve image from GPU
 	cudaMemcpy(hst_scene->cam.img.data(), dev_finalImage,
 		pixelcount * sizeof(Color3), cudaMemcpyDeviceToHost);
+
+	auto loadEnd = std::chrono::high_resolution_clock::now();
+	loadDelta += std::chrono::duration< float >(loadEnd - loadStart).count();
+
+	printf("Specific render times: Ray Generation: %f Intersection: %f Ray Color Evaluation: %f Synchronization: %f Loading Image (Device to Host): %f\n", generateDelta,intersectionDelta,colorDelta,syncDelta, loadDelta);
 
 }
