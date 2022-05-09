@@ -1,6 +1,9 @@
 # 15418FinalProj
 Ben Cagan and Kiran Khambhla: Path Tracing with CUDA
-**BVH Tree Ray Tracing with CUDA**
+**Ray Tracing with CUDA**
+
+**PRESENTATION**
+https://drive.google.com/file/d/1p8AookxAq4dRjuBfD1vTGcy_yCCRoTag/view?usp=sharing
 
 **Summary:**
 
