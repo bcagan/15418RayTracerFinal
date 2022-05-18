@@ -42,7 +42,7 @@ We plan to use the GHC machines with their RTX 2080s. We mostly will start from 
 
 **Platform Choice**
 
-GHC 2080s - If possible also run on local GPU. C++/CUDA - Rendering image: If possible output to window via OpenGL, if not possible (due to SSH), based on image saving from Assignment 2. We need to compute a lot (many rays being traced at once) of very similar protocols in parallel, CUDA seems to be the best option.
+Local GPU (Tested on RTX 3070 Laptop). C++/CUDA - Rendering image: If possible output to window via OpenGL, if not possible (due to SSH), based on image saving from Assignment 2. We need to compute a lot (many rays being traced at once) of very similar protocols in parallel, CUDA seems to be the best option.
 
 **Schedule**
 
